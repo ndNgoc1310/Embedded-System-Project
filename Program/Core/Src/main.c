@@ -2,15 +2,15 @@
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
-#include "i2c.h"
-#include "gpio.h"
 #include "stdbool.h"
 
 /* Private variables ---------------------------------------------------------*/
-
+I2C_HandleTypeDef hi2c1;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_I2C1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 #define DS3231_ADDRESS 0xD0
@@ -89,7 +89,8 @@ void Set_Alarm (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t do
 
   // Mask bits to set the Control register in the RTC module
     // Address 0Eh: A1IE = 1, INTCN = 1
-  uint8_t ctrl_alarm = 5;
+  //uint8_t ctrl_alarm = 5;
+  uint8_t ctrl_alarm = 1; // Test the effect of the EOSC bit of Control register of the RTC module
 
   // A mask bit to set the alarm modes (Bit 7) in the RTC module
   uint8_t maskBit = 128;
@@ -174,6 +175,22 @@ void Set_Alarm (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t do
   HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, 0x0E, 1, &ctrl_alarm, 1, 1000);
 }
 
+// Temp variable to read value from Port B (Pin 4) and check the interrupt from INT/SQW pin of RTC module 
+uint8_t PB4;
+
+// Temp array to read values of Alarm 1 registers from RTC module
+uint8_t alarm_check[4];
+
+// Temp variable to read values of Control register from RTC module
+uint8_t ctrl_check;
+
+// Temp variable to read values of Status register from RTC module
+uint8_t status_check;
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -185,24 +202,32 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
-
+ 
   // Run only once after reset the RTC module to initially set the time
   //Set_Time (00, 55, 12, 5, 13, 3, 25);
 
   // Run only to initially set the alarm  for the RTC module
-  //Set_Alarm (0, 0, 0, 0, 0, 0);
+  Set_Alarm (0, 0, 0, 0, 0, 0);
 
-  bool tracePB4;
-
+  /* Infinite loop */
   while (1)
   {
 	  Get_Time();
+	  if(HAL_GPIO_ReadPin(Test_GPIO_Port, Test_Pin) == 1)
+    {
+      PB4 += 1;
+    }
+	  HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x07, 1, alarm_check, 4, 1000);
+	  HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x0E, 1, &ctrl_check, 1, 1000);
+    HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x0F, 1, &status_check, 1, 1000);
 	  HAL_Delay(500);
   }
-
 }
 
-
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -236,6 +261,68 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C1_Init 2 */
+
+  /* USER CODE END I2C1_Init 2 */
+
+}
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+
+  /* USER CODE END MX_GPIO_Init_1 */
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin : Test_Pin */
+  GPIO_InitStruct.Pin = Test_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(Test_GPIO_Port, &GPIO_InitStruct);
+
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+
+  /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
