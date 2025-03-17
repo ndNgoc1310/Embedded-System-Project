@@ -10,9 +10,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
   2 .rodata       0000002c  08002080  08002080  00003080  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   3 .ARM.extab    00000000  080020ac  080020ac  0000400c  2**0
-                  CONTENTS
+                  CONTENTS, READONLY
   4 .ARM          00000000  080020ac  080020ac  0000400c  2**0
-                  CONTENTS
+                  CONTENTS, READONLY
   5 .preinit_array 00000000  080020ac  080020ac  0000400c  2**0
                   CONTENTS, ALLOC, LOAD, DATA
   6 .init_array   00000004  080020ac  080020ac  000030ac  2**2
@@ -27,25 +27,25 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000029  00000000  00000000  0000400c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   000060d6  00000000  00000000  00004035  2**0
+ 12 .debug_info   00006191  00000000  00000000  00004035  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 0000141d  00000000  00000000  0000a10b  2**0
+ 13 .debug_abbrev 0000141c  00000000  00000000  0000a1c6  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 000006e0  00000000  00000000  0000b528  2**3
+ 14 .debug_aranges 000006e8  00000000  00000000  0000b5e8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 0000053a  00000000  00000000  0000bc08  2**0
+ 15 .debug_rnglists 00000541  00000000  00000000  0000bcd0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00016148  00000000  00000000  0000c142  2**0
+ 16 .debug_macro  0001619e  00000000  00000000  0000c211  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000949c  00000000  00000000  0002228a  2**0
+ 17 .debug_line   000095b6  00000000  00000000  000223af  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0007e5c5  00000000  00000000  0002b726  2**0
+ 18 .debug_str    0007e6d2  00000000  00000000  0002b965  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  000a9ceb  2**0
+ 19 .comment      00000043  00000000  00000000  000aa037  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00001ad8  00000000  00000000  000a9d30  2**2
+ 20 .debug_frame  00001b00  00000000  00000000  000aa07c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000083  00000000  00000000  000ab808  2**0
+ 21 .debug_line_str 00000083  00000000  00000000  000abb7c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -237,17 +237,21 @@ int bcdToDec(uint8_t val)
 	...
 
 08000234 <Get_Time>:
-
 	HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, 0x00, 1, set_time, 7, 1000);
 }
 
+// Function to get time
 void Get_Time (void)
 {
  8000234:	b580      	push	{r7, lr}
  8000236:	b086      	sub	sp, #24
  8000238:	af04      	add	r7, sp, #16
-	uint8_t get_time[7];
-	HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x00, 1, get_time, 7, 1000);
+	// A blank array (7 slots) to contain the time values received from the RTC module
+  uint8_t get_time[7];
+
+  // Receive the time values from the RTC module through I2C interface, then store them into the blank array (size of value: 7 bytes)
+	  // TypeDef: HAL_I2C_Mem_Read(*hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+  HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x00, 1, get_time, 7, 1000);
  800023a:	f44f 737a 	mov.w	r3, #1000	@ 0x3e8
  800023e:	9302      	str	r3, [sp, #8]
  8000240:	2307      	movs	r3, #7
@@ -259,7 +263,9 @@ void Get_Time (void)
  800024c:	21d0      	movs	r1, #208	@ 0xd0
  800024e:	481f      	ldr	r0, [pc, #124]	@ (80002cc <Get_Time+0x98>)
  8000250:	f000 fd98 	bl	8000d84 <HAL_I2C_Mem_Read>
-	time.seconds 	= bcdToDec(get_time[0]);
+
+  // Store the time values (converted from BCD code to decimal) into the time variable
+	time.seconds 	  = bcdToDec(get_time[0]);
  8000254:	783b      	ldrb	r3, [r7, #0]
  8000256:	4618      	mov	r0, r3
  8000258:	f7ff ffd4 	bl	8000204 <bcdToDec>
@@ -267,7 +273,7 @@ void Get_Time (void)
  800025e:	b2da      	uxtb	r2, r3
  8000260:	4b1b      	ldr	r3, [pc, #108]	@ (80002d0 <Get_Time+0x9c>)
  8000262:	701a      	strb	r2, [r3, #0]
-	time.minutes 	= bcdToDec(get_time[1]);
+	time.minutes 	  = bcdToDec(get_time[1]);
  8000264:	787b      	ldrb	r3, [r7, #1]
  8000266:	4618      	mov	r0, r3
  8000268:	f7ff ffcc 	bl	8000204 <bcdToDec>
@@ -275,7 +281,7 @@ void Get_Time (void)
  800026e:	b2da      	uxtb	r2, r3
  8000270:	4b17      	ldr	r3, [pc, #92]	@ (80002d0 <Get_Time+0x9c>)
  8000272:	705a      	strb	r2, [r3, #1]
-	time.hour 		= bcdToDec(get_time[2]);
+	time.hour 		  = bcdToDec(get_time[2]);
  8000274:	78bb      	ldrb	r3, [r7, #2]
  8000276:	4618      	mov	r0, r3
  8000278:	f7ff ffc4 	bl	8000204 <bcdToDec>
@@ -299,7 +305,7 @@ void Get_Time (void)
  800029e:	b2da      	uxtb	r2, r3
  80002a0:	4b0b      	ldr	r3, [pc, #44]	@ (80002d0 <Get_Time+0x9c>)
  80002a2:	711a      	strb	r2, [r3, #4]
-	time.month 		= bcdToDec(get_time[5]);
+	time.month 		  = bcdToDec(get_time[5]);
  80002a4:	797b      	ldrb	r3, [r7, #5]
  80002a6:	4618      	mov	r0, r3
  80002a8:	f7ff ffac 	bl	8000204 <bcdToDec>
@@ -307,7 +313,7 @@ void Get_Time (void)
  80002ae:	b2da      	uxtb	r2, r3
  80002b0:	4b07      	ldr	r3, [pc, #28]	@ (80002d0 <Get_Time+0x9c>)
  80002b2:	715a      	strb	r2, [r3, #5]
-	time.year 		= bcdToDec(get_time[6]);
+	time.year 		  = bcdToDec(get_time[6]);
  80002b4:	79bb      	ldrb	r3, [r7, #6]
  80002b6:	4618      	mov	r0, r3
  80002b8:	f7ff ffa4 	bl	8000204 <bcdToDec>
@@ -324,8 +330,9 @@ void Get_Time (void)
  80002d0:	2000007c 	.word	0x2000007c
 
 080002d4 <main>:
-
-//char buffer[15];
+      // TypeDef: HAL_I2C_Mem_Write(*hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+  HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, 0x0E, 1, &ctrl_alarm, 1, 1000);
+}
 
 int main(void)
 {
@@ -344,8 +351,8 @@ int main(void)
  80002e0:	f7ff ff34 	bl	800014c <MX_GPIO_Init>
   MX_I2C1_Init();
  80002e4:	f7ff ff60 	bl	80001a8 <MX_I2C1_Init>
-
-  //Set_Time (00, 55, 12, 5, 13, 3, 25);
+  // Run only to initially set the alarm  for the RTC module
+  //Set_Alarm (0, 0, 0, 0, 0, 0);
 
   while (1)
   {
@@ -552,10 +559,10 @@ void HAL_MspInit(void)
  80003f0:	40010000 	.word	0x40010000
 
 080003f4 <HAL_I2C_MspInit>:
-* This function configures the hardware resources used in this example
-* @param hi2c: I2C handle pointer
-* @retval None
-*/
+  * This function configures the hardware resources used in this example
+  * @param hi2c: I2C handle pointer
+  * @retval None
+  */
 void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
 {
  80003f4:	b580      	push	{r7, lr}
@@ -576,9 +583,9 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
  8000410:	4293      	cmp	r3, r2
  8000412:	d123      	bne.n	800045c <HAL_I2C_MspInit+0x68>
   {
-  /* USER CODE BEGIN I2C1_MspInit 0 */
+    /* USER CODE BEGIN I2C1_MspInit 0 */
 
-  /* USER CODE END I2C1_MspInit 0 */
+    /* USER CODE END I2C1_MspInit 0 */
 
     __HAL_RCC_GPIOB_CLK_ENABLE();
  8000414:	4b14      	ldr	r3, [pc, #80]	@ (8000468 <HAL_I2C_MspInit+0x74>)
@@ -623,7 +630,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
  8000458:	60bb      	str	r3, [r7, #8]
  800045a:	68bb      	ldr	r3, [r7, #8]
 
-  /* USER CODE END I2C1_MspInit 1 */
+    /* USER CODE END I2C1_MspInit 1 */
 
   }
 
