@@ -13,19 +13,8 @@ static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
+// Slave adress of DS3231
 #define DS3231_ADDRESS 0xD0
-
-// Convert normal decimal numbers to binary coded decimal
-uint8_t decToBcd(int val)
-{
-  return (uint8_t)( (val/10*16) + (val%10) );
-}
-
-// Convert binary coded decimal to normal decimal numbers
-int bcdToDec(uint8_t val)
-{
-  return (int)( (val/16*10) + (val%16) );
-}
 
 // A structure of 7 one-byte unsigned characters to store 7 time values
 typedef struct {
@@ -41,7 +30,80 @@ typedef struct {
 // Time variable
 TIME time;
 
-// Function to set time (Run only once after reset the RTC)
+/* Function declaration ------------------------------------------------------*/
+// Convert normal decimal numbers to binary coded decimal
+uint8_t decToBcd(int val);
+
+// Convert binary coded decimal to normal decimal numbers
+int bcdToDec(uint8_t val);
+
+// Function to initialize RTC module
+void RTC_Init (void);
+
+// Function to initially set time to the RTC module through I2C interface (Run only once after reset the RTC)
+void Set_Time (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year);
+
+// Function to get time from the RTC module through I2C interface
+void Get_Time (void);
+
+// Function to set the RTC alarm settings (Alarm 1)
+void Set_Alarm (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt);
+
+/* Main program --------------------------------------------------------------*/
+int main(void)
+{
+  // Reset of all peripherals, Initializes the Flash interface and the Systick.
+  HAL_Init();
+
+  // Configure the system clock 
+  SystemClock_Config();
+
+  // Initialize all configured peripherals 
+  MX_GPIO_Init();
+  MX_I2C1_Init();
+ 
+  // Initialize RTC module (Run only once after reset the RTC module)
+  //RTC_Init();
+  
+  // Infinite loop 
+  while (1)
+  {
+
+  }
+}
+
+// RTC module initialization
+void RTC_Init (void)
+{
+  // Run only once after reset the RTC module to initially set the time
+    // Input real time values in order: second, minute, hour, day of week, date of month, month, year
+  Set_Time (00, 37, 17, 2, 18, 3, 25);
+
+  // Run only once after reset the RTC module to initially set the alarm
+    // Input setting values in order: alarm mode, alarm second, alarm minute, alarm hour, alarm day of week/ date of month, day of week/ date of month selection
+      // Mode  : Alarm rate
+      //  0    : Alarm once per second
+      //  1    : Alarm when seconds match
+      //  2    : Alarm when minutes and seconds match
+      //  3    : Alarm when hours, minutes, and seconds match
+      //  4    : Alarm when date, hours, minutes, and seconds match
+      //  5    : Alarm when day, hours, minutes, and seconds match
+  Set_Alarm (0, 0, 0, 0, 0, 0);   
+}
+
+// Convert normal decimal numbers to binary coded decimal
+uint8_t decToBcd(int val)
+{
+  return (uint8_t)( (val/10*16) + (val%10) );
+}
+
+// Convert binary coded decimal to normal decimal numbers
+int bcdToDec(uint8_t val)
+{
+  return (int)( (val/16*10) + (val%16) );
+}
+
+// Function to initially set time to the RTC module through I2C interface (Run only once after reset the RTC)
 void Set_Time (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
 {
 	// A blank array (7 slots) to contain the time values
@@ -61,7 +123,7 @@ void Set_Time (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom,
 	HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, 0x00, 1, set_time, 7, 1000);
 }
 
-// Function to get time
+// Function to get time from the RTC module through I2C interface
 void Get_Time (void)
 {
 	// A blank array (7 slots) to contain the time values received from the RTC module
@@ -87,10 +149,9 @@ void Set_Alarm (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t do
   // A blank array (4 slots) to contain the RTC alarm settings
   uint8_t set_alarm[4];
 
-  // Mask bits to set the Control register in the RTC module
-    // Address 0Eh: A1IE = 1, INTCN = 1
-  //uint8_t ctrl_alarm = 5;
-  uint8_t ctrl_alarm = 1; // Test the effect of the EOSC bit of Control register of the RTC module
+  // Mask bit to set the Control register in the RTC module
+    // Address 0Eh: A1IE = 1
+  uint8_t ctrl_alarm = 1; 
 
   // A mask bit to set the alarm modes (Bit 7) in the RTC module
   uint8_t maskBit = 128;
@@ -175,55 +236,6 @@ void Set_Alarm (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t do
   HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, 0x0E, 1, &ctrl_alarm, 1, 1000);
 }
 
-// Temp variable to read value from Port B (Pin 4) and check the interrupt from INT/SQW pin of RTC module 
-uint8_t PB4;
-
-// Temp array to read values of Alarm 1 registers from RTC module
-uint8_t alarm_check[4];
-
-// Temp variable to read values of Control register from RTC module
-uint8_t ctrl_check;
-
-// Temp variable to read values of Status register from RTC module
-uint8_t status_check;
-
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
-{
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
-
-  /* Configure the system clock */
-  SystemClock_Config();
-
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_I2C1_Init();
- 
-  // Run only once after reset the RTC module to initially set the time
-  //Set_Time (00, 55, 12, 5, 13, 3, 25);
-
-  // Run only to initially set the alarm  for the RTC module
-  Set_Alarm (0, 0, 0, 0, 0, 0);
-
-  /* Infinite loop */
-  while (1)
-  {
-	  Get_Time();
-	  if(HAL_GPIO_ReadPin(Test_GPIO_Port, Test_Pin) == 1)
-    {
-      PB4 += 1;
-    }
-	  HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x07, 1, alarm_check, 4, 1000);
-	  HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x0E, 1, &ctrl_check, 1, 1000);
-    HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x0F, 1, &status_check, 1, 1000);
-	  HAL_Delay(500);
-  }
-}
-
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -305,29 +317,54 @@ static void MX_I2C1_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  /* USER CODE BEGIN MX_GPIO_Init_1 */
-
-  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
-  /*Configure GPIO pin : Test_Pin */
-  GPIO_InitStruct.Pin = Test_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  /*Configure GPIO pin : PB4 */
+  GPIO_InitStruct.Pin = GPIO_PIN_4;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(Test_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /* USER CODE BEGIN MX_GPIO_Init_2 */
-
-  /* USER CODE END MX_GPIO_Init_2 */
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI4_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 }
+/*
+// For test only
+  // Temp array to read values of Alarm 1 registers from RTC module
+uint8_t alarm_check[4];
 
-/* USER CODE BEGIN 4 */
+  // Temp variable to read values of Control register from RTC module
+uint8_t ctrl_check;
 
-/* USER CODE END 4 */
+  // Temp variable to read values of Status register from RTC module
+uint8_t status_check;
+
+// Interrupt Handler for PB4 (Interrupt occurs every second)
+*/
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if(GPIO_Pin == GPIO_PIN_4)
+  {
+    // Get time from the RTC module through I2C interface
+    Get_Time();
+    /*
+    // For test only
+      // Read values of Alarm 1 registers from RTC module
+	  HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x07, 1, alarm_check, 4, 1000);
+
+      // Read values of Control register from RTC module
+	  HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x0E, 1, &ctrl_check, 1, 1000);
+
+      // Read values of Status register from RTC module
+    HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x0F, 1, &status_check, 1, 1000);
+    */
+  }
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
