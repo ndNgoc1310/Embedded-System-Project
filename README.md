@@ -32,3 +32,17 @@ ChronoSync is powered by an **STM32 microcontroller**, interfacing with key peri
    ```sh
    git clone https://github.com/ndNgoc1310/Embedded-System-Project.git
    cd Embedded-System-Project
+2. Open the project in STM32CubeIDE.
+3. Compile and flash the firmware to the STM32 board.
+
+## Usage
+- Power On via DC Jack or Battery.
+- Set Time & Alarms via buttons or Bluetooth app.
+- View Time & Alarm Info on the E-Ink LCD.
+- Automatic Timekeeping via RTC, retaining settings after power loss.
+
+## License
+This project is open-source. Contributions are welcome!
+
+## Contributors
+Nguyen Hung Minh, Bui Dinh Trung Nam, Nguyen Duy Ngoc (Student at Vietnam National University, Ho Chi Minh City - University of Technology)
