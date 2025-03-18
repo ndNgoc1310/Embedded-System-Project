@@ -1,7 +1,7 @@
 # ChronoSync: Embedded Digital Clock  
 
 ## Overview  
-**ChronoSync** is an energy-efficient **digital clock** designed with **real-time clock (RTC) synchronization, Bluetooth connectivity, and an E-Ink display**. It ensures **accurate timekeeping**, low power consumption, and remote configuration via a mobile app or PC.  
+**ChronoSync** is an energy-efficient **digital clock** designed with **real-time clock (RTC) synchronization, Bluetooth connectivity, and an E-Ink display**. It ensures **accurate timekeeping**, low power consumption, and remote configuration via a mobile app.  
 
 ## Features  
 - **Precise Timekeeping** – Uses **DS3231 RTC** with minimal drift.  
@@ -45,4 +45,4 @@ ChronoSync is powered by an **STM32 microcontroller**, interfacing with key peri
 This project is open-source. Contributions are welcome!
 
 ## Contributors
-Nguyen Hung Minh, Bui Dinh Trung Nam, Nguyen Duy Ngoc (Student at Vietnam National University, Ho Chi Minh City - University of Technology)
+Nguyen Hung Minh, Bui Dinh Trung Nam, Nguyen Duy Ngoc (Students at Vietnam National University, Ho Chi Minh City - University of Technology)
