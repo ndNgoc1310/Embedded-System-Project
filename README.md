@@ -19,7 +19,7 @@ ChronoSync is powered by an **STM32 microcontroller**, interfacing with key peri
 - **Memory** – EEPROM for non-volatile data storage.  
 
 ### **Block Diagram**  
-![System Architecture](Block-diagram.png)  
+![Block-diagram](https://github.com/user-attachments/assets/aa5ef7aa-f239-42a0-bf8f-e37bf8ad20eb)
 
 ## Setup & Compilation  
 ### **Requirements**  
