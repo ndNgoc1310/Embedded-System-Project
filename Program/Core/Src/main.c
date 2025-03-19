@@ -1,6 +1,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "rtc_ds3231.h"
+#include "rtc_ds3231.c"
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);

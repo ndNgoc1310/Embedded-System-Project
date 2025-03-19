@@ -1,3 +1,12 @@
+../Core/Src/rtc_ds3231.c:54:6:RTC_Init	24	static
+../Core/Src/rtc_ds3231.c:73:9:decToBcd	16	static
+../Core/Src/rtc_ds3231.c:79:5:bcdToDec	16	static
+../Core/Src/rtc_ds3231.c:85:6:Set_Time	48	static
+../Core/Src/rtc_ds3231.c:105:6:Get_Time	32	static
+../Core/Src/rtc_ds3231.c:125:6:Set_Alarm	56	static
+../Core/Src/rtc_ds3231.c:218:13:MX_I2C1_Init	8	static
+../Core/Src/rtc_ds3231.c:235:13:MX_GPIO_Init	40	static
+../Core/Src/rtc_ds3231.c:268:6:HAL_GPIO_EXTI_Callback	16	static
 ../Core/Src/main.c:9:5:main	8	static
 ../Core/Src/main.c:35:6:SystemClock_Config	72	static
 ../Core/Src/main.c:74:6:Error_Handler	4	static,ignoring_inline_asm
