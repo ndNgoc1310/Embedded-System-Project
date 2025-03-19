@@ -1,6 +1,26 @@
 /* Includes ------------------------------------------------------------------*/
 #include "rtc_ds3231.h"
 
+/* Private variables ---------------------------------------------------------*/
+I2C_HandleTypeDef hi2c1;
+
+// Slave adress of DS3231
+#define DS3231_ADDRESS 0xD0
+
+// A structure of 7 one-byte unsigned characters to store 7 time values
+typedef struct {
+	uint8_t seconds;
+	uint8_t minutes;
+	uint8_t hour;
+	uint8_t dayofweek;
+	uint8_t dayofmonth;
+	uint8_t month;
+	uint8_t year;
+} TIME;
+
+// Time variable
+TIME time;
+
 /* Functions -----------------------------------------------------------------*/
 // RTC module initialization
 void RTC_Init (void)
@@ -166,3 +186,78 @@ void Set_Alarm (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t do
   HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, 0x0E, 1, &ctrl_alarm, 1, 1000);
 }
 
+// I2C1 Initialization Function
+static void MX_I2C1_Init(void)
+{
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin : PB4 */
+  GPIO_InitStruct.Pin = GPIO_PIN_4;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI4_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
+}
+
+/*
+// For test only
+  // Temp array to read values of Alarm 1 registers from RTC module
+uint8_t alarm_check[4];
+
+  // Temp variable to read values of Control register from RTC module
+uint8_t ctrl_check;
+
+  // Temp variable to read values of Status register from RTC module
+uint8_t status_check;
+
+// Interrupt Handler for PB4 (Interrupt occurs every second)
+*/
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if(GPIO_Pin == GPIO_PIN_4)
+  {
+    // Get time from the RTC module through I2C interface
+    Get_Time();
+    /*
+    // For test only
+      // Read values of Alarm 1 registers from RTC module
+	  HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x07, 1, alarm_check, 4, 1000);
+
+      // Read values of Control register from RTC module
+	  HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x0E, 1, &ctrl_check, 1, 1000);
+
+      // Read values of Status register from RTC module
+    HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x0F, 1, &status_check, 1, 1000);
+    */
+  }
+}
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
