@@ -9,7 +9,7 @@
 #define DS3231_ADDRESS 0xD0
 
 // Slave address of AT24C64D EEPROM module
-#define EEPROM_ADDR 0xA0 // Demo of AT24C256
+#define EEPROM_ADDR 0xA0
 
 /* Private dtypedefs ---------------------------------------------------------*/
 // A structure of 7 one-byte unsigned characters to store 7 time values
@@ -106,6 +106,7 @@ void Alarm_Save (uint8_t adress, ALARM alarm, bool on_off)
   // A mask bit for On/ Off state of the alarm
   uint8_t onOff = 128;
 
+  // For test: Try to add an On/ Off (1 bit) signal into the alarm pakage by using the empty MSB of the second register
   if (on_off)
   {
     alarm.second += onOff;
