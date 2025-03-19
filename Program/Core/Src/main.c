@@ -77,7 +77,7 @@ void RTC_Init (void)
 {
   // Run only once after reset the RTC module to initially set the time
     // Input real time values in order: second, minute, hour, day of week, date of month, month, year
-  Set_Time (00, 37, 17, 2, 18, 3, 25);
+  Set_Time (50, 04, 15, 3, 19, 3, 25);
 
   // Run only once after reset the RTC module to initially set the alarm
     // Input setting values in order: alarm mode, alarm second, alarm minute, alarm hour, alarm day of week/ date of month, day of week/ date of month selection
