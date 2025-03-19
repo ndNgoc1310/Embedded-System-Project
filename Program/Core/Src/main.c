@@ -5,14 +5,17 @@
 #include "stdbool.h"
 
 /* Private defines -----------------------------------------------------------*/
-// Slave adress of DS3231
+// Slave adress of DS3231 RTC module
 #define DS3231_ADDRESS 0xD0
+
+// Slave address of AT24C64D EEPROM module
+#define EEPROM_ADDR 0xA0 // Demo of AT24C256
 
 /* Private dtypedefs ---------------------------------------------------------*/
 // A structure of 7 one-byte unsigned characters to store 7 time values
 typedef struct {
-	uint8_t seconds;
-	uint8_t minutes;
+	uint8_t second;
+	uint8_t minute;
 	uint8_t hour;
 	uint8_t dayofweek;
 	uint8_t dayofmonth;
@@ -20,12 +23,23 @@ typedef struct {
 	uint8_t year;
 } TIME;
 
+// A structure of 4 one-byte unsigned characters to store 4 alarm values
+typedef struct {
+	uint8_t second;
+	uint8_t minute;
+	uint8_t hour;
+	uint8_t dow_dom;  // value of [Day of the week] or [Date of the month]
+} ALARM;
+
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c2;
 
 // Time variable
-TIME time;
+TIME time_check;
+
+// Alarm variable
+ALARM alarm_check;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
@@ -42,7 +56,7 @@ uint8_t decToBcd(int val);
 int bcdToDec(uint8_t val);
 
 // Function to initialize RTC module
-void RTC_Init (void);
+void Clock_Init (void);
 
 // Function to initially set time to the RTC module through I2C interface (Run only once after reset the RTC)
 void Set_Time (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year);
@@ -50,8 +64,14 @@ void Set_Time (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom,
 // Function to get time from the RTC module through I2C interface
 void Get_Time (void);
 
-// Function to set the RTC alarm settings (Alarm 1)
-void Set_Alarm (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt);
+// Function to control settings of the RTC module (Alarm 1)
+void Ctrl_Time (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt);
+
+// Function to write a single alarm to the EEPROM module
+void Alarm_Save (uint8_t adress, ALARM alarm, bool on_off);
+
+// Function to read a single alarm from the EEPROM module
+void Alarm_Check (uint8_t adress);
 
 /* Main program --------------------------------------------------------------*/
 int main(void)
@@ -65,9 +85,12 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
- 
+  MX_I2C2_Init();
+
   // Initialize RTC module (Run only once after reset the RTC module)
-  //RTC_Init();
+  //Clock_Init();
+
+  // Store a single alarm to the EEPROM module
 
   /* Infinite loop */
   while (1)
@@ -77,23 +100,46 @@ int main(void)
 }
 
 /* Private functions --------------------------------------------------------*/
-// RTC module initialization
-void RTC_Init (void)
+// Write a single alarm to the EEPROM module
+void Alarm_Save (uint8_t adress, ALARM alarm, bool on_off)
 {
-  // Run only once after reset the RTC module to initially set the time
-    // Input real time values in order: second, minute, hour, day of week, date of month, month, year
-  Set_Time (50, 04, 15, 3, 19, 3, 25);
+  // A mask bit for On/ Off state of the alarm
+  uint8_t onOff = 128;
 
-  // Run only once after reset the RTC module to initially set the alarm
-    // Input setting values in order: alarm mode, alarm second, alarm minute, alarm hour, alarm day of week/ date of month, day of week/ date of month selection
-      // Mode  : Alarm rate
-      //  0    : Alarm once per second
-      //  1    : Alarm when seconds match
-      //  2    : Alarm when minutes and seconds match
-      //  3    : Alarm when hours, minutes, and seconds match
-      //  4    : Alarm when date, hours, minutes, and seconds match
-      //  5    : Alarm when day, hours, minutes, and seconds match
-  Set_Alarm (0, 0, 0, 0, 0, 0);   
+  if (on_off)
+  {
+    alarm.second += onOff;
+  }
+
+  // A blank array (4 slots) to contain the alarm values
+  uint8_t set_alarm[4];
+  
+  // Store the alarm values into the blank array
+  set_alarm[0] = alarm.second;
+  set_alarm[1] = alarm.minute;
+  set_alarm[2] = alarm.hour;
+  set_alarm[3] = alarm.dow_dom;
+
+  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+  HAL_I2C_Mem_Write(&hi2c2, EEPROM_ADDR, adress, 4, set_alarm, sizeof(set_alarm), 1000);
+}
+
+// Read a single alarm from the EEPROM module
+void Alarm_Check (uint8_t adress)
+{
+  // A blank array (4 slots) to contain the alarm values received from the EEPROM module
+  uint8_t get_alarm[4];
+
+  // HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+  HAL_I2C_Mem_Read(&hi2c2, EEPROM_ADDR, adress, 4, get_alarm, sizeof(get_alarm), 1000);
+
+  // Store the alarm values into the alarm variable
+  alarm_check.second    = get_alarm[0];
+  alarm_check.minute    = get_alarm[1];
+  alarm_check.hour      = get_alarm[2];
+  alarm_check.dow_dom   = get_alarm[3];
 }
 
 // Convert normal decimal numbers to binary coded decimal
@@ -106,6 +152,25 @@ uint8_t decToBcd(int val)
 int bcdToDec(uint8_t val)
 {
   return (int)( (val/16*10) + (val%16) );
+}
+
+// RTC module initialization
+void Clock_Init (void)
+{
+  // Run only once after reset the RTC module to initially set the time
+  //    Set_Time (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
+  Set_Time (50, 04, 15, 3, 19, 3, 25);
+
+  // Run only once after reset the RTC module to initially set the alarm
+  //    Ctrl_Time (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt)
+  //      Mode   : Alarm rate
+  //        0    : Alarm once per second
+  //        1    : Alarm when seconds match
+  //        2    : Alarm when minutes and seconds match
+  //        3    : Alarm when hours, minutes, and seconds match
+  //        4    : Alarm when date, hours, minutes, and seconds match
+  //        5    : Alarm when day, hours, minutes, and seconds match
+  Ctrl_Time (0, 0, 0, 0, 0, 0);   
 }
 
 // Function to initially set time to the RTC module through I2C interface (Run only once after reset the RTC)
@@ -124,8 +189,9 @@ void Set_Time (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom,
 	set_time[6] = decToBcd(year);
 
   // Send the array containing the time values to the RTC module through I2C interface at address 00h - 06h (size of value: 7 bytes)
-    // TypeDef: HAL_I2C_Mem_Write(*hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout)
-	HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, 0x00, 1, set_time, 7, 1000);
+  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);	
+  HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, 0x00, 1, set_time, sizeof(set_time), 1000);
 }
 
 // Function to get time from the RTC module through I2C interface
@@ -135,122 +201,124 @@ void Get_Time (void)
   uint8_t get_time[7];
 
   // Receive the time values from the RTC module through I2C interface, then store them into the blank array (size of value: 7 bytes)
-	  // TypeDef: HAL_I2C_Mem_Read(*hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout)
-  HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x00, 1, get_time, 7, 1000);
+  // HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);  
+  HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x00, 1, get_time, sizeof(get_time), 1000);
 
   // Store the time values (converted from BCD code to decimal) into the time variable
-	time.seconds 	  = bcdToDec(get_time[0]);
-	time.minutes 	  = bcdToDec(get_time[1]);
-	time.hour 		  = bcdToDec(get_time[2]);
-	time.dayofweek 	= bcdToDec(get_time[3]);
-	time.dayofmonth = bcdToDec(get_time[4]);
-	time.month 		  = bcdToDec(get_time[5]);
-	time.year 		  = bcdToDec(get_time[6]);
+	time_check.second 	    = bcdToDec(get_time[0]);
+	time_check.minute 	    = bcdToDec(get_time[1]);
+	time_check.hour 		    = bcdToDec(get_time[2]);
+	time_check.dayofweek 	  = bcdToDec(get_time[3]);
+	time_check.dayofmonth   = bcdToDec(get_time[4]);
+	time_check.month 		    = bcdToDec(get_time[5]);
+	time_check.year 		    = bcdToDec(get_time[6]);
 }
 
-// Function to set the RTC alarm settings (Alarm 1)
-void Set_Alarm (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt)
+// Function to control settings of the RTC module (Alarm 1)
+void Ctrl_Time (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt)
 {
   // A blank array (4 slots) to contain the RTC alarm settings
-  uint8_t set_alarm[4];
+  uint8_t Ctrl_Time[4];
 
-  // Mask bit to set the Control register in the RTC module
-    // Address 0Eh: A1IE = 1
+  // A mask bit to set the Control register in the RTC module
+  //    Address 0Eh: A1IE = 1
   uint8_t ctrl_alarm = 1; 
 
   // A mask bit to set the alarm modes (Bit 7) in the RTC module
   uint8_t maskBit = 128;
 
   // A mask bit for selection of [day of week] or [date of month] (Bit 6) in the RTC module
-    // If the input [day of week]/ [date of month] selection is 1, the mask bit will be 64.
+  //    If the input [day of week]/ [date of month] selection is 1, the mask bit will be 64.
   uint8_t dyDt = (dy_dt == 1) ? 64 : 0;
 
   // Store the RTC alarm time settings (converted into BCD code) into the blank array
-  set_alarm[0] = decToBcd(sec);
-	set_alarm[1] = decToBcd(min);
-	set_alarm[2] = decToBcd(hour);
-	set_alarm[3] = decToBcd(dow_dom);
+  Ctrl_Time[0] = decToBcd(sec);
+	Ctrl_Time[1] = decToBcd(min);
+	Ctrl_Time[2] = decToBcd(hour);
+	Ctrl_Time[3] = decToBcd(dow_dom);
 
   // Adjust the RTC alarm mode settings into the array basing on the input mode
-    // Mode  : Alarm rate
-    //  0    : Alarm once per second
-    //  1    : Alarm when seconds match
-    //  2    : Alarm when minutes and seconds match
-    //  3    : Alarm when hours, minutes, and seconds match
-    //  4    : Alarm when date, hours, minutes, and seconds match
-    //  5    : Alarm when day, hours, minutes, and seconds match
+  //    Mode  : Alarm rate
+  //      0    : Alarm once per second
+  //      1    : Alarm when seconds match
+  //      2    : Alarm when minutes and seconds match
+  //      3    : Alarm when hours, minutes, and seconds match
+  //      4    : Alarm when date, hours, minutes, and seconds match
+  //      5    : Alarm when day, hours, minutes, and seconds match
   switch (mode)
   {
     case 0:
       // Alarm mask bit: A1M4:A1M1 = b1111, DY/DT = X
-      set_alarm[0] += maskBit;
-      set_alarm[1] += maskBit;
-      set_alarm[2] += maskBit;
-      set_alarm[3] += maskBit;
+      Ctrl_Time[0] += maskBit;
+      Ctrl_Time[1] += maskBit;
+      Ctrl_Time[2] += maskBit;
+      Ctrl_Time[3] += maskBit;
       break;
     case 1:
       // Alarm mask bit: A1M4:A1M1 = b1110, DY/DT = X
-      set_alarm[0] += 0;
-      set_alarm[1] += maskBit;
-      set_alarm[2] += maskBit;
-      set_alarm[3] += maskBit;
+      Ctrl_Time[0] += 0;
+      Ctrl_Time[1] += maskBit;
+      Ctrl_Time[2] += maskBit;
+      Ctrl_Time[3] += maskBit;
       break;
     case 2:
       // Alarm mask bit: A1M4:A1M1 = b1100, DY/DT = X
-      set_alarm[0] += 0;
-      set_alarm[1] += 0;
-      set_alarm[2] += maskBit;
-      set_alarm[3] += maskBit;
+      Ctrl_Time[0] += 0;
+      Ctrl_Time[1] += 0;
+      Ctrl_Time[2] += maskBit;
+      Ctrl_Time[3] += maskBit;
       break;
     case 3:
       // Alarm mask bit: A1M4:A1M1 = b1000, DY/DT = X
-      set_alarm[0] += 0;
-      set_alarm[1] += 0;
-      set_alarm[2] += 0;
-      set_alarm[3] += maskBit;
+      Ctrl_Time[0] += 0;
+      Ctrl_Time[1] += 0;
+      Ctrl_Time[2] += 0;
+      Ctrl_Time[3] += maskBit;
       break;
     case 4:
       // Alarm mask bit: A1M4:A1M1 = b0000, DY/DT = 0
-      set_alarm[0] += 0;
-      set_alarm[1] += 0;
-      set_alarm[2] += 0;
-      set_alarm[3] += 0;
+      Ctrl_Time[0] += 0;
+      Ctrl_Time[1] += 0;
+      Ctrl_Time[2] += 0;
+      Ctrl_Time[3] += 0;
       break;
     case 5:
       // Alarm mask bit: A1M4:A1M1 = b0000, DY/DT = 1
-      set_alarm[0] += 0;
-      set_alarm[1] += 0;
-      set_alarm[2] += 0;
-      set_alarm[3] += dyDt;
+      Ctrl_Time[0] += 0;
+      Ctrl_Time[1] += 0;
+      Ctrl_Time[2] += 0;
+      Ctrl_Time[3] += dyDt;
       break;
     default:
       // Alarm mask bit: A1M4:A1M1 = b0000, DY/DT = 0
-      set_alarm[0] += 0;
-      set_alarm[1] += 0;
-      set_alarm[2] += 0;
-      set_alarm[3] += 0;
+      Ctrl_Time[0] += 0;
+      Ctrl_Time[1] += 0;
+      Ctrl_Time[2] += 0;
+      Ctrl_Time[3] += 0;
       break;
   }
 
   // Send the array containing the RTC alarm mode setting to the RTC module through I2C interface at address 07h - 0Ah (size of value: 4 bytes)
-    // TypeDef: HAL_I2C_Mem_Write(*hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout)
-  HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, 0x07, 1, set_alarm, 4, 1000);
+  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);	  
+  HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, 0x07, 1, Ctrl_Time, sizeof(Ctrl_Time), 1000);
 
   // Send the alarm control mask bits to the RTC module through I2C interface at address 0Eh (size of value: 1 byte)
-      // TypeDef: HAL_I2C_Mem_Write(*hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout)
-  HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, 0x0E, 1, &ctrl_alarm, 1, 1000);
+  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);	  
+  HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, 0x0E, 1, &ctrl_alarm, sizeof(ctrl_alarm), 1000);
 }
-
 
 /*
 // For test only
-  // Temp array to read values of Alarm 1 registers from RTC module
+//    Temp array to read values of Alarm 1 registers from RTC module
 uint8_t alarm_check[4];
 
-  // Temp variable to read values of Control register from RTC module
+//    Temp variable to read values of Control register from RTC module
 uint8_t ctrl_check;
 
-  // Temp variable to read values of Status register from RTC module
+//    Temp variable to read values of Status register from RTC module
 uint8_t status_check;
 
 // Interrupt Handler for PB4 (Interrupt occurs every second)
@@ -263,13 +331,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     Get_Time();
     /*
     // For test only
-      // Read values of Alarm 1 registers from RTC module
+    //    Read values of Alarm 1 registers from RTC module
 	  HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x07, 1, alarm_check, 4, 1000);
 
-      // Read values of Control register from RTC module
+    //    Read values of Control register from RTC module
 	  HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x0E, 1, &ctrl_check, 1, 1000);
 
-      // Read values of Status register from RTC module
+    //    Read values of Status register from RTC module
     HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x0F, 1, &status_check, 1, 1000);
     */
   }
