@@ -83,6 +83,9 @@ void Alarm_Set (uint8_t adress, uint8_t sec, uint8_t min, uint8_t hour, uint8_t 
 // Function to read a single alarm from the EEPROM module
 void Alarm_Get (uint8_t adress);
 
+// Function to check the alarms
+void Alarm_Check (void);
+
 /* Main program --------------------------------------------------------------*/
 int main(void)
 {
@@ -111,79 +114,20 @@ int main(void)
   /* Infinite loop */
   while (1)
   { 
-  
-    // If the Alarm Check Flag is activated,
-    // retreive the current time from the RTC module
-    // then compare the current time with all alarms stored in the EEPROM module.
-    // If a comparison matches, trigger the alarm,
-    // then reset the Alarm Check Flag
     if (alarm_check_flag == 1)
-      {
-        // Retrieve the current time from the RTC module
-        //    void Time_Get()
-        Time_Get();
+    {
+      // Retrieve the current time from the RTC module
+      //    void Time_Get()
+      Time_Get();
 
-        // Compare the current time with all alarms stored in the EEPROM module
-        for (int i = 0; i <= alarm_pointer; i++)
-        {
-          // Retrieve the alarm values from the EEPROM module
-          //    void Alarm_Get (uint8_t adress)
-          Alarm_Get(i);
+      // Check the alarms
+      //    void Alarm_Check()
+      Alarm_Check();
 
-          // Check if the alarm is at ON or OFF state by checking the MSB of the second register
-          if (alarm_get.second < 128)
-          {
-            // Stop checking other conditions if the alarm is at OFF state
-            break;
-          }
-
-          // Unmask the MSB of the second register to get the original value of the second register
-          alarm_get.second -= 128;
-
-          // Check if the current time matches the alarm time
-          if ((alarm_get.second  == time_get.second)  
-           && (alarm_get.minute  == time_get.minute)
-           && (alarm_get.hour    == time_get.hour))
-          {
-            // Check if the alarm is at the [day of week]/ [date of month] mode by checking the MSB of the dow_dom register
-            if (alarm_get.dow_dom >= 128)
-            {
-              // Unmask the MSB of the dow_dom register to get the original value of the dow_dom register
-              alarm_get.dow_dom -= 128;
-
-              // Check if the alarm is at the [day of week] mode by checking the mask bit (bit 6) of the dow_dom register
-              if (alarm_get.dow_dom >= 64)
-              {
-                // Unmask bit 6 of the dow_dom register to get the original value of the dow_dom register
-                alarm_get.dow_dom -= 64;
-
-                // Check if the [day of the week] matches the current time
-                if (alarm_get.dow_dom == time_get.dayofweek)
-                {
-                  // Alarm is triggered
-
-                  break;
-                }
-              }
-              
-              // If the alarm is at the [date of month] mode, check if the [date of month] matches the current time
-              else if (alarm_get.dow_dom == time_get.dayofmonth)
-              {
-                // Alarm is triggered
-
-                break;
-              }
-            }
-          }
-          else
-          {
-            break;
-          }
-        }
-        
-        // Reset the Alarm Check Flag
-        alarm_check_flag = 0;
-      }
+      // Reset the Alarm Check Flag
+      alarm_check_flag = 0;
+    }
+    
   }
 }
 
@@ -397,6 +341,68 @@ void Alarm_Get (uint8_t adress)
   alarm_get.minute  = getAlarm[1];
   alarm_get.hour    = getAlarm[2];
   alarm_get.dow_dom = getAlarm[3];
+}
+
+// Function to check the alarms
+void Alarm_Check (void)
+{
+  // Compare the current time with all alarms stored in the EEPROM module
+  for (int i = 0; i <= alarm_pointer; i++)
+  {
+    // Retrieve the alarm values from the EEPROM module
+    //    void Alarm_Get (uint8_t adress)
+    Alarm_Get(i);
+
+    // Check if the alarm is at ON or OFF state by checking the MSB of the second register
+    if (alarm_get.second < 128)
+    {
+      // Stop checking other conditions if the alarm is at OFF state
+      break;
+    }
+
+    // Unmask the MSB of the second register to get the original value of the second register
+    alarm_get.second -= 128;
+
+    // Check if the current time matches the alarm time
+    if ((alarm_get.second  == time_get.second)  
+      && (alarm_get.minute  == time_get.minute)
+      && (alarm_get.hour    == time_get.hour))
+    {
+      // Check if the alarm is at the [day of week]/ [date of month] mode by checking the MSB of the dow_dom register
+      if (alarm_get.dow_dom >= 128)
+      {
+        // Unmask the MSB of the dow_dom register to get the original value of the dow_dom register
+        alarm_get.dow_dom -= 128;
+
+        // Check if the alarm is at the [day of week] mode by checking the mask bit (bit 6) of the dow_dom register
+        if (alarm_get.dow_dom >= 64)
+        {
+          // Unmask bit 6 of the dow_dom register to get the original value of the dow_dom register
+          alarm_get.dow_dom -= 64;
+
+          // Check if the [day of the week] matches the current time
+          if (alarm_get.dow_dom == time_get.dayofweek)
+          {
+            // Alarm is triggered
+
+            break;
+          }
+        }
+        
+        // If the alarm is at the [date of month] mode, check if the [date of month] matches the current time
+        else if (alarm_get.dow_dom == time_get.dayofmonth)
+        {
+          // Alarm is triggered
+
+          break;
+        }
+      }
+    }
+    else
+    {
+      break;
+    }
+  }
 }
 
 // Function to handle the external interrupt
