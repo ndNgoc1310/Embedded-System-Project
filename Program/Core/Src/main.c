@@ -51,6 +51,8 @@ volatile bool alarm_check_flag = 0;
     // Pointer variable to store the next available address (alarm) on the EEPROM module
 uint8_t alarm_pointer = 0;
 
+bool alarm_activated = 0;
+
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
@@ -66,7 +68,7 @@ uint8_t Dec_To_BCD(int val);
 int BCD_To_Dec(uint8_t val);
 
 // Function to initialize RTC module
-void Clock_Init (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year);
+void Time_Init (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year);
 
 // Function to initially set time to the RTC module through I2C interface (Run only once after reset the RTC)
 void Time_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year);
@@ -101,15 +103,15 @@ int main(void)
   MX_I2C2_Init();
 
   // Initialize RTC module (Run only once after reset the RTC module)
-  //Clock_Init(00, 27, 23, 4, 20, 3, 25);
+  //Time_Init(00, 53, 15, 3, 26, 3, 25);
 
   // Store values of a single alarm to the next available address on the EEPROM module
   //    void Alarm_Set (uint8_t adress, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool on_off)
-  //Alarm_Set(0, 30, 42, 15, 1, 1);
+  Alarm_Set(0, 30, 59, 15, 0, 1);
 
   // Read values of a single alarm from a specific address on the EEPROM module
   //    void Alarm_Get (uint8_t adress)
-  //Alarm_Get(0);
+  Alarm_Get(0);
 
   /* Infinite loop */
   while (1)
@@ -142,25 +144,6 @@ uint8_t Dec_To_BCD(int val)
 int BCD_To_Dec(uint8_t val)
 {
   return (int)( (val/16*10) + (val%16) );
-}
-
-// RTC module initialization
-void Clock_Init (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
-{
-  // Run only once after reset the RTC module to initially set the time
-  //    Time_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
-  Time_Set (sec, min, hour, dow, dom, month, year);
-
-  // Run only once after reset the RTC module to initially set the alarm
-  //    Time_Ctrl (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt)
-  //      Mode   : Alarm rate
-  //        0    : Alarm once per second
-  //        1    : Alarm when seconds match
-  //        2    : Alarm when minutes and seconds match
-  //        3    : Alarm when hours, minutes, and seconds match
-  //        4    : Alarm when date, hours, minutes, and seconds match
-  //        5    : Alarm when day, hours, minutes, and seconds match
-  Time_Ctrl (0, 0, 0, 0, 0, 0);   
 }
 
 // Function to initially set time to the RTC module through I2C interface (Run only once after reset the RTC)
@@ -300,6 +283,26 @@ void Time_Ctrl (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t do
   HAL_I2C_Mem_Write(&hi2c1, DS3231_ADDRESS, 0x0E, 1, &ctrlAlarm, sizeof(ctrlAlarm), 1000);
 }
 
+// RTC module initialization
+void Time_Init (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
+{
+  // Run only once after reset the RTC module to initially set the time
+  //    Time_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
+  Time_Set (sec, min, hour, dow, dom, month, year);
+
+  // Run only once after reset the RTC module to initially set the alarm
+  //    Time_Ctrl (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt)
+  //      Mode   : Alarm rate
+  //        0    : Alarm once per second
+  //        1    : Alarm when seconds match
+  //        2    : Alarm when minutes and seconds match
+  //        3    : Alarm when hours, minutes, and seconds match
+  //        4    : Alarm when date, hours, minutes, and seconds match
+  //        5    : Alarm when day, hours, minutes, and seconds match
+  //      For mode 0, the remaining input are don't-care values
+  Time_Ctrl (0, 0, 0, 0, 0, 0);   
+}
+
 // Write a single alarm to the EEPROM module
 void Alarm_Set (uint8_t adress, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool on_off)
 {
@@ -343,6 +346,15 @@ void Alarm_Get (uint8_t adress)
   alarm_get.dow_dom = getAlarm[3];
 }
 
+uint8_t alarm_check_counter = 0;
+uint8_t alarm_check_onoff = 0;
+uint8_t alarm_check_match1 = 0;
+uint8_t alarm_check_match2 = 0;
+uint8_t alarm_check_match3 = 0;
+uint8_t alarm_check_dowdom = 0;
+uint8_t alarm_check_dow = 0;
+uint8_t alarm_check_dom = 0;
+
 // Function to check the alarms
 void Alarm_Check (void)
 {
@@ -360,39 +372,56 @@ void Alarm_Check (void)
       break;
     }
 
-    // Unmask the MSB of the second register to get the original value of the second register
-    alarm_get.second -= 128;
+    // For test only
+    alarm_check_onoff = 1;
 
     // Check if the current time matches the alarm time
-    if ((alarm_get.second  == time_get.second)  
-      && (alarm_get.minute  == time_get.minute)
-      && (alarm_get.hour    == time_get.hour))
+        // Unmask the MSB of the second register to get the original value of the second register
+    if ((alarm_get.second - 128 == time_get.second)  
+      && (alarm_get.minute      == time_get.minute)
+      && (alarm_get.hour        == time_get.hour))
     {
+      // For test only
+      alarm_check_match1 = 1;
+
       // Check if the alarm is at the [day of week]/ [date of month] mode by checking the MSB of the dow_dom register
       if (alarm_get.dow_dom >= 128)
       {
-        // Unmask the MSB of the dow_dom register to get the original value of the dow_dom register
-        alarm_get.dow_dom -= 128;
-
+        // For test only
+        alarm_check_dowdom = 1;
+        
         // Check if the alarm is at the [day of week] mode by checking the mask bit (bit 6) of the dow_dom register
-        if (alarm_get.dow_dom >= 64)
+            // Unmask the MSB of the dow_dom register to get the original value of the dow_dom register
+        if (alarm_get.dow_dom - 128 >= 64)
         {
-          // Unmask bit 6 of the dow_dom register to get the original value of the dow_dom register
-          alarm_get.dow_dom -= 64;
-
+          // For test only
+          alarm_check_dow = 1;
+          
           // Check if the [day of the week] matches the current time
-          if (alarm_get.dow_dom == time_get.dayofweek)
+              // Unmask MSB and bit 6 of the dow_dom register to get the original value of the dow_dom register
+          if (alarm_get.dow_dom - 128 - 64 == time_get.dayofweek)
           {
+            // For test only
+            alarm_check_match2 = 1;
+
             // Alarm is triggered
+            alarm_activated = 1;
 
             break;
           }
         }
         
         // If the alarm is at the [date of month] mode, check if the [date of month] matches the current time
-        else if (alarm_get.dow_dom == time_get.dayofmonth)
+        else if (alarm_get.dow_dom - 128 == time_get.dayofmonth)
         {
+          // For test only
+          alarm_check_dom = 1;
+          
+          // For test only
+          alarm_check_match3 = 1;
+          
           // Alarm is triggered
+          alarm_activated = 1;
 
           break;
         }
@@ -402,7 +431,17 @@ void Alarm_Check (void)
     {
       break;
     }
+
+    alarm_check_counter += 1;
   }
+
+  alarm_check_onoff = 0;
+  alarm_check_match1 = 0;
+  alarm_check_match2 = 0;
+  alarm_check_match3 = 0;
+  alarm_check_dowdom = 0;
+  alarm_check_dow = 0;
+  alarm_check_dom = 0;
 }
 
 // Function to handle the external interrupt
