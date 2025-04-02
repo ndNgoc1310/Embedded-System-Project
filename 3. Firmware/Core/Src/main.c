@@ -13,6 +13,12 @@
   * in the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
+  * 
+  * This project is developed by Nguyen Hung Minh, Bui Dinh Trung Nam, and Nguyen Duy Ngoc
+  * (Students at Vietnam National University, Ho Chi Minh City - University of Technology).
+  * 
+  * Please read and follow the naming conventions in naming_conventions.md before editing this file.
+  * 
   ******************************************************************************
   */
 /* USER CODE END Header */
