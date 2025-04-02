@@ -235,14 +235,20 @@ int main(void)
     // Check if the ADC interrupt flag is set (ADC Valid Flag)
     if (adc_valid_flag == 1)
 	  {
-      HAL_ADC_Start_IT(&hadc1);                   //Enabling interrupt of adc
+      // Re-enable the ADC interrupt to continue monitoring ADC values
+      HAL_ADC_Start_IT(&hadc1);
+
+      // Delay for 100ms to allow the ADC to stabilize
       HAL_Delay(100);
 	  }
 
     // Check if the UART interrupt flag is set (UART Receive Flag)
     if (uart_rx_flag ==1 )
 	  {
-      HAL_UART_Receive_IT(&huart1,uart_rx_data,2); // Enabling interrupt receive again
+      // Re-enable the UART interrupt to continue receiving data
+      HAL_UART_Receive_IT(&huart1,uart_rx_data,2); 
+      
+      // Delay for 100ms to allow the UART to stabilize
       HAL_Delay(100);
 	  }
 
@@ -451,7 +457,8 @@ void Time_Ctrl (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t do
 // RTC module initialization
 void Time_Init (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
 {
-  // Run only once after reset the RTC module to initially set the time
+  // This function is intended for initial setup of the RTC module after a reset.
+  // It should not be called repeatedly unless reinitialization is required.
   //    Time_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
   Time_Set (sec, min, hour, dow, dom, month, year);
 
@@ -474,7 +481,7 @@ void Alarm_Set (uint8_t adress, uint8_t sec, uint8_t min, uint8_t hour, uint8_t 
   // A mask bit for On/ Off state of the alarm
   uint8_t onOff = 128;
 
-  // For test: Try to add an On/ Off (1 bit) signal into the alarm pakage by using the empty MSB of the second register
+  // Add an ON/OFF (1 bit) signal into the alarm package by using the MSB of the second register
   if (on_off == 1)
   {
     sec += onOff;
@@ -533,11 +540,11 @@ void Alarm_Check (void)
     // Check if the alarm is at ON or OFF state by checking the MSB of the second register
     if (alarm_get.second < 128)
     {
-      // Stop checking other conditions if the alarm is at OFF state
+      // Skip further checks
       break;
     }
 
-    // For test only
+    // Debugging: Track if the alarm is at ON or OFF state
     alarm_check_onoff = 1;
 
     // Check if the current time matches the alarm time
@@ -546,27 +553,27 @@ void Alarm_Check (void)
       && (alarm_get.minute      == time_get.minute)
       && (alarm_get.hour        == time_get.hour))
     {
-      // For test only
+      // Debugging: Track if the alarm matches the current time (second, minute, hour)
       alarm_check_match1 = 1;
 
-      // Check if the alarm is at the [day of week]/ [date of month] mode by checking the MSB of the dow_dom register
+      // Check if the alarm is in [day of week] or [date of month] mode by examining the MSB of dow_dom.
       if (alarm_get.dow_dom >= 128)
       {
-        // For test only
+        // Debugging: Track if the alarm is at the [day of week]/ [date of month] mode
         alarm_check_dowdom = 1;
         
         // Check if the alarm is at the [day of week] mode by checking the mask bit (bit 6) of the dow_dom register
             // Unmask the MSB of the dow_dom register to get the original value of the dow_dom register
         if (alarm_get.dow_dom - 128 >= 64)
         {
-          // For test only
+          // Debugging: Track if the alarm is at the [day of week] mode
           alarm_check_dow = 1;
           
           // Check if the [day of the week] matches the current time
               // Unmask MSB and bit 6 of the dow_dom register to get the original value of the dow_dom register
           if (alarm_get.dow_dom - 128 - 64 == time_get.dayofweek)
           {
-            // For test only
+            // Debugging: Track if the alarm matches the current time (day of week)
             alarm_check_match2 = 1;
 
             // Alarm is triggered
@@ -579,10 +586,10 @@ void Alarm_Check (void)
         // If the alarm is at the [date of month] mode, check if the [date of month] matches the current time
         else if (alarm_get.dow_dom - 128 == time_get.dayofmonth)
         {
-          // For test only
+          // Debugging: Track if the alarm is at the [date of month] mode
           alarm_check_dom = 1;
           
-          // For test only
+          // Debugging: Track if the alarm matches the current time (date of month)
           alarm_check_match3 = 1;
           
           // Alarm is triggered
@@ -600,6 +607,7 @@ void Alarm_Check (void)
     alarm_check_counter += 1;
   }
 
+  // Debugging: Reset all the debugging variables
   alarm_check_onoff = 0;
   alarm_check_match1 = 0;
   alarm_check_match2 = 0;
@@ -612,7 +620,7 @@ void Alarm_Check (void)
 // Callback function to handle external GPIO interrupts
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  // Check the external interrupt on PB4
+  // Handle the external interrupt on PB5, triggered by the RTC module every second
   if(GPIO_Pin == RTC_TRIGGER_Pin)
   {
     // Set the RTC Trigger Flag
@@ -623,7 +631,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 // Callback function to handle UART interrupts
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-  // Check the UART instance
+  // Verify the UART instance to ensure the callback is for USART1
   // If the UART instance is USART1, store the received data into the uart_rx_data array
   if(huart->Instance == USART1)
   {
@@ -639,7 +647,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 // Callback function to handle ADC interrupts
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
-	// Check the ADC instance
+	// Verify the ADC instance to ensure the callback is for ADC1
   // If the ADC instance is ADC1, get the ADC value and calculate the battery percentage
   if (hadc == &hadc1)
 	{
