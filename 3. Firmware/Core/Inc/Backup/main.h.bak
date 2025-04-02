@@ -57,18 +57,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define BUTTON1_Pin GPIO_PIN_12
-#define BUTTON1_GPIO_Port GPIOB
-#define BUTTON2_Pin GPIO_PIN_13
-#define BUTTON2_GPIO_Port GPIOB
-#define BUTTON3_Pin GPIO_PIN_14
-#define BUTTON3_GPIO_Port GPIOB
-#define BUTTON4_Pin GPIO_PIN_15
-#define BUTTON4_GPIO_Port GPIOB
-#define BUTTON5_Pin GPIO_PIN_8
-#define BUTTON5_GPIO_Port GPIOA
-#define RTC_TRIGGER_Pin GPIO_PIN_5
-#define RTC_TRIGGER_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
