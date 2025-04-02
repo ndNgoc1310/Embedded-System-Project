@@ -25,11 +25,14 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
 #include "stdbool.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+
 // A structure of 7 one-byte unsigned characters to store 7 time values
 typedef struct {
 	uint8_t second;
@@ -48,15 +51,18 @@ typedef struct {
 	uint8_t hour;
 	uint8_t dow_dom;  // value of [Day of the week] or [Date of the month]
 } ALARM;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 // Slave address of DS3231 RTC module
 #define DS3231_ADDRESS 0xD0
 
 // Slave address of AT24C64D EEPROM module
 #define EEPROM_ADDR 0xA0
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -67,28 +73,31 @@ typedef struct {
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
 // Time variable
     // A variable to store the time values received from the RTC module every second
-    volatile TIME time_get;
+volatile TIME time_get;
 
-    // Alarm variable
-        // A variable to store the alarm values received from the EEPROM module every second
-    volatile ALARM alarm_get;
-    
-    // Flag variables
-        // Flag for alarm check external interrupt (Alarm Check Flag) on PB4 (Activated every second)
-    volatile bool alarm_check_flag = 0;
-    
-    // Pointer variables
-        // Pointer variable to store the next available address (alarm) on the EEPROM module
-    uint8_t alarm_pointer = 0;
-    
-    bool alarm_activated = 0;
+// Alarm variable
+    // A variable to store the alarm values received from the EEPROM module every second
+volatile ALARM alarm_get;
+
+// Flag variables
+    // Flag for alarm check external interrupt (Alarm Check Flag) on PB4 (Activated every second)
+volatile bool alarm_check_flag = 0;
+
+// Pointer variables
+    // Pointer variable to store the next available address (alarm) on the EEPROM module
+uint8_t alarm_pointer = 0;
+
+bool alarm_activated = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+
 // Function to convert a normal decimal number to a binary coded decimal (BCD) value
 uint8_t Dec_To_BCD(int val);
 
@@ -115,6 +124,7 @@ void Alarm_Get (uint8_t adress);
 
 // Function to check the alarms
 void Alarm_Check (void);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -140,6 +150,9 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
+  // Initialize RTC module (Run only once after reset the RTC module)
+  //Time_Init(00, 53, 15, 3, 26, 3, 25);
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -155,8 +168,6 @@ int main(void)
   MX_ADC1_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  // Initialize RTC module (Run only once after reset the RTC module)
-  //Time_Init(00, 53, 15, 3, 26, 3, 25);
 
   // Store values of a single alarm to the next available address on the EEPROM module
   //    void Alarm_Set (uint8_t adress, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool on_off)
@@ -165,6 +176,7 @@ int main(void)
   // Read values of a single alarm from a specific address on the EEPROM module
   //    void Alarm_Get (uint8_t adress)
   Alarm_Get(0);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -172,6 +184,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+    /* USER CODE BEGIN 3 */
+
     if (alarm_check_flag == 1)
     {
       // Retrieve the current time from the RTC module
@@ -185,7 +199,6 @@ int main(void)
       // Reset the Alarm Check Flag
       alarm_check_flag = 0;
     }
-    /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
@@ -237,6 +250,8 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+/* User-defined functions---------------------------------------------------*/
 // Convert normal decimal numbers to binary coded decimal
 uint8_t Dec_To_BCD(int val)
 {
@@ -429,7 +444,7 @@ void Alarm_Set (uint8_t adress, uint8_t sec, uint8_t min, uint8_t hour, uint8_t 
 
   // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-  HAL_I2C_Mem_Write(&hi2c2, EEPROM_ADDR, adress, 4, setAlarm, sizeof(setAlarm), 1000);
+  HAL_I2C_Mem_Write(&hi2c1, EEPROM_ADDR, adress, 4, setAlarm, sizeof(setAlarm), 1000);
 }
 
 // Read a single alarm from the EEPROM module
@@ -440,7 +455,7 @@ void Alarm_Get (uint8_t adress)
 
   // HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-  HAL_I2C_Mem_Read(&hi2c2, EEPROM_ADDR, adress, 4, getAlarm, sizeof(getAlarm), 1000);
+  HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDR, adress, 4, getAlarm, sizeof(getAlarm), 1000);
 
   // Store the alarm values into the alarm variable
   alarm_get.second  = getAlarm[0];
@@ -546,6 +561,18 @@ void Alarm_Check (void)
   alarm_check_dow = 0;
   alarm_check_dom = 0;
 }
+
+// Callback function to handle external GPIO interrupts
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  // Check the external interrupt on PB4
+  if(GPIO_Pin == RTC_TRIGGER_Pin)
+  {
+    // Set the Alarm Check Flag
+    alarm_check_flag = 1;
+  }
+}
+
 /* USER CODE END 4 */
 
 /**
