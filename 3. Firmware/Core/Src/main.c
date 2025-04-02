@@ -27,6 +27,8 @@
 /* USER CODE BEGIN Includes */
 
 #include "stdbool.h"
+#include "stdio.h"
+#include "string.h"
 
 /* USER CODE END Includes */
 
@@ -74,23 +76,44 @@ typedef struct {
 
 /* USER CODE BEGIN PV */
 
-// Time variable
-    // A variable to store the time values received from the RTC module every second
+// Variables for RTC module
+    // Variable to store the time values received from the RTC module every second
 volatile TIME time_get;
 
-// Alarm variable
-    // A variable to store the alarm values received from the EEPROM module every second
+    // Variable to store the alarm values received from the EEPROM module every second
 volatile ALARM alarm_get;
 
-// Flag variables
-    // Flag for alarm check external interrupt (Alarm Check Flag) on PB4 (Activated every second)
-volatile bool alarm_check_flag = 0;
+    // Flag for RTC trigger external interrupt (RTC Trigger Flag) on PB4 (Activated every second)
+volatile bool rtc_trigger_flag = 0;
 
-// Pointer variables
     // Pointer variable to store the next available address (alarm) on the EEPROM module
 uint8_t alarm_pointer = 0;
 
+    // Variable to check if the alarm is activated or not
 bool alarm_activated = 0;
+
+// Variables for ADC interface
+    // Flag for ADC interrupt (ADC Valid Flag)
+volatile bool adc_valid_flag = 0;   
+
+    // Variable for ADC raw data
+uint16_t adc_data;           
+
+    // Variable for battery percentage (raw data * 100 / 4095 (2^12))
+uint16_t battery_percentage; 
+
+// Variables for UART interface
+    // Flag for UART interrupt (UART Receive Flag)
+volatile bool uart_rx_flag = 0;
+
+    // Variable for UART receive data: hour and minute
+uint8_t uart_rx_data[2];
+
+    // Variable to store hour and minute values received from the UART module
+uint8_t uart_rx_hour;
+uint8_t uart_rx_minute;
+
+//uint8_t uVar;
 
 /* USER CODE END PV */
 
@@ -177,16 +200,25 @@ int main(void)
   //    void Alarm_Get (uint8_t adress)
   Alarm_Get(0);
 
+  // 
+  HAL_UART_Receive_IT(&huart1, uart_rx_data, 2);
+
+  // 
+  HAL_ADC_Start_IT(&hadc1);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    
     /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
 
-    if (alarm_check_flag == 1)
+    // Check if the RTC trigger flag is set (RTC Trigger Flag) on PB4 (Activated every second)
+    if (rtc_trigger_flag == 1)
     {
       // Retrieve the current time from the RTC module
       //    void Time_Get()
@@ -196,9 +228,24 @@ int main(void)
       //    void Alarm_Check()
       Alarm_Check();
 
-      // Reset the Alarm Check Flag
-      alarm_check_flag = 0;
+      // Reset the RTC Trigger Flag
+      rtc_trigger_flag = 0;
     }
+
+    // Check if the ADC interrupt flag is set (ADC Valid Flag)
+    if (adc_valid_flag == 1)
+	  {
+      HAL_ADC_Start_IT(&hadc1);                   //Enabling interrupt of adc
+      HAL_Delay(100);
+	  }
+
+    // Check if the UART interrupt flag is set (UART Receive Flag)
+    if (uart_rx_flag ==1 )
+	  {
+      HAL_UART_Receive_IT(&huart1,uart_rx_data,2); // Enabling interrupt receive again
+      HAL_Delay(100);
+	  }
+
   }
   /* USER CODE END 3 */
 }
@@ -568,9 +615,43 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   // Check the external interrupt on PB4
   if(GPIO_Pin == RTC_TRIGGER_Pin)
   {
-    // Set the Alarm Check Flag
-    alarm_check_flag = 1;
+    // Set the RTC Trigger Flag
+    rtc_trigger_flag = 1;
   }
+}
+
+// Callback function to handle UART interrupts
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  // Check the UART instance
+  // If the UART instance is USART1, store the received data into the uart_rx_data array
+  if(huart->Instance == USART1)
+  {
+    // Store the received data into the uart_rx_data array
+    uart_rx_hour = uart_rx_data[0];
+    uart_rx_minute = uart_rx_data[1];
+
+    // Set the UART receive flag
+    uart_rx_flag = 1;
+  }
+}
+
+// Callback function to handle ADC interrupts
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+	// Check the ADC instance
+  // If the ADC instance is ADC1, get the ADC value and calculate the battery percentage
+  if (hadc == &hadc1)
+	{
+    // Get the ADC value
+    adc_data = HAL_ADC_GetValue(&hadc1);
+
+    // Set the ADC valid flag
+    adc_valid_flag = 1;
+
+    // Calculate the battery percentage
+    battery_percentage = adc_data * 100 / 4095;
+	}
 }
 
 /* USER CODE END 4 */
