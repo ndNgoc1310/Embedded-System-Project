@@ -57,7 +57,9 @@ typedef struct {
 	uint8_t second;   // Seconds: 0-59 (MSB = 1 for ON, 0 for OFF)
 	uint8_t minute;   // Minutes: 0-59
 	uint8_t hour;     // Hours: 0-23
-	uint8_t dow_dom;  // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday) or Date of the month: 1-31 (MSB = 1 for [day of week], 0 for [date of month])
+	uint8_t dow_dom;  // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday) 
+                    // or Date of the month: 1-31 (MSB = 1 for [day of week], 0 for [date of month])
+                    // Not used: 0
 } ALARM;
 
 // Enum for button debounce states
@@ -108,9 +110,17 @@ typedef struct {
 volatile TIME time_get;
 
     // Variable to store the alarm values received from the EEPROM module every second
-volatile ALARM alarm_get;
+//volatile ALARM alarm_get;
 
-    // Flag for RTC trigger external interrupt (RTC Interrupt Flag) on PB4 (Activated every second)
+    // Pointer variable to store the alarm values received from the EEPROM module
+// ALARM alarm_check;
+// ALARM* alarm_check_pointer;
+
+    // Debugging: Track the values of alarms stored in the EEPROM module
+ALARM debug_alarm[10] = {0}; 
+ALARM* debug_alarm_pointer[10];
+
+// Flag for RTC trigger external interrupt (RTC Interrupt Flag) on PB4 (Activated every second)
 volatile bool rtc_int_flag = false;
 
     // Pointer variable to store the next available address (alarm) on the EEPROM module
@@ -189,9 +199,9 @@ void Time_Ctrl (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t do
 void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt, bool on_off, uint8_t adress);
 
 // Function to read a single alarm from the EEPROM module
-void Alarm_Get (uint8_t adress);
+void Alarm_Get (uint8_t adress, ALARM *alarm);
 
-// Function to check the alarms
+// // Function to check the alarms
 void Alarm_Check (void);
 
 // Debounce handler function to be called in main loop
@@ -248,7 +258,7 @@ int main(void)
   //      dom: Date of the month: 1-31
   //      month: Month: 1-12
   //      year: Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
-  Time_Init(00, 20, 21, 3, 26, 3, 25);
+  Time_Init(0, 2, 20, 7, 5, 4, 25);
   
   // Store values of a single alarm to the next available address on the EEPROM module
   //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt, bool on_off, uint8_t adress)
@@ -256,16 +266,21 @@ int main(void)
   //      min: Minutes: 0-59
   //      hour: Hours: 0-23
   //      dow_dom: Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday) 
-  //               or Date of the month: 1-31 (MSB = 1 for [day of week], 0 for [date of month])
-  //      dy_dt: [Day of week] or [date of month] (1 = day of week, 0 = date of month)
+  //               or Date of the month: 1-31 
+  //               (MSB = 1 for [day of week], 0 for [date of month])
+  //               Not used: 0
+  //      dy_dt: [Day of week] or [date of month] (1 = day of week, 0 = date of month, 0 = not used)
   //      on_off: On/ Off state of the alarm (1 = ON, 0 = OFF)
   //      adress: Address of the alarm in the EEPROM module (0-10)
-  Alarm_Set(00, 30, 20, 0, 1);
+  Alarm_Set(00, 30, 20, 0, 0, true, 0);
 
-  // Read values of a single alarm from a specific address on the EEPROM module
-  //    void Alarm_Get (uint8_t adress)
-  //      adress: Address of the alarm in the EEPROM module (0-10)
-  Alarm_Get(0);
+  // Assign the pointer debug_alarm_pointer to point to debug_alarm
+  for (int i = 0; i < 10; i++) {
+    debug_alarm_pointer[i] = &debug_alarm[i];
+  }
+
+  // Assign the pointer alarm_check_pointer to point to alarm_check
+  //alarm_check_pointer = &alarm_check;
 
   // Initialize the UART module to receive data
   //    HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
@@ -285,6 +300,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    
 
     // Check if the RTC Interrupt Flag is set (RTC Interrupt Flag) on PB4 (Activated every second)
     if (rtc_int_flag)
@@ -293,9 +309,15 @@ int main(void)
       //    void Time_Get()
       Time_Get();
 
+      // Debugging: Track the values of alarms stored in the EEPROM module
+      for (int i = 0; i <= 10; i++)
+      {
+        Alarm_Get(i, debug_alarm_pointer[i]);
+      }
+
       // Check the alarms
       //    void Alarm_Check()
-      Alarm_Check();
+      //Alarm_Check();
 
       // Reset the RTC Interrupt Flag
       rtc_int_flag = false;
@@ -631,6 +653,14 @@ void Time_Ctrl (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t do
 // RTC module initialization
 void Time_Init (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
 {
+  // sec: Seconds: 0-59
+  // min: Minutes: 0-59
+  // hour: Hours: 0-23
+  // dow: Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+  // dom: Date of the month: 1-31
+  // month: Month: 1-12
+  // year: Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
+  
   // This function is intended for initial setup of the RTC module after a reset.
   // It should not be called repeatedly unless reinitialization is required.
   //    Time_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
@@ -652,6 +682,17 @@ void Time_Init (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom
 // Write a single alarm to the EEPROM module
 void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt, bool on_off, uint8_t adress)
 {
+  // sec: Seconds: 0-59
+  // min: Minutes: 0-59
+  // hour: Hours: 0-23
+  // dow_dom: Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+  //          or Date of the month: 1-31
+  //          (MSB = 1 for [day of week], 0 for [date of month])
+  //          Not used: 0
+  // dy_dt: [Day of week] or [date of month] (1 = day of week, 0 = date of month, 0 = not used)
+  // on_off: On/ Off state of the alarm (1 = ON, 0 = OFF)
+  // adress: Address of the alarm in the EEPROM module (0-10)
+  
   // A mask bit for On/ Off state of the alarm
   uint8_t onOff = 128;
 
@@ -685,8 +726,10 @@ void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy
 }
 
 // Read a single alarm from the EEPROM module
-void Alarm_Get (uint8_t adress)
+void Alarm_Get (uint8_t adress, ALARM *alarm)
 {
+  // adress: Address of the alarm in the EEPROM module (0-10)
+  
   // A blank array (4 slots) to contain the alarm values received from the EEPROM module
   uint8_t getAlarm[4];
 
@@ -695,10 +738,10 @@ void Alarm_Get (uint8_t adress)
   HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDR, adress, 4, getAlarm, sizeof(getAlarm), 1000);
 
   // Store the alarm values into the alarm variable
-  alarm_get.second  = getAlarm[0];
-  alarm_get.minute  = getAlarm[1];
-  alarm_get.hour    = getAlarm[2];
-  alarm_get.dow_dom = getAlarm[3];
+  alarm->second  = getAlarm[0];
+  alarm->minute  = getAlarm[1];
+  alarm->hour    = getAlarm[2];
+  alarm->dow_dom = getAlarm[3];
 }
 
 uint8_t alarm_check_counter = 0;
@@ -711,94 +754,94 @@ uint8_t alarm_check_dow = 0;
 uint8_t alarm_check_dom = 0;
 
 // Function to check the alarms
-void Alarm_Check (void)
-{
-  // Compare the current time with all alarms stored in the EEPROM module
-  for (int i = 0; i <= alarm_pointer; i++)
-  {
-    // Retrieve the alarm values from the EEPROM module
-    //    void Alarm_Get (uint8_t adress)
-    Alarm_Get(i);
+// void Alarm_Check (void)
+// {
+//   // Compare the current time with all alarms stored in the EEPROM module
+//   for (int i = 0; i <= alarm_pointer; i++)
+//   {
+//     // Retrieve the alarm values from the EEPROM module
+//     //    void Alarm_Get (uint8_t adress)
+//     Alarm_Get(i, alarm_check_pointer);
 
-    // Check if the alarm is at ON or OFF state by checking the MSB of the second register
-    if (alarm_get.second < 128)
-    {
-      // Skip further checks
-      break;
-    }
+//     // Check if the alarm is at ON or OFF state by checking the MSB of the second register
+//     if (alarm_check_pointer->second < 128)
+//     {
+//       // Skip further checks
+//       break;
+//     }
 
-    // Debugging: Track if the alarm is at ON or OFF state
-    alarm_check_onoff = 1;
+//     // Debugging: Track if the alarm is at ON or OFF state
+//     alarm_check_onoff = 1;
 
-    // Check if the current time matches the alarm time
-        // Unmask the MSB of the second register to get the original value of the second register
-    if ((alarm_get.second - 128 == time_get.second)  
-      && (alarm_get.minute      == time_get.minute)
-      && (alarm_get.hour        == time_get.hour))
-    {
-      // Debugging: Track if the alarm matches the current time (second, minute, hour)
-      alarm_check_match1 = 1;
+//     // Check if the current time matches the alarm time
+//         // Unmask the MSB of the second register to get the original value of the second register
+//     if ((alarm_check_pointer->second - 128 == time_get.second)  
+//       && (alarm_check_pointer->minute      == time_get.minute)
+//       && (alarm_check_pointer->hour        == time_get.hour))
+//     {
+//       // Debugging: Track if the alarm matches the current time (second, minute, hour)
+//       alarm_check_match1 = 1;
 
-      // Check if the alarm is in [day of week] or [date of month] mode by examining the MSB of dow_dom.
-      if (alarm_get.dow_dom >= 128)
-      {
-        // Debugging: Track if the alarm is at the [day of week]/ [date of month] mode
-        alarm_check_dowdom = 1;
+//       // Check if the alarm is in [day of week] or [date of month] mode by examining the MSB of dow_dom.
+//       if (alarm_check_pointer->dow_dom >= 128)
+//       {
+//         // Debugging: Track if the alarm is at the [day of week]/ [date of month] mode
+//         alarm_check_dowdom = 1;
         
-        // Check if the alarm is at the [day of week] mode by checking the mask bit (bit 6) of the dow_dom register
-            // Unmask the MSB of the dow_dom register to get the original value of the dow_dom register
-        if (alarm_get.dow_dom - 128 >= 64)
-        {
-          // Debugging: Track if the alarm is at the [day of week] mode
-          alarm_check_dow = 1;
+//         // Check if the alarm is at the [day of week] mode by checking the mask bit (bit 6) of the dow_dom register
+//             // Unmask the MSB of the dow_dom register to get the original value of the dow_dom register
+//         if (alarm_check_pointer->dow_dom - 128 >= 64)
+//         {
+//           // Debugging: Track if the alarm is at the [day of week] mode
+//           alarm_check_dow = 1;
           
-          // Check if the [day of the week] matches the current time
-              // Unmask MSB and bit 6 of the dow_dom register to get the original value of the dow_dom register
-          if (alarm_get.dow_dom - 128 - 64 == time_get.dayofweek)
-          {
-            // Debugging: Track if the alarm matches the current time (day of week)
-            alarm_check_match2 = 1;
+//           // Check if the [day of the week] matches the current time
+//               // Unmask MSB and bit 6 of the dow_dom register to get the original value of the dow_dom register
+//           if (alarm_check_pointer->dow_dom - 128 - 64 == time_get.dayofweek)
+//           {
+//             // Debugging: Track if the alarm matches the current time (day of week)
+//             alarm_check_match2 = 1;
 
-            // Alarm is triggered
-            alarm_activated = 1;
+//             // Alarm is triggered
+//             alarm_activated = 1;
 
-            break;
-          }
-        }
+//             break;
+//           }
+//         }
         
-        // If the alarm is at the [date of month] mode, check if the [date of month] matches the current time
-        else if (alarm_get.dow_dom - 128 == time_get.dateofmonth)
-        {
-          // Debugging: Track if the alarm is at the [date of month] mode
-          alarm_check_dom = 1;
+//         // If the alarm is at the [date of month] mode, check if the [date of month] matches the current time
+//         else if (alarm_check_pointer->dow_dom - 128 == time_get.dateofmonth)
+//         {
+//           // Debugging: Track if the alarm is at the [date of month] mode
+//           alarm_check_dom = 1;
           
-          // Debugging: Track if the alarm matches the current time (date of month)
-          alarm_check_match3 = 1;
+//           // Debugging: Track if the alarm matches the current time (date of month)
+//           alarm_check_match3 = 1;
           
-          // Alarm is triggered
-          alarm_activated = 1;
+//           // Alarm is triggered
+//           alarm_activated = 1;
 
-          break;
-        }
-      }
-    }
-    else
-    {
-      break;
-    }
+//           break;
+//         }
+//       }
+//     }
+//     else
+//     {
+//       break;
+//     }
 
-    alarm_check_counter += 1;
-  }
+//     alarm_check_counter += 1;
+//   }
 
-  // Debugging: Reset all the debugging variables
-  alarm_check_onoff = 0;
-  alarm_check_match1 = 0;
-  alarm_check_match2 = 0;
-  alarm_check_match3 = 0;
-  alarm_check_dowdom = 0;
-  alarm_check_dow = 0;
-  alarm_check_dom = 0;
-}
+//   // Debugging: Reset all the debugging variables
+//   alarm_check_onoff = 0;
+//   alarm_check_match1 = 0;
+//   alarm_check_match2 = 0;
+//   alarm_check_match3 = 0;
+//   alarm_check_dowdom = 0;
+//   alarm_check_dow = 0;
+//   alarm_check_dom = 0;
+// }
 
 // Debounce handler function to be called in main loop
 void Button_Debounce(BUTTON *button)
