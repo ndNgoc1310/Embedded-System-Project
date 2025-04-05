@@ -186,7 +186,7 @@ void Time_Get (void);
 void Time_Ctrl (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt);
 
 // Function to write a single alarm to the EEPROM module
-void Alarm_Set (uint8_t adress, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool on_off);
+void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt, bool on_off, uint8_t adress);
 
 // Function to read a single alarm from the EEPROM module
 void Alarm_Get (uint8_t adress);
@@ -195,7 +195,7 @@ void Alarm_Get (uint8_t adress);
 void Alarm_Check (void);
 
 // Debounce handler function to be called in main loop
-void Debounce_Handle(BUTTON *button);
+void Button_Debounce(BUTTON *button);
 
 
 /* USER CODE END PFP */
@@ -240,15 +240,32 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // Initialize RTC module (Run only once after reset the RTC module)
+  //    void Time_Init(uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
+  //      sec: Seconds: 0-59
+  //      min: Minutes: 0-59
+  //      hour: Hours: 0-23
+  //      dow: Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+  //      dom: Date of the month: 1-31
+  //      month: Month: 1-12
+  //      year: Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
   Time_Init(00, 20, 21, 3, 26, 3, 25);
   
   // Store values of a single alarm to the next available address on the EEPROM module
-  //    void Alarm_Set (uint8_t adress, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool on_off)
-  //Alarm_Set(0, 30, 59, 15, 0, 1);
+  //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt, bool on_off, uint8_t adress)
+  //      sec: Seconds: 0-59
+  //      min: Minutes: 0-59
+  //      hour: Hours: 0-23
+  //      dow_dom: Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday) 
+  //               or Date of the month: 1-31 (MSB = 1 for [day of week], 0 for [date of month])
+  //      dy_dt: [Day of week] or [date of month] (1 = day of week, 0 = date of month)
+  //      on_off: On/ Off state of the alarm (1 = ON, 0 = OFF)
+  //      adress: Address of the alarm in the EEPROM module (0-10)
+  Alarm_Set(00, 30, 20, 0, 1);
 
   // Read values of a single alarm from a specific address on the EEPROM module
   //    void Alarm_Get (uint8_t adress)
-  //Alarm_Get(0);
+  //      adress: Address of the alarm in the EEPROM module (0-10)
+  Alarm_Get(0);
 
   // Initialize the UART module to receive data
   //    HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
@@ -288,8 +305,8 @@ int main(void)
     if (button1.int_flag)
     {
       // Handle button 1 press event
-      //    void Debounce_Handle(BUTTON *button)
-      Debounce_Handle(&button1);
+      //    void Button_Debounce(BUTTON *button)
+      Button_Debounce(&button1);
 
       // Check if the button is pressed (LOW)
       if (button1.press_flag)
@@ -309,8 +326,8 @@ int main(void)
     if (button2.int_flag)
     {
       // Handle button 2 press event
-      //    void Debounce_Handle(BUTTON *button)
-      Debounce_Handle(&button2);
+      //    void Button_Debounce(BUTTON *button)
+      Button_Debounce(&button2);
 
       // Check if the button is pressed (LOW)
       if (button2.press_flag)
@@ -330,8 +347,8 @@ int main(void)
     if (button3.int_flag)
     {
       // Handle button 3 press event
-      //    void Debounce_Handle(BUTTON *button)
-      Debounce_Handle(&button3);
+      //    void Button_Debounce(BUTTON *button)
+      Button_Debounce(&button3);
 
       // Check if the button is pressed (LOW)
       if (button3.press_flag)
@@ -351,8 +368,8 @@ int main(void)
     if (button4.int_flag)
     {
       // Handle button 4 press event
-      //    void Debounce_Handle(BUTTON *button)
-      Debounce_Handle(&button4);
+      //    void Button_Debounce(BUTTON *button)
+      Button_Debounce(&button4);
 
       // Check if the button is pressed (LOW)
       if (button4.press_flag)
@@ -372,8 +389,8 @@ int main(void)
     if (button5.int_flag)
     {
       // Handle button 5 press event
-      //    void Debounce_Handle(BUTTON *button)
-      Debounce_Handle(&button5);
+      //    void Button_Debounce(BUTTON *button)
+      Button_Debounce(&button5);
 
       // Check if the button is pressed (LOW)
       if (button5.press_flag)
@@ -633,15 +650,24 @@ void Time_Init (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom
 }
 
 // Write a single alarm to the EEPROM module
-void Alarm_Set (uint8_t adress, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool on_off)
+void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt, bool on_off, uint8_t adress)
 {
   // A mask bit for On/ Off state of the alarm
   uint8_t onOff = 128;
 
   // Add an ON/OFF (1 bit) signal into the alarm package by using the MSB of the second register
-  if (on_off == 1)
+  if (on_off)
   {
     sec += onOff;
+  }
+
+  // A mask bit for the [day of week] or [date of month] selection
+  uint8_t dyDt = 64;
+
+  // Add a [day of week] or [date of month] (1 bit) signal into the alarm package by using bit 6 of the dow_dom register
+  if (dy_dt)
+  {
+    dow_dom += dyDt;
   }
 
   // A blank array (4 slots) to contain the alarm values
@@ -775,7 +801,7 @@ void Alarm_Check (void)
 }
 
 // Debounce handler function to be called in main loop
-void Debounce_Handle(BUTTON *button)
+void Button_Debounce(BUTTON *button)
 {
   // Check button state and handle debouncing
   switch (button->state)
@@ -875,11 +901,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       // Handle other GPIO interrupts if necessary
     break;
   }
-}
-
-void Button_Debounce (void)
-{
-  
 }
 
 // Callback function to handle UART interrupts
