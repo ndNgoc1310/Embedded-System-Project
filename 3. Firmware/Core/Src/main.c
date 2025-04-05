@@ -41,25 +41,26 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
-// Structure of 7 one-byte unsigned characters to store 7 time values
+// Structure of 7 one-byte unsigned characters to store time values
 typedef struct {
-	uint8_t second;
-	uint8_t minute;
-	uint8_t hour;
-	uint8_t dayofweek;
-	uint8_t dayofmonth;
-	uint8_t month;
-	uint8_t year;
+	uint8_t second;       // Seconds: 0-59
+	uint8_t minute;       // Minutes: 0-59
+	uint8_t hour;         // Hours: 0-23    
+	uint8_t dayofweek;    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+	uint8_t dateofmonth;  // Date of the month: 1-31
+	uint8_t month;        // Month: 1-12
+	uint8_t year;         // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
 } TIME;
 
-// Structure of 4 one-byte unsigned characters to store 4 alarm values
+// Structure of 4 one-byte unsigned characters to store alarm values
 typedef struct {
-	uint8_t second;
-	uint8_t minute;
-	uint8_t hour;
-	uint8_t dow_dom;  // value of [Day of the week] or [Date of the month]
+	uint8_t second;   // Seconds: 0-59 (MSB = 1 for ON, 0 for OFF)
+	uint8_t minute;   // Minutes: 0-59
+	uint8_t hour;     // Hours: 0-23
+	uint8_t dow_dom;  // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday) or Date of the month: 1-31 (MSB = 1 for [day of week], 0 for [date of month])
 } ALARM;
 
+// Enum for button debounce states
 typedef enum {
   BUTTON_STATE_HIGH,
   BUTTON_STATE_WAITING,
@@ -68,12 +69,12 @@ typedef enum {
 
 // Struct representing each button with debouncing state
 typedef struct {
-  GPIO_TypeDef    *gpio_port; // GPIO port       
-  uint16_t        gpio_pin;   // GPIO pin number
-  BUTTON_STATE    state;      // Current debounce state
-  uint32_t        start_tick; // Timestamp when debounce started
-  volatile bool   int_flag;   // Set in ISR
-  volatile bool   press_flag; // Set when valid press is confirmed
+  GPIO_TypeDef    *gpio_port; // GPIO port of the button      
+  uint16_t        gpio_pin;   // GPIO pin of the button
+  BUTTON_STATE    state;      // Current state of the button
+  uint32_t        start_tick; // Start time of the debounce timer
+  volatile bool   int_flag;   // Set when button interrupt is triggered
+  volatile bool   press_flag; // Set when button is pressed
 } BUTTON;
 
 
@@ -89,7 +90,7 @@ typedef struct {
 #define EEPROM_ADDR 0xA0
 
 // Debounce threshold in milliseconds
-#define DEBOUNCE_DELAY_MS 50  
+#define DEBOUNCE_DELAY_MS 50 
 
 /* USER CODE END PD */
 
@@ -283,17 +284,109 @@ int main(void)
       rtc_int_flag = false;
     }
 
-    // Call debounce check for each button
-    Debounce_Handle(&button1);
-
-    if (button1.press_flag)
+    // Check if the Button 1 Interrupt Flag is set (Button 1 Interrupt Flag) on PB12
+    if (button1.int_flag)
     {
       // Handle button 1 press event
-      button1_pressed = !button1_pressed;
-      button1_counter += 1;
+      //    void Debounce_Handle(BUTTON *button)
+      Debounce_Handle(&button1);
 
-      // Reset the Button 1 Interrupt Flag
+      // Check if the button is pressed (LOW)
+      if (button1.press_flag)
+      {
+      // Debugging: Track if the button is pressed
+      button1_pressed = !button1_pressed;
+
+      // Debugging: Track the number of button presses
+      button1_counter += 1;
+      }
+    
+      // Reset the Button 1 Press Flag
       button1.press_flag = false;
+    }
+
+    // Check if the Button 2 Interrupt Flag is set (Button 2 Interrupt Flag) on PB13
+    if (button2.int_flag)
+    {
+      // Handle button 2 press event
+      //    void Debounce_Handle(BUTTON *button)
+      Debounce_Handle(&button2);
+
+      // Check if the button is pressed (LOW)
+      if (button2.press_flag)
+      {
+      // Debugging: Track if the button is pressed
+      button2_pressed = !button2_pressed;
+
+      // Debugging: Track the number of button presses
+      button2_counter += 1;
+      }
+    
+      // Reset the Button 2 Press Flag
+      button2.press_flag = false;
+    }
+
+    // Check if the Button 3 Interrupt Flag is set (Button 3 Interrupt Flag) on PB14
+    if (button3.int_flag)
+    {
+      // Handle button 3 press event
+      //    void Debounce_Handle(BUTTON *button)
+      Debounce_Handle(&button3);
+
+      // Check if the button is pressed (LOW)
+      if (button3.press_flag)
+      {
+      // Debugging: Track if the button is pressed
+      button3_pressed = !button3_pressed;
+
+      // Debugging: Track the number of button presses
+      button3_counter += 1;
+      }
+    
+      // Reset the Button 3 Press Flag
+      button3.press_flag = false;
+    }
+
+    // Check if the Button 4 Interrupt Flag is set (Button 4 Interrupt Flag) on PB15
+    if (button4.int_flag)
+    {
+      // Handle button 4 press event
+      //    void Debounce_Handle(BUTTON *button)
+      Debounce_Handle(&button4);
+
+      // Check if the button is pressed (LOW)
+      if (button4.press_flag)
+      {
+      // Debugging: Track if the button is pressed
+      button4_pressed = !button4_pressed;
+
+      // Debugging: Track the number of button presses
+      button4_counter += 1;
+      }
+    
+      // Reset the Button 4 Press Flag
+      button4.press_flag = false;
+    }
+
+    // Check if the Button 5 Interrupt Flag is set (Button 5 Interrupt Flag) on PA8
+    if (button5.int_flag)
+    {
+      // Handle button 5 press event
+      //    void Debounce_Handle(BUTTON *button)
+      Debounce_Handle(&button5);
+
+      // Check if the button is pressed (LOW)
+      if (button5.press_flag)
+      {
+      // Debugging: Track if the button is pressed
+      button5_pressed = !button5_pressed;
+
+      // Debugging: Track the number of button presses
+      button5_counter += 1;
+      }
+    
+      // Reset the Button 5 Press Flag
+      button5.press_flag = false;
     }
 
     // Check if the ADC interrupt flag is set (ADC Valid Flag)
@@ -414,13 +507,13 @@ void Time_Get (void)
   HAL_I2C_Mem_Read(&hi2c1, DS3231_ADDRESS, 0x00, 1, getTime, sizeof(getTime), 1000);
 
   // Store the time values (converted from BCD code to decimal) into the time variable
-	time_get.second     = BCD_To_Dec(getTime[0]);
-	time_get.minute     = BCD_To_Dec(getTime[1]);
-	time_get.hour       = BCD_To_Dec(getTime[2]);
-	time_get.dayofweek  = BCD_To_Dec(getTime[3]);
-	time_get.dayofmonth = BCD_To_Dec(getTime[4]);
-	time_get.month      = BCD_To_Dec(getTime[5]);
-	time_get.year       = BCD_To_Dec(getTime[6]);
+	time_get.second       = BCD_To_Dec(getTime[0]);
+	time_get.minute       = BCD_To_Dec(getTime[1]);
+	time_get.hour         = BCD_To_Dec(getTime[2]);
+	time_get.dayofweek    = BCD_To_Dec(getTime[3]);
+	time_get.dateofmonth  = BCD_To_Dec(getTime[4]);
+	time_get.month        = BCD_To_Dec(getTime[5]);
+	time_get.year         = BCD_To_Dec(getTime[6]);
 }
 
 // Function to control settings of the RTC module (Alarm 1)
@@ -648,7 +741,7 @@ void Alarm_Check (void)
         }
         
         // If the alarm is at the [date of month] mode, check if the [date of month] matches the current time
-        else if (alarm_get.dow_dom - 128 == time_get.dayofmonth)
+        else if (alarm_get.dow_dom - 128 == time_get.dateofmonth)
         {
           // Debugging: Track if the alarm is at the [date of month] mode
           alarm_check_dom = 1;
@@ -699,6 +792,7 @@ void Debounce_Handle(BUTTON *button)
         // Set the button state to waiting
         button->state = BUTTON_STATE_WAITING;
       }
+
     break;
 
     // State when the button is in transition (waiting for debounce)
@@ -714,14 +808,15 @@ void Debounce_Handle(BUTTON *button)
           button->press_flag = true;
 
           // Set the button state to stable low (pressed)
-          button->state = BUTTON_STATE_STABLE_LOW;
+          button->state = BUTTON_STATE_LOW;
         } 
         else 
         {
           // Set the button state to stable high (not pressed)
-          button->state = BUTTON_STATE_STABLE_HIGH; // False alarm
+          button->state = BUTTON_STATE_HIGH; // False alarm
         }
       }
+
     break;
 
     // State when the button is pressed (LOW)
@@ -731,12 +826,13 @@ void Debounce_Handle(BUTTON *button)
       if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == GPIO_PIN_SET) 
       {
         // Set the button state to stable high (not pressed)
-        button->state = BUTTON_STATE_STABLE_HIGH;
+        button->state = BUTTON_STATE_HIGH;
 
         // Reset the button interrupt flag
         button->int_flag = false;
       }
-      break;
+
+    break;
   }
 }
 
