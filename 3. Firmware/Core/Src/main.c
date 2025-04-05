@@ -41,7 +41,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
-// A structure of 7 one-byte unsigned characters to store 7 time values
+// Structure of 7 one-byte unsigned characters to store 7 time values
 typedef struct {
 	uint8_t second;
 	uint8_t minute;
@@ -52,13 +52,30 @@ typedef struct {
 	uint8_t year;
 } TIME;
 
-// A structure of 4 one-byte unsigned characters to store 4 alarm values
+// Structure of 4 one-byte unsigned characters to store 4 alarm values
 typedef struct {
 	uint8_t second;
 	uint8_t minute;
 	uint8_t hour;
 	uint8_t dow_dom;  // value of [Day of the week] or [Date of the month]
 } ALARM;
+
+typedef enum {
+  BUTTON_STATE_HIGH,
+  BUTTON_STATE_WAITING,
+  BUTTON_STATE_LOW
+} BUTTON_STATE;
+
+// Struct representing each button with debouncing state
+typedef struct {
+  GPIO_TypeDef    *gpio_port; // GPIO port       
+  uint16_t        gpio_pin;   // GPIO pin number
+  BUTTON_STATE    state;      // Current debounce state
+  uint32_t        start_tick; // Timestamp when debounce started
+  volatile bool   int_flag;   // Set in ISR
+  volatile bool   press_flag; // Set when valid press is confirmed
+} BUTTON;
+
 
 /* USER CODE END PTD */
 
@@ -70,6 +87,9 @@ typedef struct {
 
 // Slave address of AT24C64D EEPROM module
 #define EEPROM_ADDR 0xA0
+
+// Debounce threshold in milliseconds
+#define DEBOUNCE_DELAY_MS 50  
 
 /* USER CODE END PD */
 
@@ -89,18 +109,39 @@ volatile TIME time_get;
     // Variable to store the alarm values received from the EEPROM module every second
 volatile ALARM alarm_get;
 
-    // Flag for RTC trigger external interrupt (RTC Trigger Flag) on PB4 (Activated every second)
-volatile bool rtc_trigger_flag = 0;
+    // Flag for RTC trigger external interrupt (RTC Interrupt Flag) on PB4 (Activated every second)
+volatile bool rtc_int_flag = false;
 
     // Pointer variable to store the next available address (alarm) on the EEPROM module
 uint8_t alarm_pointer = 0;
 
     // Variable to check if the alarm is activated or not
-bool alarm_activated = 0;
+bool alarm_activated = false;
+
+// Variables for pressing buttons
+    // Debugging: Track if the button is pressed or not
+bool button1_pressed = false;
+bool button2_pressed = false;
+bool button3_pressed = false;
+bool button4_pressed = false;
+bool button5_pressed = false;
+
+uint8_t button1_counter = 0;
+uint8_t button2_counter = 0;
+uint8_t button3_counter = 0;
+uint8_t button4_counter = 0;
+uint8_t button5_counter = 0;
+
+  // Global instances of DEBOUNCE_BUTTON for each button
+BUTTON button1 = {GPIOB, BUTTON1_IN12_Pin, BUTTON_STATE_HIGH, 0, false, false};
+BUTTON button2 = {GPIOB, BUTTON2_IN13_Pin, BUTTON_STATE_HIGH, 0, false, false};
+BUTTON button3 = {GPIOB, BUTTON3_IN14_Pin, BUTTON_STATE_HIGH, 0, false, false};
+BUTTON button4 = {GPIOB, BUTTON4_IN15_Pin, BUTTON_STATE_HIGH, 0, false, false};
+BUTTON button5 = {GPIOA, BUTTON5_IN8_Pin, BUTTON_STATE_HIGH, 0, false, false};
 
 // Variables for ADC interface
     // Flag for ADC interrupt (ADC Valid Flag)
-volatile bool adc_valid_flag = 0;   
+volatile bool adc_valid_flag = false;   
 
     // Variable for ADC raw data
 uint16_t adc_data;           
@@ -110,7 +151,7 @@ uint16_t battery_percentage;
 
 // Variables for UART interface
     // Flag for UART interrupt (UART Receive Flag)
-volatile bool uart_rx_flag = 0;
+volatile bool uart_rx_flag = false;
 
     // Variable for UART receive data: hour and minute
 uint8_t uart_rx_data[2];
@@ -118,8 +159,6 @@ uint8_t uart_rx_data[2];
     // Variable to store hour and minute values received from the UART module
 uint8_t uart_rx_hour;
 uint8_t uart_rx_minute;
-
-//uint8_t uVar;
 
 /* USER CODE END PV */
 
@@ -154,6 +193,10 @@ void Alarm_Get (uint8_t adress);
 // Function to check the alarms
 void Alarm_Check (void);
 
+// Debounce handler function to be called in main loop
+void Debounce_Handle(BUTTON *button);
+
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -179,9 +222,6 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
-  // Initialize RTC module (Run only once after reset the RTC module)
-  //Time_Init(00, 53, 15, 3, 26, 3, 25);
-
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -198,18 +238,23 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  // Initialize RTC module (Run only once after reset the RTC module)
+  Time_Init(00, 20, 21, 3, 26, 3, 25);
+  
   // Store values of a single alarm to the next available address on the EEPROM module
   //    void Alarm_Set (uint8_t adress, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool on_off)
-  Alarm_Set(0, 30, 59, 15, 0, 1);
+  //Alarm_Set(0, 30, 59, 15, 0, 1);
 
   // Read values of a single alarm from a specific address on the EEPROM module
   //    void Alarm_Get (uint8_t adress)
-  Alarm_Get(0);
+  //Alarm_Get(0);
 
-  // 
+  // Initialize the UART module to receive data
+  //    HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
   HAL_UART_Receive_IT(&huart1, uart_rx_data, 2);
 
-  // 
+  // Initialize the ADC module to monitor battery voltage
+  //    HAL_ADC_Start_IT(ADC_HandleTypeDef *hadc);
   HAL_ADC_Start_IT(&hadc1);
 
   /* USER CODE END 2 */
@@ -223,8 +268,8 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    // Check if the RTC trigger flag is set (RTC Trigger Flag) on PB4 (Activated every second)
-    if (rtc_trigger_flag == 1)
+    // Check if the RTC Interrupt Flag is set (RTC Interrupt Flag) on PB4 (Activated every second)
+    if (rtc_int_flag)
     {
       // Retrieve the current time from the RTC module
       //    void Time_Get()
@@ -234,12 +279,25 @@ int main(void)
       //    void Alarm_Check()
       Alarm_Check();
 
-      // Reset the RTC Trigger Flag
-      rtc_trigger_flag = 0;
+      // Reset the RTC Interrupt Flag
+      rtc_int_flag = false;
+    }
+
+    // Call debounce check for each button
+    Debounce_Handle(&button1);
+
+    if (button1.press_flag)
+    {
+      // Handle button 1 press event
+      button1_pressed = !button1_pressed;
+      button1_counter += 1;
+
+      // Reset the Button 1 Interrupt Flag
+      button1.press_flag = false;
     }
 
     // Check if the ADC interrupt flag is set (ADC Valid Flag)
-    if (adc_valid_flag == 1)
+    if (adc_valid_flag)
 	  {
       // Re-enable the ADC interrupt to continue monitoring ADC values
       HAL_ADC_Start_IT(&hadc1);
@@ -249,7 +307,7 @@ int main(void)
 	  }
 
     // Check if the UART interrupt flag is set (UART Receive Flag)
-    if (uart_rx_flag ==1 )
+    if (uart_rx_flag)
 	  {
       // Re-enable the UART interrupt to continue receiving data
       HAL_UART_Receive_IT(&huart1,uart_rx_data,2); 
@@ -380,7 +438,7 @@ void Time_Ctrl (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t do
 
   // A mask bit for selection of [day of week] or [date of month] (Bit 6) in the RTC module
   //    If the input [day of week]/ [date of month] selection is 1, the mask bit will be 64.
-  uint8_t dyDt = (dy_dt == 1) ? 64 : 0;
+  uint8_t dyDt = (dy_dt == true) ? 64 : 0;
 
   // Store the RTC alarm time settings (converted into BCD code) into the blank array
   ctrlTime[0] = Dec_To_BCD(sec);
@@ -623,15 +681,109 @@ void Alarm_Check (void)
   alarm_check_dom = 0;
 }
 
+// Debounce handler function to be called in main loop
+void Debounce_Handle(BUTTON *button)
+{
+  // Check button state and handle debouncing
+  switch (button->state)
+  {
+    // State when the button is not pressed (HIGH)
+    case BUTTON_STATE_HIGH:
+
+      // Check if the button is pressed (LOW)
+      if (button->int_flag) 
+      {
+        // Start the debounce timer
+        button->start_tick = HAL_GetTick();
+
+        // Set the button state to waiting
+        button->state = BUTTON_STATE_WAITING;
+      }
+    break;
+
+    // State when the button is in transition (waiting for debounce)
+    case BUTTON_STATE_WAITING:
+
+      // Check if the button is still pressed (LOW) after the debounce delay
+      if (HAL_GetTick() - button->start_tick >= DEBOUNCE_DELAY_MS) 
+      {
+        // Check if the button is still pressed (LOW)
+        if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == GPIO_PIN_RESET) 
+        {
+          // Set the button press flag to true (valid press detected)
+          button->press_flag = true;
+
+          // Set the button state to stable low (pressed)
+          button->state = BUTTON_STATE_STABLE_LOW;
+        } 
+        else 
+        {
+          // Set the button state to stable high (not pressed)
+          button->state = BUTTON_STATE_STABLE_HIGH; // False alarm
+        }
+      }
+    break;
+
+    // State when the button is pressed (LOW)
+    case BUTTON_STATE_LOW:
+
+      // Wait until button is released
+      if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == GPIO_PIN_SET) 
+      {
+        // Set the button state to stable high (not pressed)
+        button->state = BUTTON_STATE_STABLE_HIGH;
+
+        // Reset the button interrupt flag
+        button->int_flag = false;
+      }
+      break;
+  }
+}
+
 // Callback function to handle external GPIO interrupts
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  // Handle the external interrupt on PB5, triggered by the RTC module every second
-  if(GPIO_Pin == RTC_TRIGGER_Pin)
+  switch (GPIO_Pin)
   {
-    // Set the RTC Trigger Flag
-    rtc_trigger_flag = 1;
+    case RTC_IN5_Pin:
+      // Set the RTC Interrupt Flag
+      rtc_int_flag = true;
+    break;
+    
+    case BUTTON1_IN12_Pin:
+      // Set the Button 1 Interrupt Flag
+      button1.int_flag = true;
+    break;
+
+    case BUTTON2_IN13_Pin:
+      // Set the Button 2 Interrupt Flag
+      button2.int_flag = true;
+    break;
+
+    case BUTTON3_IN14_Pin:
+      // Set the Button 3 Interrupt Flag
+      button3.int_flag = true;
+    break;
+
+    case BUTTON4_IN15_Pin:
+      // Set the Button 4 Interrupt Flag
+      button4.int_flag = true;
+    break;  
+
+    case BUTTON5_IN8_Pin:
+      // Set the Button 5 Interrupt Flag
+      button5.int_flag = true;
+    break;  
+
+    default:
+      // Handle other GPIO interrupts if necessary
+    break;
   }
+}
+
+void Button_Debounce (void)
+{
+  
 }
 
 // Callback function to handle UART interrupts

@@ -57,18 +57,24 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define BUTTON1_Pin GPIO_PIN_12
-#define BUTTON1_GPIO_Port GPIOB
-#define BUTTON2_Pin GPIO_PIN_13
-#define BUTTON2_GPIO_Port GPIOB
-#define BUTTON3_Pin GPIO_PIN_14
-#define BUTTON3_GPIO_Port GPIOB
-#define BUTTON4_Pin GPIO_PIN_15
-#define BUTTON4_GPIO_Port GPIOB
-#define BUTTON5_Pin GPIO_PIN_8
-#define BUTTON5_GPIO_Port GPIOA
-#define RTC_TRIGGER_Pin GPIO_PIN_5
-#define RTC_TRIGGER_GPIO_Port GPIOB
+#define BUTTON1_IN12_Pin GPIO_PIN_12
+#define BUTTON1_IN12_GPIO_Port GPIOB
+#define BUTTON1_IN12_EXTI_IRQn EXTI15_10_IRQn
+#define BUTTON2_IN13_Pin GPIO_PIN_13
+#define BUTTON2_IN13_GPIO_Port GPIOB
+#define BUTTON2_IN13_EXTI_IRQn EXTI15_10_IRQn
+#define BUTTON3_IN14_Pin GPIO_PIN_14
+#define BUTTON3_IN14_GPIO_Port GPIOB
+#define BUTTON3_IN14_EXTI_IRQn EXTI15_10_IRQn
+#define BUTTON4_IN15_Pin GPIO_PIN_15
+#define BUTTON4_IN15_GPIO_Port GPIOB
+#define BUTTON4_IN15_EXTI_IRQn EXTI15_10_IRQn
+#define BUTTON5_IN8_Pin GPIO_PIN_8
+#define BUTTON5_IN8_GPIO_Port GPIOA
+#define BUTTON5_IN8_EXTI_IRQn EXTI9_5_IRQn
+#define RTC_IN5_Pin GPIO_PIN_5
+#define RTC_IN5_GPIO_Port GPIOB
+#define RTC_IN5_EXTI_IRQn EXTI9_5_IRQn
 
 /* USER CODE BEGIN Private defines */
 
