@@ -62,22 +62,22 @@ typedef struct {
                     // Not used: 0
 } ALARM;
 
-// Enum for button debounce states
-typedef enum {
-  BUTTON_STATE_HIGH,
-  BUTTON_STATE_WAITING,
-  BUTTON_STATE_LOW
-} BUTTON_STATE;
+// // Enum for button debounce states
+// typedef enum {
+//   BUTTON_STATE_HIGH,
+//   BUTTON_STATE_WAITING,
+//   BUTTON_STATE_LOW
+// } BUTTON_STATE;
 
-// Struct representing each button with debouncing state
-typedef struct {
-  GPIO_TypeDef    *gpio_port; // GPIO port of the button      
-  uint16_t        gpio_pin;   // GPIO pin of the button
-  BUTTON_STATE    state;      // Current state of the button
-  uint32_t        start_tick; // Start time of the debounce timer
-  volatile bool   int_flag;   // Set when button interrupt is triggered
-  volatile bool   press_flag; // Set when button is pressed
-} BUTTON;
+// // Struct representing each button with debouncing state
+// typedef struct {
+//   GPIO_TypeDef    *gpio_port; // GPIO port of the button      
+//   uint16_t        gpio_pin;   // GPIO pin of the button
+//   BUTTON_STATE    state;      // Current state of the button
+//   uint32_t        start_tick; // Start time of the debounce timer
+//   volatile bool   int_flag;   // Set when button interrupt is triggered
+//   volatile bool   press_flag; // Set when button is pressed
+// } BUTTON;
 
 
 /* USER CODE END PTD */
@@ -88,11 +88,11 @@ typedef struct {
 // Slave address of DS3231 RTC module
 #define DS3231_ADDRESS 0xD0
 
-// Slave address of AT24C64D EEPROM module
-#define EEPROM_ADDR 0xA0
+// // Slave address of AT24C64D EEPROM module
+// #define EEPROM_ADDR 0xA0
 
-// Debounce threshold in milliseconds
-#define DEBOUNCE_DELAY_MS 50 
+// // Debounce threshold in milliseconds
+// #define DEBOUNCE_DELAY_MS 50 
 
 /* USER CODE END PD */
 
@@ -129,47 +129,47 @@ uint8_t alarm_pointer = 0;
     // Variable to check if the alarm is activated or not
 bool alarm_activated = false;
 
-// Variables for pressing buttons
-    // Debugging: Track if the button is pressed or not
-bool button1_pressed = false;
-bool button2_pressed = false;
-bool button3_pressed = false;
-bool button4_pressed = false;
-bool button5_pressed = false;
+// // Variables for pressing buttons
+//     // Debugging: Track if the button is pressed or not
+// bool button1_pressed = false;
+// bool button2_pressed = false;
+// bool button3_pressed = false;
+// bool button4_pressed = false;
+// bool button5_pressed = false;
 
-uint8_t button1_counter = 0;
-uint8_t button2_counter = 0;
-uint8_t button3_counter = 0;
-uint8_t button4_counter = 0;
-uint8_t button5_counter = 0;
+// uint8_t button1_counter = 0;
+// uint8_t button2_counter = 0;
+// uint8_t button3_counter = 0;
+// uint8_t button4_counter = 0;
+// uint8_t button5_counter = 0;
 
-  // Global instances of DEBOUNCE_BUTTON for each button
-BUTTON button1 = {GPIOB, BUTTON1_IN12_Pin, BUTTON_STATE_HIGH, 0, false, false};
-BUTTON button2 = {GPIOB, BUTTON2_IN13_Pin, BUTTON_STATE_HIGH, 0, false, false};
-BUTTON button3 = {GPIOB, BUTTON3_IN14_Pin, BUTTON_STATE_HIGH, 0, false, false};
-BUTTON button4 = {GPIOB, BUTTON4_IN15_Pin, BUTTON_STATE_HIGH, 0, false, false};
-BUTTON button5 = {GPIOA, BUTTON5_IN8_Pin, BUTTON_STATE_HIGH, 0, false, false};
+//   // Global instances of DEBOUNCE_BUTTON for each button
+// BUTTON button1 = {GPIOB, BUTTON1_IN12_Pin, BUTTON_STATE_HIGH, 0, false, false};
+// BUTTON button2 = {GPIOB, BUTTON2_IN13_Pin, BUTTON_STATE_HIGH, 0, false, false};
+// BUTTON button3 = {GPIOB, BUTTON3_IN14_Pin, BUTTON_STATE_HIGH, 0, false, false};
+// BUTTON button4 = {GPIOB, BUTTON4_IN15_Pin, BUTTON_STATE_HIGH, 0, false, false};
+// BUTTON button5 = {GPIOA, BUTTON5_IN8_Pin, BUTTON_STATE_HIGH, 0, false, false};
 
-// Variables for ADC interface
-    // Flag for ADC interrupt (ADC Valid Flag)
-volatile bool adc_valid_flag = false;   
+// // Variables for ADC interface
+//     // Flag for ADC interrupt (ADC Valid Flag)
+// volatile bool adc_valid_flag = false;   
 
-    // Variable for ADC raw data
-uint16_t adc_data;           
+//     // Variable for ADC raw data
+// uint16_t adc_data;           
 
-    // Variable for battery percentage (raw data * 100 / 4095 (2^12))
-uint16_t battery_percentage; 
+//     // Variable for battery percentage (raw data * 100 / 4095 (2^12))
+// uint16_t battery_percentage; 
 
-// Variables for UART interface
-    // Flag for UART interrupt (UART Receive Flag)
-volatile bool uart_rx_flag = false;
+// // Variables for UART interface
+//     // Flag for UART interrupt (UART Receive Flag)
+// volatile bool uart_rx_flag = false;
 
-    // Variable for UART receive data: hour and minute
-uint8_t uart_rx_data[2];
+//     // Variable for UART receive data: hour and minute
+// uint8_t uart_rx_data[2];
 
-    // Variable to store hour and minute values received from the UART module
-uint8_t uart_rx_hour;
-uint8_t uart_rx_minute;
+//     // Variable to store hour and minute values received from the UART module
+// uint8_t uart_rx_hour;
+// uint8_t uart_rx_minute;
 
 /* USER CODE END PV */
 
@@ -195,17 +195,17 @@ void Time_Get (void);
 // Function to control settings of the RTC module (Alarm 1)
 void Time_Ctrl (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt);
 
-// Function to write a single alarm to the EEPROM module
-void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt, bool on_off, uint8_t adress);
+// // Function to write a single alarm to the EEPROM module
+// void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt, bool on_off, uint8_t adress);
 
-// Function to read a single alarm from the EEPROM module
-void Alarm_Get (uint8_t adress, ALARM *alarm);
+// // Function to read a single alarm from the EEPROM module
+// void Alarm_Get (uint8_t adress, ALARM *alarm);
 
-// // Function to check the alarms
-void Alarm_Check (void);
+// // // Function to check the alarms
+// void Alarm_Check (void);
 
-// Debounce handler function to be called in main loop
-void Button_Debounce(BUTTON *button);
+// // Debounce handler function to be called in main loop
+// void Button_Debounce(BUTTON *button);
 
 
 /* USER CODE END PFP */
@@ -245,8 +245,8 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
-  MX_ADC1_Init();
-  MX_USART1_UART_Init();
+  // MX_ADC1_Init();
+  // MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
   // Initialize RTC module (Run only once after reset the RTC module)
@@ -272,23 +272,23 @@ int main(void)
   //      dy_dt: [Day of week] or [date of month] (1 = day of week, 0 = date of month, 0 = not used)
   //      on_off: On/ Off state of the alarm (1 = ON, 0 = OFF)
   //      adress: Address of the alarm in the EEPROM module (0-10)
-  Alarm_Set(00, 30, 20, 0, 0, true, 0);
+  // Alarm_Set(00, 30, 20, 0, 0, true, 0);
 
   // Assign the pointer debug_alarm_pointer to point to debug_alarm
-  for (int i = 0; i < 10; i++) {
-    debug_alarm_pointer[i] = &debug_alarm[i];
-  }
+  // for (int i = 0; i < 10; i++) {
+  //   debug_alarm_pointer[i] = &debug_alarm[i];
+  // }
 
   // Assign the pointer alarm_check_pointer to point to alarm_check
   //alarm_check_pointer = &alarm_check;
 
   // Initialize the UART module to receive data
   //    HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
-  HAL_UART_Receive_IT(&huart1, uart_rx_data, 2);
+  // HAL_UART_Receive_IT(&huart1, uart_rx_data, 2);
 
   // Initialize the ADC module to monitor battery voltage
   //    HAL_ADC_Start_IT(ADC_HandleTypeDef *hadc);
-  HAL_ADC_Start_IT(&hadc1);
+  // HAL_ADC_Start_IT(&hadc1);
 
   /* USER CODE END 2 */
 
@@ -310,10 +310,10 @@ int main(void)
       Time_Get();
 
       // Debugging: Track the values of alarms stored in the EEPROM module
-      for (int i = 0; i <= 10; i++)
-      {
-        Alarm_Get(i, debug_alarm_pointer[i]);
-      }
+      // for (int i = 0; i <= 10; i++)
+      // {
+      //   Alarm_Get(i, debug_alarm_pointer[i]);
+      // }
 
       // Check the alarms
       //    void Alarm_Check()
@@ -323,130 +323,130 @@ int main(void)
       rtc_int_flag = false;
     }
 
-    // Check if the Button 1 Interrupt Flag is set (Button 1 Interrupt Flag) on PB12
-    if (button1.int_flag)
-    {
-      // Handle button 1 press event
-      //    void Button_Debounce(BUTTON *button)
-      Button_Debounce(&button1);
+    // // Check if the Button 1 Interrupt Flag is set (Button 1 Interrupt Flag) on PB12
+    // if (button1.int_flag)
+    // {
+    //   // Handle button 1 press event
+    //   //    void Button_Debounce(BUTTON *button)
+    //   Button_Debounce(&button1);
 
-      // Check if the button is pressed (LOW)
-      if (button1.press_flag)
-      {
-      // Debugging: Track if the button is pressed
-      button1_pressed = !button1_pressed;
+    //   // Check if the button is pressed (LOW)
+    //   if (button1.press_flag)
+    //   {
+    //   // Debugging: Track if the button is pressed
+    //   button1_pressed = !button1_pressed;
 
-      // Debugging: Track the number of button presses
-      button1_counter += 1;
-      }
+    //   // Debugging: Track the number of button presses
+    //   button1_counter += 1;
+    //   }
     
-      // Reset the Button 1 Press Flag
-      button1.press_flag = false;
-    }
+    //   // Reset the Button 1 Press Flag
+    //   button1.press_flag = false;
+    // }
 
-    // Check if the Button 2 Interrupt Flag is set (Button 2 Interrupt Flag) on PB13
-    if (button2.int_flag)
-    {
-      // Handle button 2 press event
-      //    void Button_Debounce(BUTTON *button)
-      Button_Debounce(&button2);
+    // // Check if the Button 2 Interrupt Flag is set (Button 2 Interrupt Flag) on PB13
+    // if (button2.int_flag)
+    // {
+    //   // Handle button 2 press event
+    //   //    void Button_Debounce(BUTTON *button)
+    //   Button_Debounce(&button2);
 
-      // Check if the button is pressed (LOW)
-      if (button2.press_flag)
-      {
-      // Debugging: Track if the button is pressed
-      button2_pressed = !button2_pressed;
+    //   // Check if the button is pressed (LOW)
+    //   if (button2.press_flag)
+    //   {
+    //   // Debugging: Track if the button is pressed
+    //   button2_pressed = !button2_pressed;
 
-      // Debugging: Track the number of button presses
-      button2_counter += 1;
-      }
+    //   // Debugging: Track the number of button presses
+    //   button2_counter += 1;
+    //   }
     
-      // Reset the Button 2 Press Flag
-      button2.press_flag = false;
-    }
+    //   // Reset the Button 2 Press Flag
+    //   button2.press_flag = false;
+    // }
 
-    // Check if the Button 3 Interrupt Flag is set (Button 3 Interrupt Flag) on PB14
-    if (button3.int_flag)
-    {
-      // Handle button 3 press event
-      //    void Button_Debounce(BUTTON *button)
-      Button_Debounce(&button3);
+    // // Check if the Button 3 Interrupt Flag is set (Button 3 Interrupt Flag) on PB14
+    // if (button3.int_flag)
+    // {
+    //   // Handle button 3 press event
+    //   //    void Button_Debounce(BUTTON *button)
+    //   Button_Debounce(&button3);
 
-      // Check if the button is pressed (LOW)
-      if (button3.press_flag)
-      {
-      // Debugging: Track if the button is pressed
-      button3_pressed = !button3_pressed;
+    //   // Check if the button is pressed (LOW)
+    //   if (button3.press_flag)
+    //   {
+    //   // Debugging: Track if the button is pressed
+    //   button3_pressed = !button3_pressed;
 
-      // Debugging: Track the number of button presses
-      button3_counter += 1;
-      }
+    //   // Debugging: Track the number of button presses
+    //   button3_counter += 1;
+    //   }
     
-      // Reset the Button 3 Press Flag
-      button3.press_flag = false;
-    }
+    //   // Reset the Button 3 Press Flag
+    //   button3.press_flag = false;
+    // }
 
-    // Check if the Button 4 Interrupt Flag is set (Button 4 Interrupt Flag) on PB15
-    if (button4.int_flag)
-    {
-      // Handle button 4 press event
-      //    void Button_Debounce(BUTTON *button)
-      Button_Debounce(&button4);
+    // // Check if the Button 4 Interrupt Flag is set (Button 4 Interrupt Flag) on PB15
+    // if (button4.int_flag)
+    // {
+    //   // Handle button 4 press event
+    //   //    void Button_Debounce(BUTTON *button)
+    //   Button_Debounce(&button4);
 
-      // Check if the button is pressed (LOW)
-      if (button4.press_flag)
-      {
-      // Debugging: Track if the button is pressed
-      button4_pressed = !button4_pressed;
+    //   // Check if the button is pressed (LOW)
+    //   if (button4.press_flag)
+    //   {
+    //   // Debugging: Track if the button is pressed
+    //   button4_pressed = !button4_pressed;
 
-      // Debugging: Track the number of button presses
-      button4_counter += 1;
-      }
+    //   // Debugging: Track the number of button presses
+    //   button4_counter += 1;
+    //   }
     
-      // Reset the Button 4 Press Flag
-      button4.press_flag = false;
-    }
+    //   // Reset the Button 4 Press Flag
+    //   button4.press_flag = false;
+    // }
 
-    // Check if the Button 5 Interrupt Flag is set (Button 5 Interrupt Flag) on PA8
-    if (button5.int_flag)
-    {
-      // Handle button 5 press event
-      //    void Button_Debounce(BUTTON *button)
-      Button_Debounce(&button5);
+    // // Check if the Button 5 Interrupt Flag is set (Button 5 Interrupt Flag) on PA8
+    // if (button5.int_flag)
+    // {
+    //   // Handle button 5 press event
+    //   //    void Button_Debounce(BUTTON *button)
+    //   Button_Debounce(&button5);
 
-      // Check if the button is pressed (LOW)
-      if (button5.press_flag)
-      {
-      // Debugging: Track if the button is pressed
-      button5_pressed = !button5_pressed;
+    //   // Check if the button is pressed (LOW)
+    //   if (button5.press_flag)
+    //   {
+    //   // Debugging: Track if the button is pressed
+    //   button5_pressed = !button5_pressed;
 
-      // Debugging: Track the number of button presses
-      button5_counter += 1;
-      }
+    //   // Debugging: Track the number of button presses
+    //   button5_counter += 1;
+    //   }
     
-      // Reset the Button 5 Press Flag
-      button5.press_flag = false;
-    }
+    //   // Reset the Button 5 Press Flag
+    //   button5.press_flag = false;
+    // }
 
-    // Check if the ADC interrupt flag is set (ADC Valid Flag)
-    if (adc_valid_flag)
-	  {
-      // Re-enable the ADC interrupt to continue monitoring ADC values
-      HAL_ADC_Start_IT(&hadc1);
+    // // Check if the ADC interrupt flag is set (ADC Valid Flag)
+    // if (adc_valid_flag)
+	  // {
+    //   // Re-enable the ADC interrupt to continue monitoring ADC values
+    //   HAL_ADC_Start_IT(&hadc1);
 
-      // Delay for 100ms to allow the ADC to stabilize
-      HAL_Delay(100);
-	  }
+    //   // Delay for 100ms to allow the ADC to stabilize
+    //   HAL_Delay(100);
+	  // }
 
-    // Check if the UART interrupt flag is set (UART Receive Flag)
-    if (uart_rx_flag)
-	  {
-      // Re-enable the UART interrupt to continue receiving data
-      HAL_UART_Receive_IT(&huart1,uart_rx_data,2); 
+    // // Check if the UART interrupt flag is set (UART Receive Flag)
+    // if (uart_rx_flag)
+	  // {
+    //   // Re-enable the UART interrupt to continue receiving data
+    //   HAL_UART_Receive_IT(&huart1,uart_rx_data,2); 
       
-      // Delay for 100ms to allow the UART to stabilize
-      HAL_Delay(100);
-	  }
+    //   // Delay for 100ms to allow the UART to stabilize
+    //   HAL_Delay(100);
+	  // }
 
   }
   /* USER CODE END 3 */
@@ -679,79 +679,79 @@ void Time_Init (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom
   Time_Ctrl (0, 0, 0, 0, 0, 0);   
 }
 
-// Write a single alarm to the EEPROM module
-void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt, bool on_off, uint8_t adress)
-{
-  // sec: Seconds: 0-59
-  // min: Minutes: 0-59
-  // hour: Hours: 0-23
-  // dow_dom: Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
-  //          or Date of the month: 1-31
-  //          (MSB = 1 for [day of week], 0 for [date of month])
-  //          Not used: 0
-  // dy_dt: [Day of week] or [date of month] (1 = day of week, 0 = date of month, 0 = not used)
-  // on_off: On/ Off state of the alarm (1 = ON, 0 = OFF)
-  // adress: Address of the alarm in the EEPROM module (0-10)
+// // Write a single alarm to the EEPROM module
+// void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt, bool on_off, uint8_t adress)
+// {
+//   // sec: Seconds: 0-59
+//   // min: Minutes: 0-59
+//   // hour: Hours: 0-23
+//   // dow_dom: Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+//   //          or Date of the month: 1-31
+//   //          (MSB = 1 for [day of week], 0 for [date of month])
+//   //          Not used: 0
+//   // dy_dt: [Day of week] or [date of month] (1 = day of week, 0 = date of month, 0 = not used)
+//   // on_off: On/ Off state of the alarm (1 = ON, 0 = OFF)
+//   // adress: Address of the alarm in the EEPROM module (0-10)
   
-  // A mask bit for On/ Off state of the alarm
-  uint8_t onOff = 128;
+//   // A mask bit for On/ Off state of the alarm
+//   uint8_t onOff = 128;
 
-  // Add an ON/OFF (1 bit) signal into the alarm package by using the MSB of the second register
-  if (on_off)
-  {
-    sec += onOff;
-  }
+//   // Add an ON/OFF (1 bit) signal into the alarm package by using the MSB of the second register
+//   if (on_off)
+//   {
+//     sec += onOff;
+//   }
 
-  // A mask bit for the [day of week] or [date of month] selection
-  uint8_t dyDt = 64;
+//   // A mask bit for the [day of week] or [date of month] selection
+//   uint8_t dyDt = 64;
 
-  // Add a [day of week] or [date of month] (1 bit) signal into the alarm package by using bit 6 of the dow_dom register
-  if (dy_dt)
-  {
-    dow_dom += dyDt;
-  }
+//   // Add a [day of week] or [date of month] (1 bit) signal into the alarm package by using bit 6 of the dow_dom register
+//   if (dy_dt)
+//   {
+//     dow_dom += dyDt;
+//   }
 
-  // A blank array (4 slots) to contain the alarm values
-  uint8_t setAlarm[4];
+//   // A blank array (4 slots) to contain the alarm values
+//   uint8_t setAlarm[4];
   
-  // Store the alarm values into the blank array
-  setAlarm[0] = sec;
-  setAlarm[1] = min;
-  setAlarm[2] = hour;
-  setAlarm[3] = dow_dom;
+//   // Store the alarm values into the blank array
+//   setAlarm[0] = sec;
+//   setAlarm[1] = min;
+//   setAlarm[2] = hour;
+//   setAlarm[3] = dow_dom;
 
-  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
-  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-  HAL_I2C_Mem_Write(&hi2c1, EEPROM_ADDR, adress, 4, setAlarm, sizeof(setAlarm), 1000);
-}
+//   // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+//   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+//   HAL_I2C_Mem_Write(&hi2c1, EEPROM_ADDR, adress, 4, setAlarm, sizeof(setAlarm), 1000);
+// }
 
-// Read a single alarm from the EEPROM module
-void Alarm_Get (uint8_t adress, ALARM *alarm)
-{
-  // adress: Address of the alarm in the EEPROM module (0-10)
+// // Read a single alarm from the EEPROM module
+// void Alarm_Get (uint8_t adress, ALARM *alarm)
+// {
+//   // adress: Address of the alarm in the EEPROM module (0-10)
   
-  // A blank array (4 slots) to contain the alarm values received from the EEPROM module
-  uint8_t getAlarm[4];
+//   // A blank array (4 slots) to contain the alarm values received from the EEPROM module
+//   uint8_t getAlarm[4];
 
-  // HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
-  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-  HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDR, adress, 4, getAlarm, sizeof(getAlarm), 1000);
+//   // HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+//   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+//   HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDR, adress, 4, getAlarm, sizeof(getAlarm), 1000);
 
-  // Store the alarm values into the alarm variable
-  alarm->second  = getAlarm[0];
-  alarm->minute  = getAlarm[1];
-  alarm->hour    = getAlarm[2];
-  alarm->dow_dom = getAlarm[3];
-}
+//   // Store the alarm values into the alarm variable
+//   alarm->second  = getAlarm[0];
+//   alarm->minute  = getAlarm[1];
+//   alarm->hour    = getAlarm[2];
+//   alarm->dow_dom = getAlarm[3];
+// }
 
-uint8_t alarm_check_counter = 0;
-uint8_t alarm_check_onoff = 0;
-uint8_t alarm_check_match1 = 0;
-uint8_t alarm_check_match2 = 0;
-uint8_t alarm_check_match3 = 0;
-uint8_t alarm_check_dowdom = 0;
-uint8_t alarm_check_dow = 0;
-uint8_t alarm_check_dom = 0;
+// uint8_t alarm_check_counter = 0;
+// uint8_t alarm_check_onoff = 0;
+// uint8_t alarm_check_match1 = 0;
+// uint8_t alarm_check_match2 = 0;
+// uint8_t alarm_check_match3 = 0;
+// uint8_t alarm_check_dowdom = 0;
+// uint8_t alarm_check_dow = 0;
+// uint8_t alarm_check_dom = 0;
 
 // Function to check the alarms
 // void Alarm_Check (void)
@@ -843,67 +843,67 @@ uint8_t alarm_check_dom = 0;
 //   alarm_check_dom = 0;
 // }
 
-// Debounce handler function to be called in main loop
-void Button_Debounce(BUTTON *button)
-{
-  // Check button state and handle debouncing
-  switch (button->state)
-  {
-    // State when the button is not pressed (HIGH)
-    case BUTTON_STATE_HIGH:
+// // Debounce handler function to be called in main loop
+// void Button_Debounce(BUTTON *button)
+// {
+//   // Check button state and handle debouncing
+//   switch (button->state)
+//   {
+//     // State when the button is not pressed (HIGH)
+//     case BUTTON_STATE_HIGH:
 
-      // Check if the button is pressed (LOW)
-      if (button->int_flag) 
-      {
-        // Start the debounce timer
-        button->start_tick = HAL_GetTick();
+//       // Check if the button is pressed (LOW)
+//       if (button->int_flag) 
+//       {
+//         // Start the debounce timer
+//         button->start_tick = HAL_GetTick();
 
-        // Set the button state to waiting
-        button->state = BUTTON_STATE_WAITING;
-      }
+//         // Set the button state to waiting
+//         button->state = BUTTON_STATE_WAITING;
+//       }
 
-    break;
+//     break;
 
-    // State when the button is in transition (waiting for debounce)
-    case BUTTON_STATE_WAITING:
+//     // State when the button is in transition (waiting for debounce)
+//     case BUTTON_STATE_WAITING:
 
-      // Check if the button is still pressed (LOW) after the debounce delay
-      if (HAL_GetTick() - button->start_tick >= DEBOUNCE_DELAY_MS) 
-      {
-        // Check if the button is still pressed (LOW)
-        if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == GPIO_PIN_RESET) 
-        {
-          // Set the button press flag to true (valid press detected)
-          button->press_flag = true;
+//       // Check if the button is still pressed (LOW) after the debounce delay
+//       if (HAL_GetTick() - button->start_tick >= DEBOUNCE_DELAY_MS) 
+//       {
+//         // Check if the button is still pressed (LOW)
+//         if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == GPIO_PIN_RESET) 
+//         {
+//           // Set the button press flag to true (valid press detected)
+//           button->press_flag = true;
 
-          // Set the button state to stable low (pressed)
-          button->state = BUTTON_STATE_LOW;
-        } 
-        else 
-        {
-          // Set the button state to stable high (not pressed)
-          button->state = BUTTON_STATE_HIGH; // False alarm
-        }
-      }
+//           // Set the button state to stable low (pressed)
+//           button->state = BUTTON_STATE_LOW;
+//         } 
+//         else 
+//         {
+//           // Set the button state to stable high (not pressed)
+//           button->state = BUTTON_STATE_HIGH; // False alarm
+//         }
+//       }
 
-    break;
+//     break;
 
-    // State when the button is pressed (LOW)
-    case BUTTON_STATE_LOW:
+//     // State when the button is pressed (LOW)
+//     case BUTTON_STATE_LOW:
 
-      // Wait until button is released
-      if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == GPIO_PIN_SET) 
-      {
-        // Set the button state to stable high (not pressed)
-        button->state = BUTTON_STATE_HIGH;
+//       // Wait until button is released
+//       if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == GPIO_PIN_SET) 
+//       {
+//         // Set the button state to stable high (not pressed)
+//         button->state = BUTTON_STATE_HIGH;
 
-        // Reset the button interrupt flag
-        button->int_flag = false;
-      }
+//         // Reset the button interrupt flag
+//         button->int_flag = false;
+//       }
 
-    break;
-  }
-}
+//     break;
+//   }
+// }
 
 // Callback function to handle external GPIO interrupts
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
@@ -915,30 +915,30 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       rtc_int_flag = true;
     break;
     
-    case BUTTON1_IN12_Pin:
-      // Set the Button 1 Interrupt Flag
-      button1.int_flag = true;
-    break;
+    // case BUTTON1_IN12_Pin:
+    //   // Set the Button 1 Interrupt Flag
+    //   button1.int_flag = true;
+    // break;
 
-    case BUTTON2_IN13_Pin:
-      // Set the Button 2 Interrupt Flag
-      button2.int_flag = true;
-    break;
+    // case BUTTON2_IN13_Pin:
+    //   // Set the Button 2 Interrupt Flag
+    //   button2.int_flag = true;
+    // break;
 
-    case BUTTON3_IN14_Pin:
-      // Set the Button 3 Interrupt Flag
-      button3.int_flag = true;
-    break;
+    // case BUTTON3_IN14_Pin:
+    //   // Set the Button 3 Interrupt Flag
+    //   button3.int_flag = true;
+    // break;
 
-    case BUTTON4_IN15_Pin:
-      // Set the Button 4 Interrupt Flag
-      button4.int_flag = true;
-    break;  
+    // case BUTTON4_IN15_Pin:
+    //   // Set the Button 4 Interrupt Flag
+    //   button4.int_flag = true;
+    // break;  
 
-    case BUTTON5_IN8_Pin:
-      // Set the Button 5 Interrupt Flag
-      button5.int_flag = true;
-    break;  
+    // case BUTTON5_IN8_Pin:
+    //   // Set the Button 5 Interrupt Flag
+    //   button5.int_flag = true;
+    // break;  
 
     default:
       // Handle other GPIO interrupts if necessary
@@ -946,39 +946,39 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   }
 }
 
-// Callback function to handle UART interrupts
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-  // Verify the UART instance to ensure the callback is for USART1
-  // If the UART instance is USART1, store the received data into the uart_rx_data array
-  if(huart->Instance == USART1)
-  {
-    // Store the received data into the uart_rx_data array
-    uart_rx_hour = uart_rx_data[0];
-    uart_rx_minute = uart_rx_data[1];
+// // Callback function to handle UART interrupts
+// void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+// {
+//   // Verify the UART instance to ensure the callback is for USART1
+//   // If the UART instance is USART1, store the received data into the uart_rx_data array
+//   if(huart->Instance == USART1)
+//   {
+//     // Store the received data into the uart_rx_data array
+//     uart_rx_hour = uart_rx_data[0];
+//     uart_rx_minute = uart_rx_data[1];
 
-    // Set the UART receive flag
-    uart_rx_flag = 1;
-  }
-}
+//     // Set the UART receive flag
+//     uart_rx_flag = 1;
+//   }
+// }
 
-// Callback function to handle ADC interrupts
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
-{
-	// Verify the ADC instance to ensure the callback is for ADC1
-  // If the ADC instance is ADC1, get the ADC value and calculate the battery percentage
-  if (hadc == &hadc1)
-	{
-    // Get the ADC value
-    adc_data = HAL_ADC_GetValue(&hadc1);
+// // Callback function to handle ADC interrupts
+// void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+// {
+// 	// Verify the ADC instance to ensure the callback is for ADC1
+//   // If the ADC instance is ADC1, get the ADC value and calculate the battery percentage
+//   if (hadc == &hadc1)
+// 	{
+//     // Get the ADC value
+//     adc_data = HAL_ADC_GetValue(&hadc1);
 
-    // Set the ADC valid flag
-    adc_valid_flag = 1;
+//     // Set the ADC valid flag
+//     adc_valid_flag = 1;
 
-    // Calculate the battery percentage
-    battery_percentage = adc_data * 100 / 4095;
-	}
-}
+//     // Calculate the battery percentage
+//     battery_percentage = adc_data * 100 / 4095;
+// 	}
+// }
 
 /* USER CODE END 4 */
 
