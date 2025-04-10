@@ -49,19 +49,19 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
-  /*Configure GPIO pins : BUTTON1_IN12_Pin BUTTON2_IN13_Pin BUTTON3_IN14_Pin BUTTON4_IN15_Pin
+  /*Configure GPIO pins : BUTTON0_IN12_Pin BUTTON1_IN13_Pin BUTTON2_IN14_Pin BUTTON3_IN15_Pin
                            RTC_IN5_Pin */
-  GPIO_InitStruct.Pin = BUTTON1_IN12_Pin|BUTTON2_IN13_Pin|BUTTON3_IN14_Pin|BUTTON4_IN15_Pin
+  GPIO_InitStruct.Pin = BUTTON0_IN12_Pin|BUTTON1_IN13_Pin|BUTTON2_IN14_Pin|BUTTON3_IN15_Pin
                           |RTC_IN5_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : BUTTON5_IN8_Pin */
-  GPIO_InitStruct.Pin = BUTTON5_IN8_Pin;
+  /*Configure GPIO pin : BUTTON4_IN8_Pin */
+  GPIO_InitStruct.Pin = BUTTON4_IN8_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(BUTTON5_IN8_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(BUTTON4_IN8_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);

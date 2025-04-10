@@ -267,15 +267,15 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  // Initialize RTC module (Run only once after reset the RTC module)
-  //    void Time_Init(uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
+  // // Initialize RTC module (Run only once after reset the RTC module)
+  // //    void Time_Init(uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
   // Time_Init
   // (
   //    0, // Seconds: 0-59
-  //   58, // Minutes: 0-59
-  //   22, // Hours: 0-23
-  //    4, // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
-  //    9, // Date of the month: 1-31
+  //   01, // Minutes: 0-59
+  //   15, // Hours: 0-23
+  //    5, // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+  //   10, // Date of the month: 1-31
   //    4, // Month: 1-12
   //   25  // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
   // );
@@ -631,12 +631,6 @@ int main(void)
       // Retrieve the time values from the RTC module
       Time_Get(&time_get_data);
       
-      // // Debugging: Track the values of alarms stored in the EEPROM module
-      // for (int i = 0; i <= 10; i++)
-      // {
-      //   Alarm_Get(i, &alarm_get_data[i]);
-      // }
-
       // Check the alarms
       //   void Alarm_Check (ALARM *alarm_check_data, TIME *time_get_data)
       Alarm_Check(&alarm_check_data, &time_get_data);
@@ -713,7 +707,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-} 
+}
 
 /* USER CODE BEGIN 4 */
 
@@ -999,12 +993,17 @@ void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, uint8_t
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
   HAL_I2C_Mem_Write(EEPROM_I2C, EEPROM_ADDR, address, 1, setAlarm, sizeof(setAlarm), 1000);
 
-  // Delay for 5ms to allow the EEPROM module to complete the write operation
+  // Delay to allow the EEPROM module to complete the Page Write operation
   //    Neccesary delay cycle calculation:
-  //        8 [Device Address Byte] + (8 * 2) [2-Byte Word Address Byte] + 
-  //        + (8 * 4) [4-Byte Data] + (1 * 8) [ACK] + 1 [Stop Condition] = ~ 65 cycles
-  //    Neccesary delay time = ~ 65 cycles / 8 MHz = ~ 8.125 ms 
-  HAL_Delay(5);
+  //        1 [Start Condition by Host] +
+  //     +  8 [Device Address Byte]     + 1 [ACK from Client]      +
+  //     +  8 [1st Word Address Byte]   + 1 [ACK from Client]      +
+  //     +  8 [2nd Word Address Byte]   + 1 [ACK from Client]      +
+  //     + {8 [1st Data Word]           + 1 [ACK from Client]} * 4 + 
+  //     +  1 [Stop Condition by Host] 
+  //     =  65 cycles  
+  //    Neccesary delay time = 65 cycles / 400 kHz = 162.5 us = ~ 0.17 ms
+  HAL_Delay(1);
 }
 
 /**
@@ -1024,6 +1023,22 @@ void Alarm_Get (uint8_t slot, volatile ALARM *alarm_get_data)
   // HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
   HAL_I2C_Mem_Read(EEPROM_I2C, EEPROM_ADDR, address, 1, getAlarm, sizeof(getAlarm), 1000);
+
+  // Delay to allow the EEPROM module to complete the Sequential Read operation
+  //    Neccesary delay cycle calculation:
+  //     {Dummy Write}
+  //        1 [Start Condition by Host] +
+  //     +  8 [Device Address Byte]     + 1 [ACK from Client]      +
+  //     +  8 [1st Word Address Byte]   + 1 [ACK from Client]      +
+  //     +  8 [2nd Word Address Byte]   + 1 [ACK from Client]      +
+  //     {Sequential Read}
+  //     +  1 [Start Condition by Host] +
+  //     +  8 [Device Address Byte]     + 1 [ACK from Client]      +
+  //     + {8 [1st Data Word]           + 1 [ACK from Client]} * 4 + 
+  //     +  1 [Stop Condition by Host] 
+  //     =  75 cycles
+  //    Neccesary delay time = 75 cycles / 400 kHz = 187.5 us = ~ 0.19 ms
+  HAL_Delay(1);
 
   // Store the alarm values into the alarm variable
   alarm_get_data->second  = getAlarm[0];
@@ -1048,6 +1063,18 @@ void Alarm_Clear (uint8_t slot)
   // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
   HAL_I2C_Mem_Write(EEPROM_I2C, EEPROM_ADDR, address, 1, clearAlarm, sizeof(clearAlarm), 1000);
+
+  // Delay to allow the EEPROM module to complete the Page Write operation
+  //    Neccesary delay cycle calculation:
+  //        1 [Start Condition by Host] +
+  //     +  8 [Device Address Byte]     + 1 [ACK from Client]      +
+  //     +  8 [1st Word Address Byte]   + 1 [ACK from Client]      +
+  //     +  8 [2nd Word Address Byte]   + 1 [ACK from Client]      +
+  //     + {8 [1st Data Word]           + 1 [ACK from Client]} * 4 + 
+  //     +  1 [Stop Condition by Host] 
+  //     =  65 cycles  
+  //    Neccesary delay time = 65 cycles / 400 kHz = 162.5 us = ~ 0.17 ms
+  HAL_Delay(1);
 }
 
 /**

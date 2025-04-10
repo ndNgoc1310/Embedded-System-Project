@@ -15,7 +15,7 @@
   *
   * 
   * This project is developed by Nguyen Hung Minh, Bui Dinh Trung Nam, and Nguyen Duy Ngoc
-  * (Students at Vietnam National University, Ho Chi Minh City - University of Technology).
+  * - Students at Vietnam National University, Ho Chi Minh City - University of Technology.
   * 
   * Please read and follow the naming conventions in naming_conventions.md before editing this file.
   * 
@@ -75,25 +75,49 @@ typedef struct
   uint8_t dy_dt;
   bool    on_off;
   uint8_t slot;
-} DEBUG_ALARM_SELECT;
+} DEBUG_ALARM_SELECT_DATA;
 
 // Enum for button debounce states
-typedef enum {
-  BUTTON_STATE_HIGH,    // Button is not pressed (HIGH state)
-  BUTTON_STATE_WAITING, // Button is pressed (LOW state) and waiting for debounce delay
-  BUTTON_STATE_LOW      // Button is pressed (LOW state)
+typedef enum 
+{
+  BUTTON_RELEASED,  // Button is not pressed (HIGH state)
+  BUTTON_WAITING,   // Button is pressed (LOW state) and waiting for debounce delay
+  BUTTON_PRESSED,   // Button is pressed (LOW state)
+  BUTTON_HELD,      // Button is held down (LOW state) for a long time
 } BUTTON_STATE;
 
 // Struct representing each button with debouncing state
-typedef struct {
+typedef struct 
+{
   GPIO_TypeDef    *gpio_port; // GPIO port of the button      
   uint16_t        gpio_pin;   // GPIO pin of the button
+  uint8_t         index;      // Index of the button (0-4)
   BUTTON_STATE    state;      // Current state of the button
   uint32_t        start_tick; // Start time of the debounce timer
   volatile bool   int_flag;   // Set when button interrupt is triggered
   volatile bool   press_flag; // Set when button is pressed
+  volatile bool   hold_flag;  // Set when button is held down
 } BUTTON;
 
+typedef enum
+{
+  SELECT_SECOND,   // Select seconds value of the alarm
+  SELECT_MINUTE,   // Select minutes value of the alarm
+  SELECT_HOUR,     // Select hours value of the alarm
+  SELECT_DOW_DOM,  // Select day of the week or date of the month value of the alarm
+  SELECT_DY_DT,    // Select day of week or date of month (1 = day of week, 0 = date of month, 2 = not used)
+  SELECT_ON_OFF,   // Select ON/OFF state of the alarm
+  SELECT_SLOT      // Select slot number of the alarm in the EEPROM module (0-9)
+} DEBUG_ALARM_SELECT_PARAM;
+
+typedef struct
+{
+  DEBUG_ALARM_SELECT_PARAM  param;      // Current state of the alarm selection
+  bool                      increment;  // Increment flag
+  bool                      decrement;  // Decrement flag
+  bool                      save;       // Save flag
+  bool                      clear;      // Clear flag
+} DEBUG_ALARM_SELECT_STATE;
 
 /* USER CODE END PTD */
 
@@ -122,7 +146,13 @@ typedef struct {
 #define ALARM_SLOT_NUM 10 
 
 // Debounce threshold in milliseconds
-#define DEBOUNCE_DELAY_MS 15 
+#define BUTTON_DEBOUNCE_DELAY 50
+
+// Button hold threshold in milliseconds
+#define BUTTON_HOLD_DELAY 1000
+
+// Button hold cycle in milliseconds
+#define BUTTON_HOLD_CYCLE 200
 
 /* USER CODE END PD */
 
@@ -150,20 +180,22 @@ volatile bool rtc_int_flag = false;
 
 // Debugging: Track the number of alarm activations
 uint8_t debug_alarm_activate_ctr = 0;
+volatile bool debug_rtc_int = false;
 
 /* BUTTON ========================================*/
 // Debugging: Track if the button is pressed or not
 volatile uint8_t debug_button_counter[5] = {0};
 
 // Global instances of DEBOUNCE_BUTTON for each button
-BUTTON button1 = {GPIOB, BUTTON1_IN12_Pin, BUTTON_STATE_HIGH, 0, false, false};
-BUTTON button2 = {GPIOB, BUTTON2_IN13_Pin, BUTTON_STATE_HIGH, 0, false, false};
-BUTTON button3 = {GPIOB, BUTTON3_IN14_Pin, BUTTON_STATE_HIGH, 0, false, false};
-BUTTON button4 = {GPIOB, BUTTON4_IN15_Pin, BUTTON_STATE_HIGH, 0, false, false};
-BUTTON button5 = {GPIOA, BUTTON5_IN8_Pin, BUTTON_STATE_HIGH, 0, false, false};
+BUTTON button0 = {GPIOB, BUTTON0_IN12_Pin, 0, BUTTON_RELEASED, 0, false, false, false};
+BUTTON button1 = {GPIOB, BUTTON1_IN13_Pin, 1, BUTTON_RELEASED, 0, false, false, false};
+BUTTON button2 = {GPIOB, BUTTON2_IN14_Pin, 2, BUTTON_RELEASED, 0, false, false, false};
+BUTTON button3 = {GPIOB, BUTTON3_IN15_Pin, 3, BUTTON_RELEASED, 0, false, false, false};
+BUTTON button4 = {GPIOA, BUTTON4_IN8_Pin,  4, BUTTON_RELEASED, 0, false, false, false};
 
 // Debugging: Track the values of alarm being selected for modification
-DEBUG_ALARM_SELECT debug_alarm_select = {0, 0, 0, 0, 0, false, 0};
+DEBUG_ALARM_SELECT_DATA debug_alarm_select_data = {0, 0, 0, 0, 2, false, 0};
+DEBUG_ALARM_SELECT_STATE debug_alarm_select_state = {SELECT_SECOND, false, false, false, false};
 
 /* ADC ==========================================*/
 // Flag for ADC interrupt (ADC Valid Flag)
@@ -225,6 +257,8 @@ void Alarm_Check (volatile ALARM *alarm_check_data, volatile TIME *time_get_data
 // Debounce handler function to be called in main loop
 void Button_Debounce(BUTTON *button);
 
+// Button handler function to be called in main loop
+void Button_Handle(BUTTON *button);
 
 /* USER CODE END PFP */
 
@@ -271,11 +305,11 @@ int main(void)
   // //    void Time_Init(uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
   // Time_Init
   // (
-  //    0, // Seconds: 0-59
-  //   01, // Minutes: 0-59
-  //   15, // Hours: 0-23
-  //    5, // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
-  //   10, // Date of the month: 1-31
+  //   30, // Seconds: 0-59
+  //   58, // Minutes: 0-59
+  //   01, // Hours: 0-23
+  //    6, // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+  //   11, // Date of the month: 1-31
   //    4, // Month: 1-12
   //   25  // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
   // );
@@ -286,24 +320,40 @@ int main(void)
   //   Alarm_Clear(i);
   // }
 
-  // Store values of a single alarm to the next available address on the EEPROM module
-  //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt, bool on_off, uint8_t slot)
-  Alarm_Set
-  (
-    10,    // Seconds: 0-59
-    20,    // Minutes: 0-59
-    22,    // Hours: 0-23
-     9,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31, or not used: 0
-     0,    // Select: 0 = date of month, 1 = day of week, 2 = not used
-    false, // true = ON, false = OFF 
-     1     // Slot number of the alarm in the EEPROM module (0-9)
-  );  
+  // // Store values of a single alarm to the next available address on the EEPROM module
+  // //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt, bool on_off, uint8_t slot)
+  // Alarm_Set
+  // (
+  //   10,    // Seconds: 0-59
+  //   20,    // Minutes: 0-59
+  //   22,    // Hours: 0-23
+  //    9,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31, or not used: 0
+  //    0,    // Select: 0 = date of month, 1 = day of week, 2 = not used
+  //   false, // true = ON, false = OFF 
+  //    1     // Slot number of the alarm in the EEPROM module (0-9)
+  // );  
+
+  // Initially retrieve the time values from the RTC module
+  Time_Get(&time_get_data);
 
   // Initially retrieve the alarm values from the EEPROM module
   for (int i = 0; i <= 10; i++)
   {
     Alarm_Get(i, &alarm_get_data[i]);
   }
+
+  // Debugging: Set the initial time values to the debug alarm select data structure for convenience
+  debug_alarm_select_data =
+  (DEBUG_ALARM_SELECT_DATA)
+  {
+    time_get_data.second,
+    time_get_data.minute,
+    time_get_data.hour,
+    time_get_data.dayofweek,
+    2,
+    false,
+    0
+  };
 
   // Initialize the UART module to receive data
   //    HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
@@ -324,305 +374,44 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    // Check if the Button 1 Interrupt Flag is set (Button 1 Interrupt Flag) on PB12
+    // Check if the Button 0 Interrupt Flag is set (Button 0 Interrupt Flag) on PB12
+    if (button0.int_flag)
+    {
+      // Button 0 Interrupt Handler
+      //    void Button_Handle(BUTTON *button)
+      Button_Handle(&button0);
+    }
+
+    // Check if the Button 1 Interrupt Flag is set (Button 1 Interrupt Flag) on PB13
     if (button1.int_flag)
     {
-      // Handle button 1 press event
-      //    void Button_Debounce(BUTTON *button)
-      Button_Debounce(&button1);
-
-      // Check if the button is pressed (LOW)
-      if (button1.press_flag)
-      {
-        // Debugging: Track the number of button presses
-        //    debug_button_counter[0]: parameter selection for an alarm
-        //      0: seconds
-        //      1: minutes
-        //      2: hours
-        //      3: day of the week, or date of the month
-        //      4: selection: date of month, day of week, not used
-        //      5: ON/OFF state of the alarm
-        //      6: slot number of the alarm in the EEPROM module (0-9)
-        
-        if (debug_button_counter[0] < 6)
-        {
-          debug_button_counter[0] += 1;
-        }
-        else
-        {
-          debug_button_counter[0] = 0;
-        }
-      }
-    
-      // Reset the Button 1 Press Flag
-      button1.press_flag = false;
+      // Button 1 Interrupt Handler
+      //    void Button_Handle(BUTTON *button)
+      Button_Handle(&button1);
     }
 
-    // Check if the Button 2 Interrupt Flag is set (Button 2 Interrupt Flag) on PB13
+    // Check if the Button 2 Interrupt Flag is set (Button 2 Interrupt Flag) on PB14
     if (button2.int_flag)
     {
-      // Handle button 2 press event
-      //    void Button_Debounce(BUTTON *button)
-      Button_Debounce(&button2);
-
-      // Check if the button is pressed (LOW)
-      if (button2.press_flag)
-      {
-        // Debugging: Track the number of button presses
-        debug_button_counter[1] += 1;
-
-        // Debugging: Increment the alarm value based on the button press count
-        switch (debug_button_counter[0])
-        {
-          case 0:
-            // Debugging: Increment the seconds value of the alarm
-            if (debug_alarm_select.second < 59)
-            {
-              debug_alarm_select.second += 1;
-            }
-            else
-            {
-              debug_alarm_select.second = 0;
-            }
-          break;
-          
-          case 1:
-            // Debugging: Increment the minutes value of the alarm
-            if (debug_alarm_select.minute < 59)
-            {
-              debug_alarm_select.minute += 1;
-            }
-            else
-            {
-              debug_alarm_select.minute = 0;
-            }
-          break;
-
-          case 2:
-            // Debugging: Increment the hours value of the alarm
-            if (debug_alarm_select.hour < 23)
-            {
-              debug_alarm_select.hour += 1;
-            }
-            else
-            {
-              debug_alarm_select.hour = 0;
-            }
-          break;
-
-          case 3:
-            // Debugging: Increment the day of the week or date of the month value of the alarm
-            if (debug_alarm_select.dow_dom < 31)
-            {
-              debug_alarm_select.dow_dom += 1;
-            }
-            else
-            {
-              debug_alarm_select.dow_dom = 0;
-            }
-          break;
-
-          case 4:
-            // Debugging: Increment the selection value of the alarm (date of month, day of week, not used)
-            if (debug_alarm_select.dy_dt < 2)
-            {
-              debug_alarm_select.dy_dt += 1;
-            }
-            else
-            {
-              debug_alarm_select.dy_dt = 0;
-            }
-          break;
-
-          case 5:
-            // Debugging: Toggle the ON/OFF state of the alarm
-            debug_alarm_select.on_off = !debug_alarm_select.on_off;
-          break;
-
-          case 6:
-            // Debugging: Increment the slot number of the alarm in the EEPROM module
-           if (debug_alarm_select.slot < 9)
-            {
-              debug_alarm_select.slot += 1;
-            }
-            else
-            {
-              debug_alarm_select.slot = 0;
-            }
-          break;
-
-          default:
-            // No operation needed for default case
-          break;
-        }
-      }
-    
-      // Reset the Button 2 Press Flag
-      button2.press_flag = false;
+      // Button 2 Interrupt Handler
+      //    void Button_Handle(BUTTON *button)
+      Button_Handle(&button2);
     }
 
-    // Check if the Button 3 Interrupt Flag is set (Button 3 Interrupt Flag) on PB14
+    // Check if the Button 3 Interrupt Flag is set (Button 3 Interrupt Flag) on PB15
     if (button3.int_flag)
     {
-      // Handle button 3 press event
-      //    void Button_Debounce(BUTTON *button)
-      Button_Debounce(&button3);
-
-      // Check if the button is pressed (LOW)
-      if (button3.press_flag)
-      {
-        // Debugging: Track the number of button presses
-        debug_button_counter[2] += 1;
-
-        switch(debug_button_counter[0])
-        {
-          case 0:
-            // Debugging: Decrement the seconds value of the alarm
-            if (debug_alarm_select.second > 0)
-            {
-              debug_alarm_select.second -= 1;
-            }
-            else
-            {
-              debug_alarm_select.second = 59;
-            }
-          break;
-
-          case 1:
-            // Debugging: Decrement the minutes value of the alarm
-            if (debug_alarm_select.minute > 0)
-            {
-              debug_alarm_select.minute -= 1;
-            }
-            else
-            {
-              debug_alarm_select.minute = 59;
-            }
-          break;
-
-          case 2:
-            // Debugging: Decrement the hours value of the alarm
-            if (debug_alarm_select.hour > 0)
-            {
-              debug_alarm_select.hour -= 1;
-            }
-            else
-            {
-              debug_alarm_select.hour = 23;
-            }
-          break;
-
-          case 3:
-            // Debugging: Decrement the day of the week or date of the month value of the alarm
-            if (debug_alarm_select.dow_dom > 0)
-            {
-              debug_alarm_select.dow_dom -= 1;
-            }
-            else
-            {
-              debug_alarm_select.dow_dom = 31;
-            }
-          break;
-
-          case 4:
-            // Debugging: Decrement the selection value of the alarm (date of month, day of week, not used)
-            if (debug_alarm_select.dy_dt > 0)
-            {
-              debug_alarm_select.dy_dt -= 1;
-            }
-            else
-            {
-              debug_alarm_select.dy_dt = 2;
-            }
-          break;
-
-          case 5:
-            // Debugging: Toggle the ON/OFF state of the alarm
-            debug_alarm_select.on_off = !debug_alarm_select.on_off;
-          break;
-
-          case 6:
-            // Debugging: Decrement the slot number of the alarm in the EEPROM module
-            if (debug_alarm_select.slot > 0)
-            {
-              debug_alarm_select.slot -= 1;
-            }
-            else
-            {
-              debug_alarm_select.slot = 9;
-            }
-          break;
-
-          default:
-            // No operation needed for default case
-          break;
-        }
-      }
-    
-      // Reset the Button 3 Press Flag
-      button3.press_flag = false;
+      // Button 3 Interrupt Handler
+      //    void Button_Handle(BUTTON *button)
+      Button_Handle(&button3);
     }
 
-    // Check if the Button 4 Interrupt Flag is set (Button 4 Interrupt Flag) on PB15
+    // Check if the Button 4 Interrupt Flag is set (Button 4 Interrupt Flag) on PA8
     if (button4.int_flag)
     {
-      // Handle button 4 press event
-      //    void Button_Debounce(BUTTON *button)
-      Button_Debounce(&button4);
-
-      // Check if the button is pressed (LOW)
-      if (button4.press_flag)
-      {
-        // Debugging: Track the number of button presses
-        debug_button_counter[3] += 1;
-
-        // Debugging: Store the alarm values to the EEPROM module
-        //   void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, uint8_t dy_dt, bool on_off, uint8_t slot)
-        Alarm_Set
-        (
-          debug_alarm_select.second, // Seconds: 0-59
-          debug_alarm_select.minute, // Minutes: 0-59
-          debug_alarm_select.hour,   // Hours: 0-23
-          debug_alarm_select.dow_dom,// Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31, or not used: 0
-          debug_alarm_select.dy_dt,  // Select: 0 = date of month, 1 = day of week, 2 = not used
-          debug_alarm_select.on_off, // true = ON, false = OFF 
-          debug_alarm_select.slot    // Slot number of the alarm in the EEPROM module (0-9)
-        );
-
-        Alarm_Get(debug_alarm_select.slot, &alarm_get_data[debug_alarm_select.slot]);
-      }
-    
-      // Reset the Button 4 Press Flag
-      button4.press_flag = false;
-    }
-
-    // Check if the Button 5 Interrupt Flag is set (Button 5 Interrupt Flag) on PA8
-    if (button5.int_flag)
-    {
-      // Handle button 5 press event
-      //    void Button_Debounce(BUTTON *button)
-      Button_Debounce(&button5);
-
-      // Check if the button is pressed (LOW)
-      if (button5.press_flag)
-      {
-        // Debugging: Track the number of button presses
-        debug_button_counter[4] += 1;
-
-        // Debugging: Clear all alarms in the EEPROM module
-        for (int i = 0; i < 10; i++)
-        {
-          Alarm_Clear(i);
-        }
-
-        for (int i = 0; i <= 10; i++)
-        {
-          Alarm_Get(i, &alarm_get_data[i]);
-        }
-      }
-    
-      // Reset the Button 5 Press Flag
-      button5.press_flag = false;
+      // Button 4 Interrupt Handler
+      //    void Button_Handle(BUTTON *button)
+      Button_Handle(&button4);
     }
 
     // Check if the RTC Interrupt Flag is set (RTC Interrupt Flag) on PB4 (Activated every second)
@@ -637,6 +426,9 @@ int main(void)
 
       // Reset the RTC Interrupt Flag
       rtc_int_flag = false;
+
+      // Toggle the debug RTC interrupt flag for debugging purposes
+      debug_rtc_int = !debug_rtc_int;
     }
 
     // Check if the ADC interrupt flag is set (ADC Valid Flag)
@@ -762,6 +554,9 @@ void Time_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom,
   // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);	
   HAL_I2C_Mem_Write(DS3231_I2C, DS3231_ADDR, 0x00, 1, setTime, sizeof(setTime), 1000);
+
+  // Delay for 1ms to allow the RTC module to process the data
+  HAL_Delay(1);
 }
 
 /**
@@ -778,6 +573,9 @@ void Time_Get (volatile TIME *time_get_data)
   // HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);  
   HAL_I2C_Mem_Read(DS3231_I2C, DS3231_ADDR, 0x00, 1, getTime, sizeof(getTime), 1000);
+
+  // Delay for 1ms to allow the RTC module to process the data
+  HAL_Delay(1);
 
   // Store the time values (converted from BCD code to decimal) into the time variable
 	time_get_data->second       = BCD_To_Dec(getTime[0]);
@@ -887,10 +685,16 @@ void Time_Ctrl (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t do
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);	  
   HAL_I2C_Mem_Write(DS3231_I2C, DS3231_ADDR, 0x07, 1, ctrlTime, sizeof(ctrlTime), 1000);
 
+  // Delay for 1ms to allow the RTC module to process the data
+  HAL_Delay(1);
+
   // Send the alarm control mask bits to the RTC module through I2C interface at address 0Eh (size of value: 1 byte)
   // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);	  
   HAL_I2C_Mem_Write(DS3231_I2C, DS3231_ADDR, 0x0E, 1, &ctrlAlarm, sizeof(ctrlAlarm), 1000);
+
+  // Delay for 1ms to allow the RTC module to process the data
+  HAL_Delay(1);
 }
 
 /**
@@ -1087,7 +891,7 @@ void Alarm_Clear (uint8_t slot)
 void Alarm_Check (volatile ALARM *alarm_check_data, volatile TIME *time_get_data)
 {
   // Compare the current time with all alarms stored in the EEPROM module
-  for (int i = 0; i <= ALARM_SLOT_NUM; i++)
+  for (int i = 0; i < ALARM_SLOT_NUM; i++)
   {
     // Retrieve the alarm values from the EEPROM module
     //    void Alarm_Get (uint8_t address, ALARM *alarm_get_data)
@@ -1150,16 +954,20 @@ void Alarm_Check (volatile ALARM *alarm_check_data, volatile TIME *time_get_data
     }
 
     // If all the above checks pass, the alarm is activated
-    debug_alarm_activate_ctr += 1;
+    debug_alarm_activate_ctr++;
     break;
   }
 
 }
 
-
 /**
   * @brief  Debounce the button state and handle button press events.
   * @param  button: Pointer to a BUTTON structure representing the button to be debounced.
+  * * @param  button->state: Current state of the button (BUTTON_RELEASED, BUTTON_WAITING, BUTTON_PRESSED, BUTTON_HELD).
+  * * @param  button->int_flag: Interrupt flag indicating if the button is pressed (LOW).
+  * * @param  button->press_flag: Flag indicating if the button is pressed (LOW).
+  * * @param  button->hold_flag: Flag indicating if the button is held down (LOW).
+  * * @param  button->start_tick: Start time of the button press event (in milliseconds).
   * @retval None
 */
 void Button_Debounce(BUTTON *button)
@@ -1167,8 +975,8 @@ void Button_Debounce(BUTTON *button)
   // Check button state and handle debouncing
   switch (button->state)
   {
-    // State when the button is not pressed (HIGH)
-    case BUTTON_STATE_HIGH:
+    // State when the button is released (HIGH)
+    case BUTTON_RELEASED:
 
       // Check if the button is pressed (LOW)
       if (button->int_flag) 
@@ -1177,16 +985,16 @@ void Button_Debounce(BUTTON *button)
         button->start_tick = HAL_GetTick();
 
         // Set the button state to waiting
-        button->state = BUTTON_STATE_WAITING;
+        button->state = BUTTON_WAITING;
       }
 
     break;
 
     // State when the button is in transition (waiting for debounce)
-    case BUTTON_STATE_WAITING:
+    case BUTTON_WAITING:
 
       // Check if the button is still pressed (LOW) after the debounce delay
-      if (HAL_GetTick() - button->start_tick >= DEBOUNCE_DELAY_MS) 
+      if (HAL_GetTick() - button->start_tick >= BUTTON_DEBOUNCE_DELAY) 
       {
         // Check if the button is still pressed (LOW)
         if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == GPIO_PIN_RESET) 
@@ -1194,32 +1002,282 @@ void Button_Debounce(BUTTON *button)
           // Set the button press flag to true (valid press detected)
           button->press_flag = true;
 
-          // Set the button state to stable low (pressed)
-          button->state = BUTTON_STATE_LOW;
+          // Set the button to pressed state (LOW)
+          button->state = BUTTON_PRESSED;
         } 
         else 
         {
-          // Set the button state to stable high (not pressed)
-          button->state = BUTTON_STATE_HIGH; // False alarm
+          // Set the button to released state (HIGH)
+          button->state = BUTTON_RELEASED;
         }
       }
 
     break;
-
+    
     // State when the button is pressed (LOW)
-    case BUTTON_STATE_LOW:
+    case BUTTON_PRESSED:
 
-      // Wait until button is released
-      if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == GPIO_PIN_SET) 
+      // Check if the button is still pressed (LOW) after the hold delay
+      if (HAL_GetTick() - button->start_tick >= BUTTON_HOLD_DELAY)
       {
-        // Set the button state to stable high (not pressed)
-        button->state = BUTTON_STATE_HIGH;
+        // Check if the button is still pressed (LOW)
+        if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == GPIO_PIN_RESET) 
+        {
+          // Set the button to held state (LOW)
+          button->state = BUTTON_HELD;
+
+          // Set the button press flag to true (valid press detected)
+          button->hold_flag = true;
+        } 
+      }
+
+      // Check if the button is released (HIGH) before the hold delay
+      else if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == GPIO_PIN_SET) 
+      {
+        // Set the button state to stable high (releasesd)
+        button->state = BUTTON_RELEASED;
 
         // Reset the button interrupt flag
         button->int_flag = false;
       }
 
     break;
+
+    // State when the button is held down (pressed for a long time)
+    case BUTTON_HELD:
+
+      // Check if the button is released (HIGH) after the hold delay
+      if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == GPIO_PIN_SET) 
+      {
+        // Set the button state to stable high (releasesd)
+        button->state = BUTTON_RELEASED;
+        
+        // Reset the button interrupt flag
+        button->int_flag = false;
+
+        // Reset the button hold flag
+        button->hold_flag = false;
+      }
+
+    break;
+      
+    // Default case (should not occur)
+    default:
+      // Reset the button state to stable high (not pressed)
+      button->state = BUTTON_RELEASED;
+    break;
+  }
+}
+
+
+/**
+ * @brief  Button interrupt handler function to be called in main loop
+ * @param  button: Pointer to the button structure
+ * * @param  button->gpio_pin: GPIO pin number of the button
+ * * @param  button->int_flag: Interrupt flag indicating if the button is pressed (LOW)
+ * * @param  button->press_flag: Flag indicating if the button is pressed (LOW)
+ * * @param  button->hold_flag: Flag indicating if the button is held down (LOW)
+ * @retval None
+ */
+void Button_Handle(BUTTON *button)
+{
+  // Perform button debouncing
+  //    void Button_Debounce(BUTTON *button)
+  Button_Debounce(button);
+
+  // Check if the button is pressed (LOW)
+  if (button->press_flag)
+  {
+    // Debugging: Track the number of button presses
+    debug_button_counter[button->index]++;
+
+    switch (button->index)
+    {
+      // Button 0
+      case 0:
+        // Select the next parameter to modify
+        debug_alarm_select_state.param = (debug_alarm_select_state.param + 1) % (SELECT_SLOT + 1);
+      break;
+      
+      // Button 1
+      case 1:
+        // Debugging: Toggle the increment state of the alarm selection
+        debug_alarm_select_state.increment = !debug_alarm_select_state.increment;
+
+        // Parameter pointer and maximum value for incrementing
+        uint8_t *paramPtr1 = NULL;
+        uint8_t maxValue1 = 0;
+
+        // Determine which parameter to increment based on the current selection
+        switch (debug_alarm_select_state.param)
+        {
+          case SELECT_SECOND:  paramPtr1 = &debug_alarm_select_data.second;  maxValue1 = 59; break;
+          case SELECT_MINUTE:  paramPtr1 = &debug_alarm_select_data.minute;  maxValue1 = 59; break;
+          case SELECT_HOUR:    paramPtr1 = &debug_alarm_select_data.hour;    maxValue1 = 23; break;
+          case SELECT_DOW_DOM: paramPtr1 = &debug_alarm_select_data.dow_dom; maxValue1 = 31; break;
+          case SELECT_DY_DT:   paramPtr1 = &debug_alarm_select_data.dy_dt;   maxValue1 = 2;  break;
+          case SELECT_SLOT:    paramPtr1 = &debug_alarm_select_data.slot;    maxValue1 = 9;  break;
+          case SELECT_ON_OFF:  debug_alarm_select_data.on_off = !debug_alarm_select_data.on_off; break;
+          default: break;
+        }
+
+        // Increment the selected parameter value, wrapping around if necessary
+        if (paramPtr1)
+        {
+          *paramPtr1 = (*paramPtr1 < maxValue1) ? (*paramPtr1 + 1) : 0;
+        }
+      break;
+      
+      // Button 2
+      case 2:
+        // Debugging: Toggle the decrement state of the alarm selection  
+        debug_alarm_select_state.decrement = !debug_alarm_select_state.decrement;
+
+        // Parameter pointer and maximum value for decrementing
+        uint8_t *paramPtr2 = NULL;
+        uint8_t maxValue2 = 0;
+
+        // Determine which parameter to decrement based on the current selection
+        switch (debug_alarm_select_state.param)
+        {
+          case SELECT_SECOND:  paramPtr2 = &debug_alarm_select_data.second;  maxValue2 = 59; break;
+          case SELECT_MINUTE:  paramPtr2 = &debug_alarm_select_data.minute;  maxValue2 = 59; break;
+          case SELECT_HOUR:    paramPtr2 = &debug_alarm_select_data.hour;    maxValue2 = 23; break;
+          case SELECT_DOW_DOM: paramPtr2 = &debug_alarm_select_data.dow_dom; maxValue2 = 31; break;
+          case SELECT_DY_DT:   paramPtr2 = &debug_alarm_select_data.dy_dt;   maxValue2 = 2;  break;
+          case SELECT_SLOT:    paramPtr2 = &debug_alarm_select_data.slot;    maxValue2 = 9;  break;
+          case SELECT_ON_OFF:  debug_alarm_select_data.on_off = !debug_alarm_select_data.on_off; break;
+          default: break;
+        }
+
+        // Decrement the selected parameter value, wrapping around if necessary
+        if (paramPtr2)
+        {
+          *paramPtr2 = (*paramPtr2 > 0) ? (*paramPtr2 - 1) : maxValue2;
+        }
+      break;
+      
+      // Button 3
+      case 3:
+        // Debugging: Toggle the save state of the alarm selection
+        debug_alarm_select_state.save = !debug_alarm_select_state.save;
+
+        // Save the alarm values to the EEPROM module
+        //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, uint8_t dy_dt, bool on_off, uint8_t slot)
+        Alarm_Set
+        (
+          debug_alarm_select_data.second,
+          debug_alarm_select_data.minute,
+          debug_alarm_select_data.hour,
+          debug_alarm_select_data.dow_dom,
+          debug_alarm_select_data.dy_dt,
+          debug_alarm_select_data.on_off,
+          debug_alarm_select_data.slot
+        );
+
+        // Retrieve the saved alarm values from the EEPROM module
+        //    void Alarm_Get (uint8_t address, ALARM *alarm_get_data)
+        Alarm_Get(debug_alarm_select_data.slot, &alarm_get_data[debug_alarm_select_data.slot]);
+      break;
+      
+      // Button 4
+      case 4:
+        // Debugging: Toggle the clear state of the alarm selection
+        debug_alarm_select_state.clear = !debug_alarm_select_state.clear;
+
+        // Clear all alarms in the EEPROM module
+        for (int i = 0; i < 10; i++)
+        {
+          // void Alarm_Clear (uint8_t slot)
+          Alarm_Clear(i);
+        }
+
+        // Retrieve the cleared alarm values from the EEPROM module
+        for (int i = 0; i < 10; i++)
+        {
+          // void Alarm_Get (uint8_t address, ALARM *alarm_get_data)
+          Alarm_Get(i, &alarm_get_data[i]);
+        }
+      break;
+
+      default:
+      break;
+    }
+
+    // Reset the press flag after handling the button press
+    button->press_flag = false;
+  }
+
+  // Check if the button is held down (pressed for a long time)
+  if (button->hold_flag)
+  {
+    // Check if the hold duration has reached the defined cycle time
+    if (HAL_GetTick() - button->start_tick >= BUTTON_HOLD_CYCLE)
+    {
+      // Debugging: Track the number of button holds
+      debug_button_counter[button->index]++;
+
+      switch (button->index)
+      {
+        // Button 1 (Increment continuously while held)
+        case 1:
+          // Parameter pointer and maximum value for incrementing
+          uint8_t *paramPtr1 = NULL;
+          uint8_t maxValue1 = 0;
+
+          // Determine which parameter to increment based on the current selection
+          switch (debug_alarm_select_state.param)
+          {
+            case SELECT_SECOND:  paramPtr1 = &debug_alarm_select_data.second;  maxValue1 = 59; break;
+            case SELECT_MINUTE:  paramPtr1 = &debug_alarm_select_data.minute;  maxValue1 = 59; break;
+            case SELECT_HOUR:    paramPtr1 = &debug_alarm_select_data.hour;    maxValue1 = 23; break;
+            case SELECT_DOW_DOM: paramPtr1 = &debug_alarm_select_data.dow_dom; maxValue1 = 31; break;
+            case SELECT_DY_DT:   paramPtr1 = &debug_alarm_select_data.dy_dt;   maxValue1 = 2;  break;
+            case SELECT_SLOT:    paramPtr1 = &debug_alarm_select_data.slot;    maxValue1 = 9;  break;
+            case SELECT_ON_OFF:  debug_alarm_select_data.on_off = !debug_alarm_select_data.on_off; break;
+            default: break;
+          }
+
+          // Increment the selected parameter value, wrapping around if necessary
+          if (paramPtr1)
+          {
+            *paramPtr1 = (*paramPtr1 < maxValue1) ? (*paramPtr1 + 1) : 0;
+          }
+        break;
+
+        // Button 2 (Decrement continuously while held)
+        case 2:
+          // Parameter pointer and maximum value for decrementing
+          uint8_t *paramPtr2 = NULL;
+          uint8_t maxValue2 = 0;
+
+          // Determine which parameter to decrement based on the current selection
+          switch (debug_alarm_select_state.param)
+          {
+            case SELECT_SECOND:  paramPtr2 = &debug_alarm_select_data.second;  maxValue2 = 59; break;
+            case SELECT_MINUTE:  paramPtr2 = &debug_alarm_select_data.minute;  maxValue2 = 59; break;
+            case SELECT_HOUR:    paramPtr2 = &debug_alarm_select_data.hour;    maxValue2 = 23; break;
+            case SELECT_DOW_DOM: paramPtr2 = &debug_alarm_select_data.dow_dom; maxValue2 = 31; break;
+            case SELECT_DY_DT:   paramPtr2 = &debug_alarm_select_data.dy_dt;   maxValue2 = 2;  break;
+            case SELECT_SLOT:    paramPtr2 = &debug_alarm_select_data.slot;    maxValue2 = 9;  break;
+            case SELECT_ON_OFF:  debug_alarm_select_data.on_off = !debug_alarm_select_data.on_off; break;
+            default: break;
+          }
+
+          // Decrement the selected parameter value, wrapping around if necessary
+          if (paramPtr2)
+          {
+            *paramPtr2 = (*paramPtr2 > 0) ? (*paramPtr2 - 1) : maxValue2;
+          }
+        break;
+
+        default:
+        break;
+      }
+
+      // Reset the start tick for the next hold cycle
+      button->start_tick = HAL_GetTick();
+    }
   }
 }
 
@@ -1237,29 +1295,29 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       rtc_int_flag = true;
     break;
     
-    case BUTTON1_IN12_Pin:
+    case BUTTON0_IN12_Pin:
+      // Set the Button 0 Interrupt Flag
+      button0.int_flag = true;
+    break;
+
+    case BUTTON1_IN13_Pin:
       // Set the Button 1 Interrupt Flag
       button1.int_flag = true;
     break;
 
-    case BUTTON2_IN13_Pin:
+    case BUTTON2_IN14_Pin:
       // Set the Button 2 Interrupt Flag
       button2.int_flag = true;
     break;
 
-    case BUTTON3_IN14_Pin:
+    case BUTTON3_IN15_Pin:
       // Set the Button 3 Interrupt Flag
       button3.int_flag = true;
-    break;
-
-    case BUTTON4_IN15_Pin:
-      // Set the Button 4 Interrupt Flag
-      button4.int_flag = true;
     break;  
 
-    case BUTTON5_IN8_Pin:
-      // Set the Button 5 Interrupt Flag
-      button5.int_flag = true;
+    case BUTTON4_IN8_Pin:
+      // Set the Button 4 Interrupt Flag
+      button4.int_flag = true;
     break;  
 
     default:
