@@ -15,7 +15,7 @@
   *
   * 
   * This project is developed by Nguyen Hung Minh, Bui Dinh Trung Nam, and Nguyen Duy Ngoc
-  * (Students at Vietnam National University, Ho Chi Minh City - University of Technology).
+  * - Students at Vietnam National University, Ho Chi Minh City - University of Technology.
   * 
   * Please read and follow the naming conventions in naming_conventions.md before editing this file.
   * 
@@ -65,35 +65,83 @@ typedef struct
                     //    [Bit 7] = 0, [Bit 6] = X: Not used
 } ALARM;
 
-// Debugging: Structure to track the values being selected for modification
-typedef struct
+// Enum for alarm day of week or date of month mode
+typedef enum
 {
-  uint8_t second;
-  uint8_t minute;
-  uint8_t hour;
-  uint8_t dow_dom;
-  uint8_t dy_dt;
-  bool    on_off;
-  uint8_t slot;
-} DEBUG_ALARM_SELECT;
+  DAY_OF_WEEK_MODE,
+  DATE_OF_MONTH_MODE,
+  NOT_USED_MODE
+} ALARM_DY_DT_MODE;
 
 // Enum for button debounce states
-typedef enum {
-  BUTTON_STATE_HIGH,    // Button is not pressed (HIGH state)
-  BUTTON_STATE_WAITING, // Button is pressed (LOW state) and waiting for debounce delay
-  BUTTON_STATE_LOW      // Button is pressed (LOW state)
+typedef enum 
+{
+  BUTTON_RELEASED,    // Button is not pressed (HIGH state)
+  BUTTON_WAITING,     // Button is pressed (LOW state) and waiting for debounce delay
+  BUTTON_PRESSED,     // Button is pressed (LOW state)
 } BUTTON_STATE;
 
 // Struct representing each button with debouncing state
-typedef struct {
+typedef struct 
+{
   GPIO_TypeDef    *gpio_port; // GPIO port of the button      
   uint16_t        gpio_pin;   // GPIO pin of the button
+  uint8_t         index;      // Index of the button (0-4)
   BUTTON_STATE    state;      // Current state of the button
   uint32_t        start_tick; // Start time of the debounce timer
   volatile bool   int_flag;   // Set when button interrupt is triggered
   volatile bool   press_flag; // Set when button is pressed
+  volatile bool   hold_flag;  // Set when button is held down
+  volatile bool   latch;  // Set when button is pressed or held (once only)
 } BUTTON;
 
+// Enum for system modes
+typedef enum {
+  DEFAULT_MODE,
+  TIME_SETUP_MODE,
+  ALARM_SETUP_MODE,
+  ALARM_REVIEW_MODE,
+  ALARM_ACTIVE_MODE,
+  SYSTEM_OPTIONS_MODE
+} SYSTEM_MODE;
+
+// Enum for system parameters to be selected for modification
+typedef enum
+{
+  SET_SECOND,   // Set seconds value
+  SET_MINUTE,   // Set minutes value
+  SET_HOUR,     // Set hours value
+  SET_DOW,      // Set day of the week value
+  SET_DOM,      // Set date of the month value
+  SET_MONTH,    // Set month value
+  SET_YEAR,     // Set year value
+  SET_DY_DT,    // Set day of week or date of month (1 = day of week, 0 = date of month, 2 = not used)
+  SET_DOW_DOM,  // Set day of the week or date of the month value
+  SET_ON_OFF,   // Set ON/OFF state
+} SYSTEM_PARAM_SELECT;
+
+// Struct for system state
+typedef struct
+{
+  SYSTEM_MODE         mode;         // Current system mode
+  SYSTEM_PARAM_SELECT param_select; // Selected system parameter to be modified
+  uint8_t             slot_free;    // Free slot number for storing alarms in the EEPROM module
+} SYSTEM_STATE;
+
+// Struct for system parameters to be modified
+typedef struct
+{
+  uint8_t           second;   // Seconds: 0-59
+  uint8_t           minute;   // Minutes: 0-59
+  uint8_t           hour;     // Hours: 0-23
+  uint8_t           dow;      // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31
+  uint8_t           dom;      // Date of the month: 1-31, or Day of the week: 1-7, or not used: 0
+  uint8_t           month;    // Month: 1-12
+  uint8_t           year;     // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
+  ALARM_DY_DT_MODE  dy_dt;    // Select: DAY_OF_WEEK_MODE, DATE_OF_MONTH_MODE, NOT_USED_MODE
+  uint8_t           dow_dom;  // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31
+  bool              on_off;   // true = ON, false = OFF
+} SYSTEM_PARAM_DATA;
 
 /* USER CODE END PTD */
 
@@ -121,8 +169,17 @@ typedef struct {
 // Number of alarms in the EEPROM module
 #define ALARM_SLOT_NUM 10 
 
+// Active state of buttons
+#define BUTTON_ACTIVE GPIO_PIN_SET;
+
 // Debounce threshold in milliseconds
-#define DEBOUNCE_DELAY_MS 15 
+#define BUTTON_DEBOUNCE_DELAY 40
+
+// Button hold threshold in milliseconds
+#define BUTTON_HOLD_TH 1000
+
+// Button hold cycle in milliseconds
+#define BUTTON_HOLD_CYCLE 250
 
 /* USER CODE END PD */
 
@@ -134,6 +191,13 @@ typedef struct {
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
+/* SYSTEM ==========================================*/
+// Global variable to store the current system mode and selected parameter
+SYSTEM_STATE system_state = {DEFAULT_MODE, SET_SECOND, 0};
+
+// Global variable to store the system parameters to be modified
+SYSTEM_PARAM_DATA system_param_data = {0};
 
 /* RTC & EEPROM ====================================*/
 // Variable to store the time values received from the RTC module every second
@@ -150,20 +214,18 @@ volatile bool rtc_int_flag = false;
 
 // Debugging: Track the number of alarm activations
 uint8_t debug_alarm_activate_ctr = 0;
+volatile bool debug_rtc_int = false;
 
 /* BUTTON ========================================*/
 // Debugging: Track if the button is pressed or not
 volatile uint8_t debug_button_counter[5] = {0};
 
 // Global instances of DEBOUNCE_BUTTON for each button
-BUTTON button1 = {GPIOB, BUTTON1_IN12_Pin, BUTTON_STATE_HIGH, 0, false, false};
-BUTTON button2 = {GPIOB, BUTTON2_IN13_Pin, BUTTON_STATE_HIGH, 0, false, false};
-BUTTON button3 = {GPIOB, BUTTON3_IN14_Pin, BUTTON_STATE_HIGH, 0, false, false};
-BUTTON button4 = {GPIOB, BUTTON4_IN15_Pin, BUTTON_STATE_HIGH, 0, false, false};
-BUTTON button5 = {GPIOA, BUTTON5_IN8_Pin, BUTTON_STATE_HIGH, 0, false, false};
-
-// Debugging: Track the values of alarm being selected for modification
-DEBUG_ALARM_SELECT debug_alarm_select = {0, 0, 0, 0, 0, false, 0};
+BUTTON button0 = {GPIOB, BUTTON0_IN12_Pin, 0, BUTTON_RELEASED, 0, false, false, false, false};
+BUTTON button1 = {GPIOB, BUTTON1_IN13_Pin, 1, BUTTON_RELEASED, 0, false, false, false, false};
+BUTTON button2 = {GPIOB, BUTTON2_IN14_Pin, 2, BUTTON_RELEASED, 0, false, false, false, false};
+BUTTON button3 = {GPIOB, BUTTON3_IN15_Pin, 3, BUTTON_RELEASED, 0, false, false, false, false};
+BUTTON button4 = {GPIOA, BUTTON4_IN8_Pin,  4, BUTTON_RELEASED, 0, false, false, false, false};
 
 /* ADC ==========================================*/
 // Flag for ADC interrupt (ADC Valid Flag)
@@ -211,7 +273,7 @@ void Time_Get (volatile TIME *time_get_data);
 void Time_Ctrl (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt);
 
 // Function to write a single alarm to the EEPROM module
-void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, uint8_t dy_dt, bool on_off, uint8_t slot);
+void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_DY_DT_MODE dy_dt, bool on_off, uint8_t slot);
 
 // Function to read a single alarm from the EEPROM module
 void Alarm_Get (uint8_t slot, volatile ALARM *alarm_get_data);
@@ -225,6 +287,8 @@ void Alarm_Check (volatile ALARM *alarm_check_data, volatile TIME *time_get_data
 // Debounce handler function to be called in main loop
 void Button_Debounce(BUTTON *button);
 
+// Button handler function to be called in main loop
+void Button_Handle(BUTTON *button);
 
 /* USER CODE END PFP */
 
@@ -267,43 +331,73 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  // // Initialize RTC module (Run only once after reset the RTC module)
-  // //    void Time_Init(uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
-  // Time_Init
-  // (
-  //    0, // Seconds: 0-59
-  //   01, // Minutes: 0-59
-  //   15, // Hours: 0-23
-  //    5, // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
-  //   10, // Date of the month: 1-31
-  //    4, // Month: 1-12
-  //   25  // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
-  // );
-
-  // // Clear all alarms in the EEPROM module
-  // for (int i = 0; i < 10; i++)
-  // {
-  //   Alarm_Clear(i);
-  // }
-
-  // Store values of a single alarm to the next available address on the EEPROM module
-  //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, bool dy_dt, bool on_off, uint8_t slot)
-  Alarm_Set
+  // Set time to the RTC module through I2C interface (Run only once after reset the RTC).
+  //    void Time_Set(uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
+  Time_Set
   (
-    10,    // Seconds: 0-59
-    20,    // Minutes: 0-59
-    22,    // Hours: 0-23
-     9,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31, or not used: 0
-     0,    // Select: 0 = date of month, 1 = day of week, 2 = not used
-    false, // true = ON, false = OFF 
-     1     // Slot number of the alarm in the EEPROM module (0-9)
-  );  
+     0, // Seconds: 0-59
+    53, // Minutes: 0-59
+    16, // Hours: 0-23
+     2, // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+    14, // Date of the month: 1-31
+     4, // Month: 1-12
+    25  // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
+  );
+
+  // Initialize RTC module (Run only once after reset the RTC).
+  Time_Ctrl 
+  (
+     0, // Alarm rate: 0-5
+     0, // Seconds: 0-59
+     0, // Minutes: 0-59
+     0, // Hours: 0-23
+     0, // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31
+     0  // Select: 1 = day of week, 0 = date of month
+  );   
+
+  // Initially retrieve the time values from the RTC module
+  Time_Get(&time_get_data);
+
+  // Clear all alarms in the EEPROM module
+  for (int i = 0; i < 10; i++)
+  {
+    Alarm_Clear(i);
+  }
+
+  // // Store values of a single alarm to the next available address on the EEPROM module
+  // //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_DY_DT_MODE dy_dt, bool on_off, uint8_t slot)
+  // Alarm_Set
+  // (
+  //   10,    // Seconds: 0-59
+  //   20,    // Minutes: 0-59
+  //   22,    // Hours: 0-23
+  //    9,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31, or not used: 0
+  //    0,    // Select: 0 = date of month, 1 = day of week, 2 = not used
+  //   false, // true = ON, false = OFF 
+  //    1     // Slot number of the alarm in the EEPROM module (0-9)
+  // );  
 
   // Initially retrieve the alarm values from the EEPROM module
   for (int i = 0; i <= 10; i++)
   {
     Alarm_Get(i, &alarm_get_data[i]);
   }
+
+  // Set the initial system parameters to current time values and default settings for convenience
+  system_param_data =
+  (SYSTEM_PARAM_DATA)
+  {
+    0,                          // Seconds: 0-59
+    time_get_data.minute,       // Minutes: 0-59
+    time_get_data.hour,         // Hours: 0-23
+    time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+    time_get_data.dateofmonth,  // Date of the month: 1-31
+    time_get_data.month,        // Month: 1-12
+    time_get_data.year,         // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
+    NOT_USED_MODE,              // Select: DAY_OF_WEEK_MODE, DATE_OF_MONTH_MODE, NOT_USED_MODE
+    time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31
+    true                        // true = ON, false = OFF
+  };
 
   // Initialize the UART module to receive data
   //    HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
@@ -324,306 +418,16 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    // Check if the Button 1 Interrupt Flag is set (Button 1 Interrupt Flag) on PB12
-    if (button1.int_flag)
-    {
-      // Handle button 1 press event
-      //    void Button_Debounce(BUTTON *button)
-      Button_Debounce(&button1);
-
-      // Check if the button is pressed (LOW)
-      if (button1.press_flag)
-      {
-        // Debugging: Track the number of button presses
-        //    debug_button_counter[0]: parameter selection for an alarm
-        //      0: seconds
-        //      1: minutes
-        //      2: hours
-        //      3: day of the week, or date of the month
-        //      4: selection: date of month, day of week, not used
-        //      5: ON/OFF state of the alarm
-        //      6: slot number of the alarm in the EEPROM module (0-9)
-        
-        if (debug_button_counter[0] < 6)
-        {
-          debug_button_counter[0] += 1;
-        }
-        else
-        {
-          debug_button_counter[0] = 0;
-        }
-      }
-    
-      // Reset the Button 1 Press Flag
-      button1.press_flag = false;
-    }
-
-    // Check if the Button 2 Interrupt Flag is set (Button 2 Interrupt Flag) on PB13
-    if (button2.int_flag)
-    {
-      // Handle button 2 press event
-      //    void Button_Debounce(BUTTON *button)
-      Button_Debounce(&button2);
-
-      // Check if the button is pressed (LOW)
-      if (button2.press_flag)
-      {
-        // Debugging: Track the number of button presses
-        debug_button_counter[1] += 1;
-
-        // Debugging: Increment the alarm value based on the button press count
-        switch (debug_button_counter[0])
-        {
-          case 0:
-            // Debugging: Increment the seconds value of the alarm
-            if (debug_alarm_select.second < 59)
-            {
-              debug_alarm_select.second += 1;
-            }
-            else
-            {
-              debug_alarm_select.second = 0;
-            }
-          break;
-          
-          case 1:
-            // Debugging: Increment the minutes value of the alarm
-            if (debug_alarm_select.minute < 59)
-            {
-              debug_alarm_select.minute += 1;
-            }
-            else
-            {
-              debug_alarm_select.minute = 0;
-            }
-          break;
-
-          case 2:
-            // Debugging: Increment the hours value of the alarm
-            if (debug_alarm_select.hour < 23)
-            {
-              debug_alarm_select.hour += 1;
-            }
-            else
-            {
-              debug_alarm_select.hour = 0;
-            }
-          break;
-
-          case 3:
-            // Debugging: Increment the day of the week or date of the month value of the alarm
-            if (debug_alarm_select.dow_dom < 31)
-            {
-              debug_alarm_select.dow_dom += 1;
-            }
-            else
-            {
-              debug_alarm_select.dow_dom = 0;
-            }
-          break;
-
-          case 4:
-            // Debugging: Increment the selection value of the alarm (date of month, day of week, not used)
-            if (debug_alarm_select.dy_dt < 2)
-            {
-              debug_alarm_select.dy_dt += 1;
-            }
-            else
-            {
-              debug_alarm_select.dy_dt = 0;
-            }
-          break;
-
-          case 5:
-            // Debugging: Toggle the ON/OFF state of the alarm
-            debug_alarm_select.on_off = !debug_alarm_select.on_off;
-          break;
-
-          case 6:
-            // Debugging: Increment the slot number of the alarm in the EEPROM module
-           if (debug_alarm_select.slot < 9)
-            {
-              debug_alarm_select.slot += 1;
-            }
-            else
-            {
-              debug_alarm_select.slot = 0;
-            }
-          break;
-
-          default:
-            // No operation needed for default case
-          break;
-        }
-      }
-    
-      // Reset the Button 2 Press Flag
-      button2.press_flag = false;
-    }
-
-    // Check if the Button 3 Interrupt Flag is set (Button 3 Interrupt Flag) on PB14
-    if (button3.int_flag)
-    {
-      // Handle button 3 press event
-      //    void Button_Debounce(BUTTON *button)
-      Button_Debounce(&button3);
-
-      // Check if the button is pressed (LOW)
-      if (button3.press_flag)
-      {
-        // Debugging: Track the number of button presses
-        debug_button_counter[2] += 1;
-
-        switch(debug_button_counter[0])
-        {
-          case 0:
-            // Debugging: Decrement the seconds value of the alarm
-            if (debug_alarm_select.second > 0)
-            {
-              debug_alarm_select.second -= 1;
-            }
-            else
-            {
-              debug_alarm_select.second = 59;
-            }
-          break;
-
-          case 1:
-            // Debugging: Decrement the minutes value of the alarm
-            if (debug_alarm_select.minute > 0)
-            {
-              debug_alarm_select.minute -= 1;
-            }
-            else
-            {
-              debug_alarm_select.minute = 59;
-            }
-          break;
-
-          case 2:
-            // Debugging: Decrement the hours value of the alarm
-            if (debug_alarm_select.hour > 0)
-            {
-              debug_alarm_select.hour -= 1;
-            }
-            else
-            {
-              debug_alarm_select.hour = 23;
-            }
-          break;
-
-          case 3:
-            // Debugging: Decrement the day of the week or date of the month value of the alarm
-            if (debug_alarm_select.dow_dom > 0)
-            {
-              debug_alarm_select.dow_dom -= 1;
-            }
-            else
-            {
-              debug_alarm_select.dow_dom = 31;
-            }
-          break;
-
-          case 4:
-            // Debugging: Decrement the selection value of the alarm (date of month, day of week, not used)
-            if (debug_alarm_select.dy_dt > 0)
-            {
-              debug_alarm_select.dy_dt -= 1;
-            }
-            else
-            {
-              debug_alarm_select.dy_dt = 2;
-            }
-          break;
-
-          case 5:
-            // Debugging: Toggle the ON/OFF state of the alarm
-            debug_alarm_select.on_off = !debug_alarm_select.on_off;
-          break;
-
-          case 6:
-            // Debugging: Decrement the slot number of the alarm in the EEPROM module
-            if (debug_alarm_select.slot > 0)
-            {
-              debug_alarm_select.slot -= 1;
-            }
-            else
-            {
-              debug_alarm_select.slot = 9;
-            }
-          break;
-
-          default:
-            // No operation needed for default case
-          break;
-        }
-      }
-    
-      // Reset the Button 3 Press Flag
-      button3.press_flag = false;
-    }
-
-    // Check if the Button 4 Interrupt Flag is set (Button 4 Interrupt Flag) on PB15
-    if (button4.int_flag)
-    {
-      // Handle button 4 press event
-      //    void Button_Debounce(BUTTON *button)
-      Button_Debounce(&button4);
-
-      // Check if the button is pressed (LOW)
-      if (button4.press_flag)
-      {
-        // Debugging: Track the number of button presses
-        debug_button_counter[3] += 1;
-
-        // Debugging: Store the alarm values to the EEPROM module
-        //   void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, uint8_t dy_dt, bool on_off, uint8_t slot)
-        Alarm_Set
-        (
-          debug_alarm_select.second, // Seconds: 0-59
-          debug_alarm_select.minute, // Minutes: 0-59
-          debug_alarm_select.hour,   // Hours: 0-23
-          debug_alarm_select.dow_dom,// Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31, or not used: 0
-          debug_alarm_select.dy_dt,  // Select: 0 = date of month, 1 = day of week, 2 = not used
-          debug_alarm_select.on_off, // true = ON, false = OFF 
-          debug_alarm_select.slot    // Slot number of the alarm in the EEPROM module (0-9)
-        );
-
-        Alarm_Get(debug_alarm_select.slot, &alarm_get_data[debug_alarm_select.slot]);
-      }
-    
-      // Reset the Button 4 Press Flag
-      button4.press_flag = false;
-    }
-
-    // Check if the Button 5 Interrupt Flag is set (Button 5 Interrupt Flag) on PA8
-    if (button5.int_flag)
-    {
-      // Handle button 5 press event
-      //    void Button_Debounce(BUTTON *button)
-      Button_Debounce(&button5);
-
-      // Check if the button is pressed (LOW)
-      if (button5.press_flag)
-      {
-        // Debugging: Track the number of button presses
-        debug_button_counter[4] += 1;
-
-        // Debugging: Clear all alarms in the EEPROM module
-        for (int i = 0; i < 10; i++)
-        {
-          Alarm_Clear(i);
-        }
-
-        for (int i = 0; i <= 10; i++)
-        {
-          Alarm_Get(i, &alarm_get_data[i]);
-        }
-      }
-    
-      // Reset the Button 5 Press Flag
-      button5.press_flag = false;
-    }
+    Button_Handle(&button0);
+    Button_Handle(&button1);
+    Button_Handle(&button2);
+    Button_Handle(&button3);
+    Button_Handle(&button4);
+    // {
+    //   // Button 4 Interrupt Handler
+    //   //    void Button_Handle(BUTTON *button)
+    //   Button_Handle(&button4);
+    // }
 
     // Check if the RTC Interrupt Flag is set (RTC Interrupt Flag) on PB4 (Activated every second)
     if (rtc_int_flag)
@@ -637,6 +441,9 @@ int main(void)
 
       // Reset the RTC Interrupt Flag
       rtc_int_flag = false;
+
+      // Toggle the debug RTC interrupt flag for debugging purposes
+      debug_rtc_int = !debug_rtc_int;
     }
 
     // Check if the ADC interrupt flag is set (ADC Valid Flag)
@@ -762,6 +569,9 @@ void Time_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom,
   // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);	
   HAL_I2C_Mem_Write(DS3231_I2C, DS3231_ADDR, 0x00, 1, setTime, sizeof(setTime), 1000);
+
+  // Delay for 1ms to allow the RTC module to process the data
+  HAL_Delay(1);
 }
 
 /**
@@ -778,6 +588,9 @@ void Time_Get (volatile TIME *time_get_data)
   // HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);  
   HAL_I2C_Mem_Read(DS3231_I2C, DS3231_ADDR, 0x00, 1, getTime, sizeof(getTime), 1000);
+
+  // Delay for 1ms to allow the RTC module to process the data
+  HAL_Delay(1);
 
   // Store the time values (converted from BCD code to decimal) into the time variable
 	time_get_data->second       = BCD_To_Dec(getTime[0]);
@@ -887,10 +700,16 @@ void Time_Ctrl (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t do
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);	  
   HAL_I2C_Mem_Write(DS3231_I2C, DS3231_ADDR, 0x07, 1, ctrlTime, sizeof(ctrlTime), 1000);
 
+  // Delay for 1ms to allow the RTC module to process the data
+  HAL_Delay(1);
+
   // Send the alarm control mask bits to the RTC module through I2C interface at address 0Eh (size of value: 1 byte)
   // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);	  
   HAL_I2C_Mem_Write(DS3231_I2C, DS3231_ADDR, 0x0E, 1, &ctrlAlarm, sizeof(ctrlAlarm), 1000);
+
+  // Delay for 1ms to allow the RTC module to process the data
+  HAL_Delay(1);
 }
 
 /**
@@ -943,7 +762,7 @@ void Time_Init (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom
   * @param  slot: Slot number of the alarm in the EEPROM module (0-9)
   * @retval None
 */
-void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, uint8_t dy_dt, bool on_off, uint8_t slot)
+void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_DY_DT_MODE dy_dt, bool on_off, uint8_t slot)
 {
   // Internal address of the alarm in the EEPROM module (0-8192, or 13 bits)
   uint16_t address = slot * 4;
@@ -958,26 +777,26 @@ void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, uint8_t
   switch (dy_dt)
   {
     // Date of the month
-    case 0:
+    case DATE_OF_MONTH_MODE:
       // Decoding: [Bit 7] = 1, [Bit 6] = 0
       dow_dom += (1 << 7);
-    break;
+      break;
 
     // Day of the week
-    case 1:
+    case DAY_OF_WEEK_MODE:
       // Decoding: [Bit 7] = 1, [Bit 6] = 1
       dow_dom += ((1 << 7) | (1 << 6));
-    break;
+      break;
 
     // Not used
-    case 2:
+    case NOT_USED_MODE:
       // Decoding: [Bit 7] = 0, [Bit 6] = 0
       dow_dom += 0;
-    break;
+      break;
 
     default:
       dow_dom += 0;
-    break;
+      break;
   }
 
   // A blank array (4 slots) to contain the alarm values
@@ -1087,7 +906,7 @@ void Alarm_Clear (uint8_t slot)
 void Alarm_Check (volatile ALARM *alarm_check_data, volatile TIME *time_get_data)
 {
   // Compare the current time with all alarms stored in the EEPROM module
-  for (int i = 0; i <= ALARM_SLOT_NUM; i++)
+  for (int i = 0; i < ALARM_SLOT_NUM; i++)
   {
     // Retrieve the alarm values from the EEPROM module
     //    void Alarm_Get (uint8_t address, ALARM *alarm_get_data)
@@ -1150,77 +969,856 @@ void Alarm_Check (volatile ALARM *alarm_check_data, volatile TIME *time_get_data
     }
 
     // If all the above checks pass, the alarm is activated
-    debug_alarm_activate_ctr += 1;
+    debug_alarm_activate_ctr++;
     break;
   }
 
 }
 
-
 /**
   * @brief  Debounce the button state and handle button press events.
   * @param  button: Pointer to a BUTTON structure representing the button to be debounced.
+  * * @param  button->state: Current state of the button (BUTTON_RELEASED, BUTTON_WAITING, BUTTON_PRESSED).
+  * * @param  button->int_flag: Interrupt flag indicating if the button is pressed (LOW).
+  * * @param  button->press_flag: Flag indicating if the button is pressed (LOW).
+  * * @param  button->hold_flag: Flag indicating if the button is held down (LOW).
+  * * @param  button->hold_latch: 
+  * * @param  button->start_tick: Start time of the button press event (in milliseconds).
   * @retval None
 */
 void Button_Debounce(BUTTON *button)
 {
-  // Check button state and handle debouncing
+  // Handle button state transitions and debounce logic
   switch (button->state)
   {
-    // State when the button is not pressed (HIGH)
-    case BUTTON_STATE_HIGH:
+    // Initial state: Button is released (HIGH)
+    case BUTTON_RELEASED:
 
-      // Check if the button is pressed (LOW)
+      button->press_flag = false;
+      button->hold_flag = false;
+      button->latch = false;
+    
+      // Check if interrupt flag is set
       if (button->int_flag) 
       {
-        // Start the debounce timer
+        // Record the start time for debounce
         button->start_tick = HAL_GetTick();
 
-        // Set the button state to waiting
-        button->state = BUTTON_STATE_WAITING;
+        // Transition to waiting state
+        button->state = BUTTON_WAITING;
       }
+      break;
 
-    break;
-
-    // State when the button is in transition (waiting for debounce)
-    case BUTTON_STATE_WAITING:
-
-      // Check if the button is still pressed (LOW) after the debounce delay
-      if (HAL_GetTick() - button->start_tick >= DEBOUNCE_DELAY_MS) 
+    // Waiting state: Button is pressed (LOW) but not yet confirmed
+    case BUTTON_WAITING:
+      // Check if debounce delay has passed
+      if (HAL_GetTick() - button->start_tick >= BUTTON_DEBOUNCE_DELAY) 
       {
-        // Check if the button is still pressed (LOW)
-        if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == GPIO_PIN_RESET) 
+        // Check if button is still pressed (LOW state) after debounce delay
+        if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == BUTTON_ACTIVE) 
         {
-          // Set the button press flag to true (valid press detected)
-          button->press_flag = true;
-
-          // Set the button state to stable low (pressed)
-          button->state = BUTTON_STATE_LOW;
+          // Transition to pressed state
+          button->state = BUTTON_PRESSED;
         } 
         else 
         {
-          // Set the button state to stable high (not pressed)
-          button->state = BUTTON_STATE_HIGH; // False alarm
+          // Reset interrupt flag and return to released state
+          button->int_flag = false;  
+          button->state = BUTTON_RELEASED;
         }
       }
-
-    break;
-
-    // State when the button is pressed (LOW)
-    case BUTTON_STATE_LOW:
-
-      // Wait until button is released
-      if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == GPIO_PIN_SET) 
+      break;
+    
+    // Pressed state: Button is pressed (LOW)
+    case BUTTON_PRESSED:
+      // Check if button is released (HIGH state)
+      if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) != BUTTON_ACTIVE) 
       {
-        // Set the button state to stable high (not pressed)
-        button->state = BUTTON_STATE_HIGH;
-
-        // Reset the button interrupt flag
+        // Check if press duration is less than hold threshold
+        if (HAL_GetTick() - button->start_tick < BUTTON_HOLD_TH)
+        {
+          // Set press flag for short press
+          button->press_flag = true;
+        }
+      
+        // Reset interrupt flag and return to released state
         button->int_flag = false;
-      }
 
-    break;
+        //button->latch = false;
+        button->state = BUTTON_RELEASED;
+      }
+      // Check if button is held down for long press
+      else if ((HAL_GetTick() - button->start_tick >= BUTTON_HOLD_TH) && !button->hold_flag)
+      {
+        // Set hold flag for long press
+        button->hold_flag = true;
+      }
+      break;
+
+    default:
+      // Reset all flags and return to released state
+      button->state = BUTTON_RELEASED;
+      button->int_flag = false;
+      button->press_flag = false;
+      button->hold_flag = false;
+      button->latch = false;
+      break;
   }
+}
+
+/**
+ * @brief  Button interrupt handler function to be called in main loop
+ * @param  button: Pointer to the button structure
+ * * @param  button->gpio_pin: GPIO pin number of the button
+ * * @param  button->int_flag: Interrupt flag indicating if the button is pressed (LOW)
+ * * @param  button->press_flag: Flag indicating if the button is pressed (LOW)
+ * * @param  button->hold_flag: Flag indicating if the button is held down (LOW)
+ * @retval None
+ */
+
+void Button_Handle(BUTTON *button) 
+{
+  // Initialize the start tick for button hold detection
+  uint32_t startTick = 0;
+  
+  // Perform button debouncing to filter out noise
+  Button_Debounce(button);
+
+  // Check if the button is pressed or held
+  if (button->press_flag)
+  {
+    // Increment the debug counter for the button
+    debug_button_counter[button->index]++;
+  }
+  else if (button->hold_flag)
+  {
+    // Check if the button is held down for a certain duration
+    if (HAL_GetTick() - startTick >= BUTTON_HOLD_CYCLE) 
+    {
+      // Increment the debug counter for the button
+      debug_button_counter[button->index]++;
+    }
+    // Reset the start tick for the next hold cycle
+    startTick = HAL_GetTick();
+  }
+
+  // Check if the button is pressed or held
+  if (button->press_flag || button->hold_flag) 
+  {
+    // Handle button actions based on the current system mode
+    switch (system_state.mode) 
+    {
+      // Default mode: Handle button actions in default mode
+      case DEFAULT_MODE: 
+        // Handle button press actions based on the button index
+        switch (button->index) 
+        {
+          // Button 0: If pressed, cycle through the modes; if held, do nothing (reserved for future use)
+          case 0:
+          if      (button->press_flag)  system_state.mode = (system_state.mode < 5) ? (system_state.mode + 1) : 0;
+          else if (button->hold_flag)
+            {
+              // Reserved
+            }
+            break;
+          
+          // Button 1: Reserved for future use
+          case 1: 
+            if (button->press_flag)
+            {
+              // Reserved
+            }
+            else if (button->hold_flag)
+            {
+              // Reserved
+            }
+            break;
+
+          // Button 2: Reserved for future use
+          case 2: 
+            if (button->press_flag)
+            {
+              // Reserved
+            }
+            else if (button->hold_flag)
+            {
+              // Reserved
+            }
+            break;
+          
+          // Button 3: If pressed, quick jump to Time Setup; if held, do nothing (reserved for future use)
+          case 3:
+            if (button->press_flag) 
+            {
+              // Quick jump to Time Setup
+              system_state.mode = TIME_SETUP_MODE;
+
+              // Set the parameter select to the first parameter
+              system_state.param_select = SET_SECOND;
+            }
+            else if (button->hold_flag)
+            {
+              // Reserved
+            }
+            break;
+
+          // Button 4: If pressed, quick jump to Alarm Setup; if held, do nothing (reserved for future use)
+          case 4:
+            if (button->press_flag)
+            {
+              // Quick jump to Alarm Setup
+              system_state.mode = ALARM_SETUP_MODE;
+
+              // Set the parameter select to the first parameter
+              system_state.param_select = SET_SECOND;
+            }
+            else if (button->hold_flag)
+            {
+              // Reserved
+            }
+            break;
+
+          default: 
+            break;
+        }
+        break;
+
+      // Time setup mode: Handle button actions in time setup mode based on the button index
+      case TIME_SETUP_MODE: 
+        switch (button->index) 
+        {
+          // Button 0: If pressed, cycle through the system modes; if held, set the mode to default
+          case 0:
+            // If pressed, cycle through the time system modes, but the temporary setting data is still retained (avoid accidental press)
+            if (button->press_flag)
+            {
+              system_state.mode = (system_state.mode < 5) ? (system_state.mode + 1) : 0;
+            }
+            
+            // If held, set the mode to default, 
+            // and refresh the system parameters to current time values and default settings for convenience
+            else if (button->hold_flag && !button->latch)
+            {
+              system_state.mode = DEFAULT_MODE; 
+              button->latch = true;
+
+              // Set the initial system parameters to current time values and default settings for convenience
+              system_param_data =
+              (SYSTEM_PARAM_DATA)
+              {
+                0,                          // Seconds: 0-59
+                time_get_data.minute,       // Minutes: 0-59
+                time_get_data.hour,         // Hours: 0-23
+                time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+                time_get_data.dateofmonth,  // Date of the month: 1-31
+                time_get_data.month,        // Month: 1-12
+                time_get_data.year,         // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
+                NOT_USED_MODE,              // Select: DAY_OF_WEEK_MODE, DATE_OF_MONTH_MODE, NOT_USED_MODE
+                time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31
+                true                        // true = ON, false = OFF
+              };
+            }
+            break;
+          
+          // Button 1: If pressed, increment the selected parameter; if held, increment continuously
+          case 1: 
+            // Pointer to the selected parameter, its maximum value, and minimum value
+            uint8_t *paramPtr1 = NULL;
+            uint8_t maxValue1 = 0;    
+            uint8_t minValue1 = 0;  
+
+            // Determine the parameter to increment based on the current selection
+            switch (system_state.param_select)
+            {
+              case SET_SECOND:  paramPtr1 = &system_param_data.second;  maxValue1 = 59; minValue1 = 0; break;
+              case SET_MINUTE:  paramPtr1 = &system_param_data.minute;  maxValue1 = 59; minValue1 = 0; break;
+              case SET_HOUR:    paramPtr1 = &system_param_data.hour;    maxValue1 = 23; minValue1 = 0; break;
+              case SET_DOW:     paramPtr1 = &system_param_data.dow;     maxValue1 = 7;  minValue1 = 1; break;
+              case SET_DOM:     paramPtr1 = &system_param_data.dom;     maxValue1 = 31; minValue1 = 1; break;
+              case SET_MONTH:   paramPtr1 = &system_param_data.month;   maxValue1 = 12; minValue1 = 1; break;
+              case SET_YEAR:    paramPtr1 = &system_param_data.year;    maxValue1 = 99; minValue1 = 0; break;
+              default: break;
+            }
+
+            // Initialize the start tick for button 1 hold detection
+            uint32_t startTick1 = 0;
+
+            // Check if the button is pressed or held
+            if (button->press_flag) 
+            {
+              // Increment the selected parameter value once for a button press
+              if (paramPtr1) 
+              {
+                // Increment the parameter value, wrapping around if necessary
+                *paramPtr1 = (*paramPtr1 < maxValue1) ? (*paramPtr1 + 1) : minValue1;
+              }
+            }
+            else if (button->hold_flag) 
+            {
+              // If the button is held down, increment the parameter value continuously
+              if (HAL_GetTick() - startTick1 >= BUTTON_HOLD_CYCLE) 
+              {
+                if (paramPtr1) 
+                {
+                  // Increment the parameter value, wrapping around if necessary
+                  *paramPtr1 = (*paramPtr1 < maxValue1) ? (*paramPtr1 + 1) : minValue1;
+                }
+
+                // Update the start tick for the next hold cycle
+                startTick1 = HAL_GetTick();
+              }
+            } 
+            break;
+          
+            // Button 2: If pressed, decrement the selected parameter; if held, decrement continuously
+            case 2: 
+              // Pointer to the selected parameter, its maximum value, and minimum value
+              uint8_t *paramPtr2 = NULL;
+              uint8_t maxValue2 = 0;    
+              uint8_t minValue2 = 0;  
+
+              // Determine the parameter to decrement based on the current selection
+              switch (system_state.param_select)
+              {
+                case SET_SECOND:  paramPtr2 = &system_param_data.second;  maxValue2 = 59; minValue2 = 0; break;
+                case SET_MINUTE:  paramPtr2 = &system_param_data.minute;  maxValue2 = 59; minValue2 = 0; break;
+                case SET_HOUR:    paramPtr2 = &system_param_data.hour;    maxValue2 = 23; minValue2 = 0; break;
+                case SET_DOW:     paramPtr2 = &system_param_data.dow;     maxValue2 = 7;  minValue2 = 1; break;
+                case SET_DOM:     paramPtr2 = &system_param_data.dom;     maxValue2 = 31; minValue2 = 1; break;
+                case SET_MONTH:   paramPtr2 = &system_param_data.month;   maxValue2 = 12; minValue2 = 1; break;
+                case SET_YEAR:    paramPtr2 = &system_param_data.year;    maxValue2 = 99; minValue2 = 0; break;
+                default: break;
+              }
+
+              // Initialize the start tick for button 2 hold detection
+              uint32_t startTick2 = 0;
+
+              // Check if the button is pressed or held
+              if (button->press_flag) 
+              {
+                // Decrement the selected parameter value once for a button press
+                if (paramPtr2) 
+                {
+                  // Decrement the parameter value, wrapping around if necessary
+                  *paramPtr2 = (*paramPtr2 > minValue2) ? (*paramPtr2 - 1) : maxValue2;
+                }
+              }
+              else if (button->hold_flag) 
+              {
+                // If the button is held down, decrement the parameter value continuously
+                if (HAL_GetTick() - startTick2 >= BUTTON_HOLD_CYCLE) 
+                {
+                  if (paramPtr2) 
+                  {
+                    // Decrement the parameter value, wrapping around if necessary
+                    *paramPtr2 = (*paramPtr2 > minValue2) ? (*paramPtr2 - 1) : maxValue2;
+                  }
+
+                  // Update the start tick for the next hold cycle
+                  startTick2 = HAL_GetTick();
+                }
+              } 
+              break;
+          
+          // Button 3: If pressed, move to the next field; if held, set the time using the current parameter values
+          case 3: 
+            // If the button is pressed, move to the next parameter field, wrapping around if necessary
+            if(button->press_flag)
+            {
+              if (system_state.param_select == SET_YEAR)
+              {
+                system_state.param_select = SET_SECOND;
+              }
+              else
+              {
+                system_state.param_select = (system_state.param_select < 9) ? (system_state.param_select + 1) : 0;
+              }
+            }
+
+            // If the button is held down, set the time using the current parameter values
+            else if (button->hold_flag && !button->latch) 
+            {
+              // Set the time using the current parameter values
+              //    void Time_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
+              Time_Init
+              (
+                system_param_data.second, 
+                system_param_data.minute, 
+                system_param_data.hour, 
+                system_param_data.dow, 
+                system_param_data.dom, 
+                system_param_data.month, 
+                system_param_data.year
+              );
+
+              button->latch = true;
+
+              break;
+            }
+            break;
+
+          // Button 4: If pressed, move to the previous field; if held, do nothing (reserved for future use)
+          case 4: 
+            // If the button is pressed, move to the previous parameter field, wrapping around if necessary
+            if (button->press_flag)
+            {
+              if (system_state.param_select == SET_SECOND)
+              {
+                system_state.param_select = SET_YEAR;
+              }
+              else
+              {
+                system_state.param_select = (system_state.param_select > 0) ? (system_state.param_select - 1) : 9;
+              }   
+            }
+            
+            // If the button is held down, do nothing (reserved for future use)
+            else if (button->hold_flag) 
+            {
+             // Reserved
+            }
+            break;
+
+          default: 
+            break;
+        }
+        break;
+      
+      // Alarm setup mode: Handle button actions in alarm setup mode based on the button index
+      case ALARM_SETUP_MODE: 
+        switch (button->index) 
+        {
+          // Button 0: If pressed, cycle through the system modes; if held, set the mode to default
+          case 0:
+            // If pressed, cycle through the time system modes, but the temporary setting data is still retained (avoid accidental press)
+            if (button->press_flag)
+            {
+              system_state.mode = (system_state.mode < 5) ? (system_state.mode + 1) : 0;
+            }
+            
+            // If held, set the mode to default, 
+            // and refresh the system parameters to current time values and default settings for convenience
+            else if (button->hold_flag && !button->latch)
+            {
+              system_state.mode = DEFAULT_MODE; 
+              button->latch = true;
+
+              // Set the initial system parameters to current time values and default settings for convenience
+              system_param_data =
+              (SYSTEM_PARAM_DATA)
+              {
+                0,                          // Seconds: 0-59
+                time_get_data.minute,       // Minutes: 0-59
+                time_get_data.hour,         // Hours: 0-23
+                time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+                time_get_data.dateofmonth,  // Date of the month: 1-31
+                time_get_data.month,        // Month: 1-12
+                time_get_data.year,         // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
+                NOT_USED_MODE,              // Select: DAY_OF_WEEK_MODE, DATE_OF_MONTH_MODE, NOT_USED_MODE
+                time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31
+                true                        // true = ON, false = OFF
+              };
+            }
+            break;
+
+          // Button 1: If pressed, increment the selected parameter; if held, increment continuously
+          case 1: 
+            // Pointer to the selected parameter, its maximum value, and minimum value
+            uint8_t *paramPtr1 = NULL;
+            uint8_t maxValue1 = 0;    
+            uint8_t minValue1 = 0;  
+
+            // Determine the parameter to increment based on the current selection
+            switch (system_state.param_select)
+            {
+              case SET_SECOND:  paramPtr1 = &system_param_data.second;  maxValue1 = 59; minValue1 = 0; break;
+              case SET_MINUTE:  paramPtr1 = &system_param_data.minute;  maxValue1 = 59; minValue1 = 0; break;
+              case SET_HOUR:    paramPtr1 = &system_param_data.hour;    maxValue1 = 23; minValue1 = 0; break;
+              case SET_DY_DT:   paramPtr1 = (uint8_t *)&system_param_data.dy_dt; maxValue1 = 2; minValue1 = 0; break;
+              case SET_DOW_DOM: paramPtr1 = &system_param_data.dom;     maxValue1 = 31; minValue1 = 1; break;
+              case SET_ON_OFF:  system_param_data.on_off = !system_param_data.on_off;                  break;
+              default: break;
+            }
+
+            if (system_state.param_select == SET_ON_OFF)
+            {
+              break;
+            }
+
+            // Initialize the start tick for button 1 hold detection
+            uint32_t startTick1 = 0;
+            
+            // Check if the button is pressed or held
+            if (button->press_flag) 
+            {
+              // Increment the selected parameter value once for a button press
+              if (paramPtr1) 
+              {
+                // Increment the parameter value, wrapping around if necessary
+                *paramPtr1 = (*paramPtr1 < maxValue1) ? (*paramPtr1 + 1) : minValue1;
+              }
+            }
+            else if (button->hold_flag) 
+            {
+              // If the button is held down, increment the parameter value continuously
+              if (HAL_GetTick() - startTick1 >= BUTTON_HOLD_CYCLE) 
+              {
+                // Increment the selected parameter value continuously
+                if (paramPtr1) 
+                {
+                  // Increment the parameter value, wrapping around if necessary
+                  *paramPtr1 = (*paramPtr1 < maxValue1) ? (*paramPtr1 + 1) : minValue1;
+                }
+              }
+
+              // Update the start tick for the next hold cycle
+              startTick1 = HAL_GetTick();
+            } 
+            
+            break;
+
+            case 2: // BTN2: Decrement current value or scroll slots
+            {
+              // Pointer to the selected parameter, its maximum value, and minimum value
+              uint8_t *paramPtr2 = NULL;
+              uint8_t maxValue2 = 0;    
+              uint8_t minValue2 = 0;  
+
+              // Determine the parameter to decrement based on the current selection
+              switch (system_state.param_select)
+              {
+                case SET_SECOND:  paramPtr2 = &system_param_data.second;  maxValue2 = 59; minValue2 = 0; break;
+                case SET_MINUTE:  paramPtr2 = &system_param_data.minute;  maxValue2 = 59; minValue2 = 0; break;
+                case SET_HOUR:    paramPtr2 = &system_param_data.hour;    maxValue2 = 23; minValue2 = 0; break;
+                case SET_DY_DT:   paramPtr2 = (uint8_t *)&system_param_data.dy_dt; maxValue2 = 2; minValue2 = 0; break;
+                case SET_DOW_DOM: paramPtr2 = &system_param_data.dow_dom; maxValue2 = 31; minValue2 = 1; break;
+                case SET_ON_OFF:  system_param_data.on_off = !system_param_data.on_off;                  break;
+                default: break;
+              }
+
+              if (system_state.param_select == SET_ON_OFF)
+              {
+                break;
+              }
+
+              // Initialize the start tick for button 2 hold detection
+              uint32_t startTick2 = 0;
+
+              // Check if the button is pressed or held
+              if (button->press_flag) 
+              {
+                // Check if the selected parameter is ON/OFF
+                if (system_state.param_select == SET_ON_OFF) 
+                {
+                  // Toggle the on/off state of the alarm
+                  system_param_data.on_off = !system_param_data.on_off;
+                } 
+                // Else, decrement the selected parameter value once for a button press
+                else 
+                {
+                  // Decrement the selected parameter value once for a button press
+                  if (paramPtr2) 
+                  {
+                    // Decrement the parameter value, wrapping around if necessary
+                    *paramPtr2 = (*paramPtr2 > minValue2) ? (*paramPtr2 - 1) : maxValue2;
+                  }
+                }
+              }
+              else if (button->hold_flag) 
+              {
+                // If the button is held down, decrement the parameter value continuously
+                if (HAL_GetTick() - startTick2 >= BUTTON_HOLD_CYCLE) 
+                {
+                  // Check if the selected parameter is ON/OFF
+                  if (system_state.param_select == SET_ON_OFF) 
+                  {
+                    // Toggle the on/off state of the alarm
+                    system_param_data.on_off = !system_param_data.on_off;
+                  } 
+                  // Else, decrement the selected parameter value continuously
+                  else 
+                  {
+                    // Decrement the selected parameter value continuously
+                    if (paramPtr2) 
+                    {
+                      // Decrement the parameter value, wrapping around if necessary
+                      *paramPtr2 = (*paramPtr2 > minValue2) ? (*paramPtr2 - 1) : maxValue2;
+                    }
+                  }
+
+                  // Update the start tick for the next hold cycle
+                  startTick2 = HAL_GetTick();
+                }
+              } 
+
+              break;
+            }
+          
+          // Button 3: If pressed, move to the next field; if held, save the alarm and return to default mode
+          case 3:
+            // If the button is pressed, move to the next parameter field, wrapping around if necessary  
+            if (button->press_flag)
+            {
+              if (system_state.param_select == SET_HOUR)
+              {
+                system_state.param_select = SET_DY_DT;
+              }
+              else
+              {
+                system_state.param_select = (system_state.param_select < 9) ? (system_state.param_select + 1) : 0;
+              }
+            }  
+            // If the button is held down, save the alarm and return to default mode
+            else if (button->hold_flag && !button->latch) 
+            {
+              // Save the alarm to EEPROM and return to Default Mode
+              //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_DY_DT_MODE dy_dt, uint8_t on_off, uint8_t slot)
+              Alarm_Set
+              (
+                system_param_data.second,  
+                system_param_data.minute,
+                system_param_data.hour,
+                system_param_data.dow_dom,
+                system_param_data.dy_dt,
+                system_param_data.on_off,
+                system_state.slot_free      // Pointer to the next available slot in the EEPROM module
+              );
+
+              Alarm_Get(system_state.slot_free, &alarm_get_data[system_state.slot_free]);
+
+              // Increment the pointer to the next available slot in the EEPROM module
+              system_state.slot_free = (system_state.slot_free < 9) ? (system_state.slot_free + 1) : 0;
+
+              button->latch = true;
+
+            }
+            break;
+
+          case 4: // BTN4: Go back to previous field
+            if (button->press_flag) 
+            {
+              if (system_state.param_select == SET_DY_DT)
+              {
+                system_state.param_select = SET_HOUR;
+              }
+              else
+              {
+                system_state.param_select = (system_state.param_select > 0) ? (system_state.param_select - 1) : 9;
+              }                   
+            }
+            break;
+
+          default:
+            // Reserved for future use
+            break;
+        }
+        break;
+
+      case ALARM_REVIEW_MODE: 
+        // Handle button actions in alarm review mode
+        switch (button->index) 
+        {
+          // Button 0: If pressed, cycle through the time setup fields; if held, set the mode to default
+          case 0:
+            // If pressed, cycle through the time setup fields
+            if (button->press_flag)
+            {
+              system_state.mode = (system_state.mode < 5) ? (system_state.mode + 1) : 0;
+            }
+            // If held, set the mode to default
+            else if (button->hold_flag && !button->latch)
+            {
+              system_state.mode = DEFAULT_MODE; 
+              button->latch = true;
+            }
+            break;
+
+          case 1:
+            if      (button->press_flag)
+            {
+
+            }
+            else if (button->hold_flag)
+            {
+
+            }
+            break;
+
+          case 2:
+            if      (button->press_flag)
+            {
+
+            }
+            else if (button->hold_flag)
+            {
+
+            }
+            break;
+          
+          case 3:
+            if      (button->press_flag)
+            {
+
+            }
+            else if (button->hold_flag)
+            {
+
+            }
+            break;
+
+          case 4: 
+            if      (button->press_flag)
+            {
+
+            }
+            else if (button->hold_flag)
+            {
+
+            }
+            break;
+
+          default: 
+            break;
+        }
+        break;
+
+      case ALARM_ACTIVE_MODE: 
+        // Handle button actions in alarm active mode
+        switch (button->index) 
+        {
+          // Button 0: If pressed, cycle through the time setup fields; if held, set the mode to default
+          case 0:
+            // If pressed, cycle through the time setup fields
+            if (button->press_flag)
+            {
+              system_state.mode = (system_state.mode < 5) ? (system_state.mode + 1) : 0;
+            }
+            // If held, set the mode to default
+            else if (button->hold_flag && !button->latch)
+            {
+              system_state.mode = DEFAULT_MODE; 
+              button->latch = true;
+            }
+            break;
+
+          case 1:
+            if      (button->press_flag)
+            {
+
+            }
+            else if (button->hold_flag)
+            {
+
+            }
+            break;
+
+          case 2:
+            if      (button->press_flag)
+            {
+
+            }
+            else if (button->hold_flag)
+            {
+
+            }
+            break;
+          
+          case 3:
+            if      (button->press_flag)
+            {
+
+            }
+            else if (button->hold_flag)
+            {
+
+            }
+            break;
+
+          case 4: 
+            if      (button->press_flag)
+            {
+
+            }
+            else if (button->hold_flag)
+            {
+
+            }
+            break;
+
+          default: 
+            break;
+        }
+        break;
+
+      case SYSTEM_OPTIONS_MODE: 
+        // Handle button actions in system options mode
+        switch (button->index) 
+        {
+          // Button 0: If pressed, cycle through the time setup fields; if held, set the mode to default
+          case 0:
+            // If pressed, cycle through the time setup fields
+            if      (button->press_flag)  system_state.mode = (system_state.mode < 5) ? (system_state.mode + 1) : 0;
+
+            // If held, set the mode to default
+            else if (button->hold_flag)   system_state.mode = DEFAULT_MODE;
+            break;
+
+          case 1:
+            if      (button->press_flag)
+            {
+
+            }
+            else if (button->hold_flag)
+            {
+
+            }
+            break;
+
+          case 2:
+            if      (button->press_flag)
+            {
+
+            }
+            else if (button->hold_flag)
+            {
+
+            }
+            break;
+          
+          case 3:
+            if      (button->press_flag)
+            {
+
+            }
+            else if (button->hold_flag)
+            {
+
+            }
+            break;
+
+          case 4: 
+            if      (button->press_flag)
+            {
+
+            }
+            else if (button->hold_flag)
+            {
+
+            }
+            break;
+
+          default: 
+            break;
+        }
+        break;
+
+      default:
+        // Handle other button presses in default mode
+        break;
+    }
+  }
+
+  button->press_flag = false;
 }
 
 /**
@@ -1235,36 +1833,36 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     case RTC_IN5_Pin:
       // Set the RTC Interrupt Flag
       rtc_int_flag = true;
-    break;
+      break;
     
-    case BUTTON1_IN12_Pin:
+    case BUTTON0_IN12_Pin:
+      // Set the Button 0 Interrupt Flag
+      button0.int_flag = true;
+      break;
+
+    case BUTTON1_IN13_Pin:
       // Set the Button 1 Interrupt Flag
       button1.int_flag = true;
-    break;
+      break;
 
-    case BUTTON2_IN13_Pin:
+    case BUTTON2_IN14_Pin:
       // Set the Button 2 Interrupt Flag
       button2.int_flag = true;
-    break;
+      break;
 
-    case BUTTON3_IN14_Pin:
+    case BUTTON3_IN15_Pin:
       // Set the Button 3 Interrupt Flag
       button3.int_flag = true;
-    break;
+      break;  
 
-    case BUTTON4_IN15_Pin:
+    case BUTTON4_IN8_Pin:
       // Set the Button 4 Interrupt Flag
       button4.int_flag = true;
-    break;  
-
-    case BUTTON5_IN8_Pin:
-      // Set the Button 5 Interrupt Flag
-      button5.int_flag = true;
-    break;  
+      break;  
 
     default:
       // Handle other GPIO interrupts if necessary
-    break;
+      break;
   }
 }
 
