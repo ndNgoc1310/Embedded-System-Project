@@ -216,14 +216,13 @@ void default_mode(int *flag_main_screen, int hour, int minute, int second)
     }
 
 	EPD_2IN9_V2_Init();
+
 	if(*flag_main_screen == 1)
 	{
-		EPD_2IN9_V2_Init();
     	EPD_2IN9_V2_Clear();
-    	DEV_Delay_ms(1000);
+
     	EPD_2IN9_V2_Init_Fast();
-    	Paint_NewImage(BlackImage, EPD_2IN9_V2_WIDTH, EPD_2IN9_V2_HEIGHT, 90, WHITE);
-    	printf("Drawing\r\n");
+
     	//1.Select Image
     	Paint_SelectImage(BlackImage);
     	Paint_Clear(WHITE);
@@ -235,10 +234,8 @@ void default_mode(int *flag_main_screen, int hour, int minute, int second)
     	Paint_DrawString_EN(10, 30, "Trung Nam - 2251032", &Font16, BLACK, WHITE);
     	Paint_DrawString_EN(10, 60, "Hung Minh - 2251030", &Font16, BLACK, WHITE);
 
-
-    	EPD_2IN9_V2_Display_Base(BlackImage);
-    	DEV_Delay_ms(3000);
-	}
+    	EPD_2IN9_V2_Display_Base(BlackImage)	
+    }
 //      printf("Paint_NewImage\r\n");
 //      Paint_NewImage(BlackImage, EPD_2IN9_V2_WIDTH, EPD_2IN9_V2_HEIGHT, 90, WHITE);
 //      printf("Partial refresh\r\n");
@@ -261,34 +258,15 @@ void default_mode(int *flag_main_screen, int hour, int minute, int second)
     sPaint_time.Hour = 12;
     sPaint_time.Min = 34;
     sPaint_time.Sec = second;
-    UBYTE num = 10;
-    for (;;) {
-        sPaint_time.Sec = sPaint_time.Sec + 1;
-        if (sPaint_time.Sec == 60) {
-            sPaint_time.Min = sPaint_time.Min + 1;
-            sPaint_time.Sec = 0;
-            if (sPaint_time.Min == 60) {
-                sPaint_time.Hour =  sPaint_time.Hour + 1;
-                sPaint_time.Min = 0;
-                if (sPaint_time.Hour == 24) {
-                    sPaint_time.Hour = 0;
-                    sPaint_time.Min = 0;
-                    sPaint_time.Sec = 0;
-                }
-            }
-        }
-        Paint_ClearWindows(150, 80, 150 + Font20.Width * 7, 80 + Font20.Height, WHITE);
-        Paint_DrawTime(150, 80, &sPaint_time, &Font20, WHITE, BLACK);
+   
+    Paint_ClearWindows(150, 80, 150 + Font20.Width * 7, 80 + Font20.Height, WHITE);
+    Paint_DrawTime(150, 80, &sPaint_time, &Font20, WHITE, BLACK);
 
-        num = num - 1;
-        if(num == 0) {
-            break;
-        }
-		EPD_2IN9_V2_Display_Partial(BlackImage);
-    }
-      EPD_2IN9_V2_Sleep();
-      *flag_main_screen = 0;
-      free(BlackImage);
+
+    EPD_2IN9_V2_Display_Partial(BlackImage);
+    EPD_2IN9_V2_Sleep();
+    *flag_main_screen = 0;
+    free(BlackImage);
 }
 
 // mode menu

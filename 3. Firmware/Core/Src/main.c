@@ -1905,7 +1905,11 @@ void System_Alarm_View_Mode_Handle (BUTTON_DATA *button)
       }
       else if (button->hold_flag)
       {
+        // Clear current alarm
         Alarm_Clear(system_state.cursor);
+
+        // Update alarm data
+        Alarm_Get(system_state.cursor, &alarm_get_data[system_state.cursor]);
       }
       break;
 
