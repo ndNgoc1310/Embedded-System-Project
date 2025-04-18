@@ -1,0 +1,11 @@
+D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9d.c:112:13:EPD_2IN9D_Reset	8	static
+D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9d.c:135:13:EPD_2IN9D_SendCommand	16	static
+D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9d.c:148:13:EPD_2IN9D_SendData	16	static
+D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9d.c:160:6:EPD_2IN9D_ReadBusy	16	static
+D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9d.c:177:13:EPD_2IN9D_SetPartReg	16	static
+D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9d.c:243:13:EPD_2IN9D_TurnOnDisplay	8	static
+D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9d.c:255:6:EPD_2IN9D_Init	8	static
+D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9d.c:278:6:EPD_2IN9D_Clear	24	static
+D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9d.c:304:6:EPD_2IN9D_Display	32	static
+D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9d.c:331:6:EPD_2IN9D_DisplayPart	24	static
+D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9d.c:365:6:EPD_2IN9D_Sleep	8	static
