@@ -36,7 +36,7 @@
 #include "stdbool.h"
 #include "stdio.h"
 #include "string.h"
-
+#include "EPD_Test.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,14 +59,14 @@ typedef enum
 } BUTTON_STATE;
 
 // Enum for system modes
-typedef enum {
-  DEFAULT_MODE,
-  TIME_SETUP_MODE,
-  ALARM_SETUP_MODE,
-  ALARM_VIEW_MODE,
-  ALARM_ACTIVE_MODE,
-  SYSTEM_OPTIONS_MODE
-} SYSTEM_MODE;
+//typedef enum {
+// DEFAULT_MODE,
+// TIME_SETUP_MODE,
+// ALARM_SETUP_MODE,
+// ALARM_VIEW_MODE,
+// ALARM_ACTIVE_MODE,
+// SYSTEM_OPTIONS_MODE
+//} SYSTEM_MODE;
 
 // Enum for system parameters to be selected for modification
 typedef enum
@@ -438,6 +438,11 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
     Button_Handle();
+    int a;
+    a = 1;
+
+    TIME_DATA time_get;
+    
 
     // Check if the RTC Interrupt Flag is set (RTC Interrupt Flag) on PB4 (Activated every second)
     if (rtc_int_flag)
@@ -454,6 +459,9 @@ int main(void)
 
       // Toggle the debug RTC interrupt flag for debugging purposes
       debug_rtc_int = !debug_rtc_int;
+
+      time_get = (TIME_DATA) time_get_data;    
+      default_mode(&a, &time_get.hour, &time_get.minute, &time_get.second);
     }
 
     // Check if the ADC interrupt flag is set (ADC Valid Flag)

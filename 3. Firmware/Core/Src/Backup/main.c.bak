@@ -36,7 +36,7 @@
 #include "stdbool.h"
 #include "stdio.h"
 #include "string.h"
-
+#include "EPD_Test.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -66,7 +66,7 @@ typedef enum {
   ALARM_VIEW_MODE,
   ALARM_ACTIVE_MODE,
   SYSTEM_OPTIONS_MODE
-} SYSTEM_MODE;
+} SYSTEM_MODE_SELECT;
 
 // Enum for system parameters to be selected for modification
 typedef enum
@@ -438,6 +438,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
     Button_Handle();
+    default_mode(1, 12, 13, 13);
 
     // Check if the RTC Interrupt Flag is set (RTC Interrupt Flag) on PB4 (Activated every second)
     if (rtc_int_flag)

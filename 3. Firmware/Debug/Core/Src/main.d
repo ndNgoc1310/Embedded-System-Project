@@ -27,7 +27,13 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
  ../Core/Inc/adc.h ../Core/Inc/main.h ../Core/Inc/i2c.h ../Core/Inc/spi.h \
- ../Core/Inc/usart.h ../Core/Inc/gpio.h
+ ../Core/Inc/usart.h ../Core/Inc/gpio.h \
+ C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/EPD_Test.h \
+ C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/DEV_Config.h \
+ C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/GUI_Paint.h \
+ C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/fonts.h \
+ C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/imagedata.h \
+ C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/Debug.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 ../Core/Inc/stm32f1xx_hal_conf.h:
@@ -62,3 +68,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/spi.h:
 ../Core/Inc/usart.h:
 ../Core/Inc/gpio.h:
+C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/EPD_Test.h:
+C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/DEV_Config.h:
+C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/GUI_Paint.h:
+C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/fonts.h:
+C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/imagedata.h:
+C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/Debug.h:

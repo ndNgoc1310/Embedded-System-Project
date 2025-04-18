@@ -29,4 +29,16 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>inc</name>
+			<type>2</type>
+			<location>C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/inc</location>
+		</link>
+		<link>
+			<name>src</name>
+			<type>2</type>
+			<location>C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src</location>
+		</link>
+	</linkedResources>
 </projectDescription>

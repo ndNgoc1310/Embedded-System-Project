@@ -1,0 +1,8 @@
+C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:34:5:EPD_test	32	static
+C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:209:6:default_mode	48	static
+C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:295:6:menu_set_up	40	static
+C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:479:6:alarm_view_mode	40	static
+C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:761:6:drawn_alarm_view_mode	48	static
+C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:782:6:alarm_setup_mode	48	static
+C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1063:6:drawn_alarm_setup_mode	48	static
+C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1089:6:time_setup_mode	40	static
