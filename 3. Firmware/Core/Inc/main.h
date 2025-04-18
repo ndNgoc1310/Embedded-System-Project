@@ -57,6 +57,18 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define BUSY_Pin GPIO_PIN_0
+#define BUSY_GPIO_Port GPIOA
+#define RST_Pin GPIO_PIN_1
+#define RST_GPIO_Port GPIOA
+#define DC_Pin GPIO_PIN_2
+#define DC_GPIO_Port GPIOA
+#define SPI_CS_Pin GPIO_PIN_3
+#define SPI_CS_GPIO_Port GPIOA
+#define BUZZER_Pin GPIO_PIN_0
+#define BUZZER_GPIO_Port GPIOB
+#define PWR_Pin GPIO_PIN_1
+#define PWR_GPIO_Port GPIOB
 #define BUTTON0_IN12_Pin GPIO_PIN_12
 #define BUTTON0_IN12_GPIO_Port GPIOB
 #define BUTTON0_IN12_EXTI_IRQn EXTI15_10_IRQn

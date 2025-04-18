@@ -41,7 +41,6 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
-
 // Enum for alarm day of week or date of month mode
 typedef enum
 {
@@ -123,7 +122,9 @@ typedef struct
 typedef struct
 {
   SYSTEM_MODE         mode;         // Current system mode
+  SYSTEM_MODE         past_mode;    // Previous system mode
   SYSTEM_PARAM_SELECT param_select; // Selected system parameter to be modified
+  uint8_t             cursor;       // Cursor of selection
 } SYSTEM_STATE;
 
 // Struct for system parameters to be modified
@@ -177,6 +178,9 @@ typedef struct
 
 // Number of system modes
 #define SYSTEM_MODE_NUM 6
+
+// 
+#define SYSTEM_CURSOR_MAX 9
 
 /* USER CODE END PD */
 
@@ -339,16 +343,16 @@ int main(void)
   MX_ADC1_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  
 //  // Set time to the RTC module through I2C interface (Run only once after reset the RTC).
 //  //    void Time_Set(uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
 //  Time_Set
 //  (
 //     0, // Seconds: 0-59
-//    16, // Minutes: 0-59
-//    01, // Hours: 0-23
+//    26, // Minutes: 0-59
+//    11, // Hours: 0-23
 //     4, // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
-//    16, // Date of the month: 1-31
+//    18, // Date of the month: 1-31
 //     4, // Month: 1-12
 //    25  // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
 //  );
@@ -1764,6 +1768,9 @@ void System_Alarm_Setup_Mode_Handle (BUTTON_DATA *button)
  */
 void System_Alarm_View_Mode_Handle (BUTTON_DATA *button)
 { 
+  // Initially reset system cursor
+  system_state.cursor = 0;
+  
   // Handle button actions in alarm view mode
   switch (button->index) 
   {
@@ -1782,10 +1789,11 @@ void System_Alarm_View_Mode_Handle (BUTTON_DATA *button)
       }
       break;
 
+    // Button 1: If pressed, increment the selection cursor
     case 1:
       if      (button->press_flag)
       {
-
+        system_state.cursor = (system_state.cursor < (SYSTEM_CURSOR_MAX - 1)) ? (system_state.cursor + 1) : 0;
       }
       else if (button->hold_flag)
       {
@@ -1793,10 +1801,11 @@ void System_Alarm_View_Mode_Handle (BUTTON_DATA *button)
       }
       break;
 
+    // Button 2: If pressed, decrement the selection cursor
     case 2:
       if      (button->press_flag)
       {
-
+        system_state.cursor = (system_state.cursor > 0) ? (system_state.cursor - 1) : SYSTEM_CURSOR_MAX;
       }
       else if (button->hold_flag)
       {
@@ -1807,11 +1816,43 @@ void System_Alarm_View_Mode_Handle (BUTTON_DATA *button)
     case 3:
       if      (button->press_flag)
       {
+        // Retrieve the selected alarm data to system parameter data
+        system_param_data.minute  = alarm_get_data[system_state.cursor].minute;
+        system_param_data.hour    = alarm_get_data[system_state.cursor].hour;
+        system_param_data.dy_dt   = alarm_get_data[system_state.cursor].dy_dt;
+        system_param_data.dow_dom = alarm_get_data[system_state.cursor].dow_dom;
+        system_param_data.on_off  = alarm_get_data[system_state.cursor].on_off;
 
+        // Toggle ON/OFF data
+        system_param_data.on_off = !system_param_data.on_off;
+
+        // Save the modified alarm to the EEPROM module
+        //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_DY_DT_MODE dy_dt, uint8_t on_off, uint8_t slot)
+        Alarm_Set
+        (
+          0,  
+          system_param_data.minute,
+          system_param_data.hour,
+          system_param_data.dow_dom,
+          system_param_data.dy_dt,
+          system_param_data.on_off,
+          system_state.cursor   
+        );
+
+        // Update the newly set alarm data
+        Alarm_Get(system_state.cursor, &alarm_get_data[system_state.cursor]);
       }
       else if (button->hold_flag)
       {
+        // Retrieve the selected alarm data to system parameter data
+        system_param_data.minute  = alarm_get_data[system_state.cursor].minute;
+        system_param_data.hour    = alarm_get_data[system_state.cursor].hour;
+        system_param_data.dy_dt   = alarm_get_data[system_state.cursor].dy_dt;
+        system_param_data.dow_dom = alarm_get_data[system_state.cursor].dow_dom;
+        system_param_data.on_off  = alarm_get_data[system_state.cursor].on_off;
 
+        // System switches to Alarm Setup Mode
+        system_state.mode = ALARM_SETUP_MODE;
       }
       break;
 
