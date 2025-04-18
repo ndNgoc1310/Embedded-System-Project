@@ -1,8 +1,0 @@
-D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9bc.c:91:6:EPD_2IN9BC_Reset	1
-D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9bc.c:106:6:EPD_2IN9BC_SendCommand	1
-D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9bc.c:119:6:EPD_2IN9BC_SendData	1
-D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9bc.c:131:6:EPD_2IN9BC_ReadBusy	2
-D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9bc.c:144:6:EPD_2IN9BC_Init	1
-D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9bc.c:175:6:EPD_2IN9BC_Clear	5
-D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9bc.c:204:6:EPD_2IN9BC_Display	5
-D:/tai_lieu_quan_trong/Embedded_system/code_e_ink_version_2/code_e_ink/Mylibrary/src/EPD_2in9bc.c:234:6:EPD_2IN9BC_Sleep	1
