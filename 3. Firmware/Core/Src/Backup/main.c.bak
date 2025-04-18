@@ -26,6 +26,7 @@
 #include "main.h"
 #include "adc.h"
 #include "i2c.h"
+#include "spi.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -342,6 +343,7 @@ int main(void)
   MX_I2C1_Init();
   MX_ADC1_Init();
   MX_USART1_UART_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   
 //  // Set time to the RTC module through I2C interface (Run only once after reset the RTC).
@@ -1817,7 +1819,11 @@ void System_Alarm_View_Mode_Handle (BUTTON_DATA *button)
       if      (button->press_flag)
       {
         // Retrieve the selected alarm data to system parameter data
-        system_param_data = alarm_get_data[system_state.cursor];
+        system_param_data.minute  = alarm_get_data[system_state.cursor].minute;
+        system_param_data.hour    = alarm_get_data[system_state.cursor].hour;
+        system_param_data.dy_dt   = alarm_get_data[system_state.cursor].dy_dt;
+        system_param_data.dow_dom = alarm_get_data[system_state.cursor].dow_dom;
+        system_param_data.on_off  = alarm_get_data[system_state.cursor].on_off;
 
         // Toggle ON/OFF data
         system_param_data.on_off = !system_param_data.on_off;
@@ -1841,7 +1847,11 @@ void System_Alarm_View_Mode_Handle (BUTTON_DATA *button)
       else if (button->hold_flag)
       {
         // Retrieve the selected alarm data to system parameter data
-        system_param_data = alarm_get_data[system_state.cursor];
+        system_param_data.minute  = alarm_get_data[system_state.cursor].minute;
+        system_param_data.hour    = alarm_get_data[system_state.cursor].hour;
+        system_param_data.dy_dt   = alarm_get_data[system_state.cursor].dy_dt;
+        system_param_data.dow_dom = alarm_get_data[system_state.cursor].dow_dom;
+        system_param_data.on_off  = alarm_get_data[system_state.cursor].on_off;
 
         // System switches to Alarm Setup Mode
         system_state.mode = ALARM_SETUP_MODE;
