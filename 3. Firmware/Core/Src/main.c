@@ -183,6 +183,8 @@ typedef struct
 // 
 #define SYSTEM_CURSOR_MAX 9
 
+#define DISPLAY_DELAY 500
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -196,7 +198,7 @@ typedef struct
 
 /* SYSTEM ==========================================*/
 // Global variable to store the current system mode and selected parameter
-SYSTEM_STATE system_state = {DEFAULT_MODE, SET_MINUTE};
+SYSTEM_STATE system_state = {DEFAULT_MODE, DEFAULT_MODE, SET_MINUTE};
 
 // Global variable to store the system parameters to be modified
 SYSTEM_PARAM_DATA system_param_data = {0};
@@ -1088,7 +1090,7 @@ void Button_Debounce(BUTTON_DATA *button)
     // Waiting state: Button is pressed (LOW) but not yet confirmed
     case BUTTON_WAITING:
       // Check if debounce delay has passed
-      if (HAL_GetTick() - button->start_tick >= BUTTON_DEBOUNCE_DELAY) 
+      if (HAL_GetTick() - button->start_tick >= (BUTTON_DEBOUNCE_DELAY + DISPLAY_DELAY)) 
       {
         // Check if button is still pressed (LOW state) after debounce delay
         if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == BUTTON_ACTIVE) 
@@ -1111,7 +1113,7 @@ void Button_Debounce(BUTTON_DATA *button)
       if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) != BUTTON_ACTIVE) 
       {
         // Check if press duration is less than hold threshold
-        if (HAL_GetTick() - button->start_tick < BUTTON_HOLD_TH)
+        if (HAL_GetTick() - button->start_tick < (BUTTON_HOLD_TH + DISPLAY_DELAY))
         {
           // Set press flag for short press
           button->press_flag = true;
@@ -1124,7 +1126,7 @@ void Button_Debounce(BUTTON_DATA *button)
         button->state = BUTTON_RELEASED;
       }
       // Check if button is held down for long press
-      else if ((HAL_GetTick() - button->start_tick >= BUTTON_HOLD_TH) && !button->hold_flag)
+      else if ((HAL_GetTick() - button->start_tick >= (BUTTON_HOLD_TH + DISPLAY_DELAY)) && !button->hold_flag)
       {
         // Set hold flag for long press
         button->hold_flag = true;
@@ -1308,6 +1310,8 @@ void System_Default_Mode_Handle (BUTTON_DATA *button)
     default: 
       break;
   }
+
+  system_state.past_mode = DEFAULT_MODE;
 }
 
 /**
@@ -1511,6 +1515,8 @@ void System_Time_Setup_Mode_Handle (BUTTON_DATA *button)
     default: 
       break;
   }
+
+  system_state.past_mode = TIME_SETUP_MODE;
 }
 
 /**
@@ -1706,31 +1712,53 @@ void System_Alarm_Setup_Mode_Handle (BUTTON_DATA *button)
       // If the button is held down, save the alarm and return to default mode
       else if (button->hold_flag && !button->latch) 
       {
-        // Save the alarm to EEPROM and return to Default Mode
-        //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_DY_DT_MODE dy_dt, uint8_t on_off, uint8_t slot)
-        Alarm_Set
-        (
-          0,  
-          system_param_data.minute,
-          system_param_data.hour,
-          system_param_data.dow_dom,
-          system_param_data.dy_dt,
-          system_param_data.on_off,
-          alarm_slot_ptr      // Pointer to the next available slot in the EEPROM module
-        );
+        // If the previous mode is Alarm View Mode
+        // Use the system cursor instead to keep the alarm slot pointer unchanged
+        if (system_state.past_mode == ALARM_VIEW_MODE)
+        {
+          // Save the alarm to EEPROM and return to Default Mode
+          //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_DY_DT_MODE dy_dt, uint8_t on_off, uint8_t slot)
+          Alarm_Set
+          (
+            0,  
+            system_param_data.minute,
+            system_param_data.hour,
+            system_param_data.dow_dom,
+            system_param_data.dy_dt,
+            system_param_data.on_off,
+            system_state.cursor         // Save the alarm at the address where the cursor points at in Alarm View Mode
+          );
 
-        // Update the newly set alarm data
-        Alarm_Get(alarm_slot_ptr, &alarm_get_data[alarm_slot_ptr]);
+          // Update the newly set alarm data
+          Alarm_Get(system_state.cursor, &alarm_get_data[system_state.cursor]);
+        }
+        else
+        {
+          // Save the alarm to EEPROM and return to Default Mode
+          //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_DY_DT_MODE dy_dt, uint8_t on_off, uint8_t slot)
+          Alarm_Set
+          (
+            0,  
+            system_param_data.minute,
+            system_param_data.hour,
+            system_param_data.dow_dom,
+            system_param_data.dy_dt,
+            system_param_data.on_off,
+            alarm_slot_ptr              // Pointer to the next available slot in the EEPROM module
+          );
 
-        // Increment the pointer to the next available slot in the EEPROM module
-        alarm_slot_ptr = (alarm_slot_ptr < ALARM_SLOT_NUM) ? (alarm_slot_ptr + 1) : 0;
+          // Update the newly set alarm data
+          Alarm_Get(alarm_slot_ptr, &alarm_get_data[alarm_slot_ptr]);
+          
+          // Increment the pointer to the next available slot in the EEPROM module
+          alarm_slot_ptr = (alarm_slot_ptr < ALARM_SLOT_NUM) ? (alarm_slot_ptr + 1) : 0;
 
-        // Save the alarm pointer data to the EEPROM module
-        Alarm_Slot_Pointer_Set();
+          // Save the alarm pointer data to the EEPROM module
+          Alarm_Slot_Pointer_Set();
+        }
 
         // Reset the button latch to avoid function replication
         button->latch = true;
-
       }
       break;
 
@@ -1769,6 +1797,8 @@ void System_Alarm_Setup_Mode_Handle (BUTTON_DATA *button)
       // Reserved for future use
       break;
   }
+
+  system_state.past_mode = ALARM_ACTIVE_MODE;
 }
 
 /**
@@ -1823,6 +1853,7 @@ void System_Alarm_View_Mode_Handle (BUTTON_DATA *button)
       }
       break;
     
+    // Button 3: If pressed, toggle ON/OFF; if held, enter Alarm Setup Mode with selected alarm data preloaded (for editing)
     case 3:
       if      (button->press_flag)
       {
@@ -1866,6 +1897,7 @@ void System_Alarm_View_Mode_Handle (BUTTON_DATA *button)
       }
       break;
 
+    // Button 4: If held, clear current alarm
     case 4: 
       if      (button->press_flag)
       {
@@ -1873,13 +1905,15 @@ void System_Alarm_View_Mode_Handle (BUTTON_DATA *button)
       }
       else if (button->hold_flag)
       {
-
+        Alarm_Clear(system_state.cursor);
       }
       break;
 
     default: 
       break;
   }
+
+  system_state.past_mode = ALARM_VIEW_MODE;
 }
 
 /**
@@ -1954,6 +1988,8 @@ void System_Alarm_Active_Mode_Handle (BUTTON_DATA *button)
     default: 
       break;
   }
+
+  system_state.past_mode = ALARM_ACTIVE_MODE;
 }
 
 /**
@@ -2028,6 +2064,8 @@ void System_Options_Mode_Handle (BUTTON_DATA *button)
     default: 
       break;
   }
+
+  system_state.past_mode = SYSTEM_OPTIONS_MODE;
 }
 
 /**
