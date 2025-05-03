@@ -180,7 +180,6 @@ typedef struct
 // Number of system modes
 #define SYSTEM_MODE_NUM 6
 
-// 
 #define SYSTEM_CURSOR_MAX 9
 
 #define DISPLAY_DELAY 500
@@ -440,11 +439,10 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
     Button_Handle();
-    int a;
-    a = 1;
 
-    TIME_DATA time_get;
-    
+    // int a;
+    // a = 1;
+    // TIME_DATA time_get;
 
     // Check if the RTC Interrupt Flag is set (RTC Interrupt Flag) on PB4 (Activated every second)
     if (rtc_int_flag)
@@ -462,8 +460,8 @@ int main(void)
       // Toggle the debug RTC interrupt flag for debugging purposes
       debug_rtc_int = !debug_rtc_int;
 
-      time_get = (TIME_DATA) time_get_data;    
-      default_mode(&a, &time_get.hour, &time_get.minute, &time_get.second);
+      // time_get = (TIME_DATA) time_get_data;    
+      // default_mode(&a, &time_get.hour, &time_get.minute, &time_get.second);
     }
 
     // Check if the ADC interrupt flag is set (ADC Valid Flag)
@@ -830,7 +828,7 @@ void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_D
 
   // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-  HAL_I2C_Mem_Write(EEPROM_I2C, EEPROM_ADDR, address, 1, setAlarm, sizeof(setAlarm), 1000);
+  HAL_I2C_Mem_Write(EEPROM_I2C, EEPROM_ADDR, address, 2, setAlarm, sizeof(setAlarm), 1000);
 
   // Delay to allow the EEPROM module to complete the Page Write operation
   //    Neccesary delay cycle calculation:
@@ -842,7 +840,7 @@ void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_D
   //     +  1 [Stop Condition by Host] 
   //     =  65 cycles  
   //    Neccesary delay time = 65 cycles / 400 kHz = 162.5 us = ~ 0.17 ms
-  HAL_Delay(1);
+  HAL_Delay(5);
 }
 
 /**
@@ -861,7 +859,7 @@ void Alarm_Get (uint8_t slot, volatile ALARM_DATA *alarm_get_data)
 
   // HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-  HAL_I2C_Mem_Read(EEPROM_I2C, EEPROM_ADDR, address, 1, getAlarm, sizeof(getAlarm), 1000);
+  HAL_I2C_Mem_Read(EEPROM_I2C, EEPROM_ADDR, address, 2, getAlarm, sizeof(getAlarm), 1000);
 
   // Delay to allow the EEPROM module to complete the Sequential Read operation
   //    Neccesary delay cycle calculation:
@@ -897,7 +895,11 @@ void Alarm_Get (uint8_t slot, volatile ALARM_DATA *alarm_get_data)
       alarm_get_data->dow_dom = getAlarm[3] & 0x7F;
     }
   }
-  else alarm_get_data->dy_dt = NOT_USED_MODE;
+  else 
+  {
+    alarm_get_data->dy_dt = NOT_USED_MODE;
+    alarm_get_data->dow_dom = getAlarm[3] & 0x7F;
+  }
 
   if (getAlarm[0] >= (1 << 7)) alarm_get_data->on_off = true;
   else alarm_get_data->on_off = false;
@@ -918,7 +920,7 @@ void Alarm_Clear (uint8_t slot)
 
   // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-  HAL_I2C_Mem_Write(EEPROM_I2C, EEPROM_ADDR, address, 1, clearAlarm, sizeof(clearAlarm), 1000);
+  HAL_I2C_Mem_Write(EEPROM_I2C, EEPROM_ADDR, address, 2, clearAlarm, sizeof(clearAlarm), 1000);
 
   // Delay to allow the EEPROM module to complete the Page Write operation
   //    Neccesary delay cycle calculation:
@@ -930,7 +932,7 @@ void Alarm_Clear (uint8_t slot)
   //     +  1 [Stop Condition by Host] 
   //     =  65 cycles  
   //    Neccesary delay time = 65 cycles / 400 kHz = 162.5 us = ~ 0.17 ms
-  HAL_Delay(1);
+  HAL_Delay(5);
 }
 
 /**
@@ -941,7 +943,7 @@ void Alarm_Slot_Pointer_Set (void)
 {
   // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-  HAL_I2C_Mem_Write(EEPROM_I2C, EEPROM_ADDR, ALARM_SLOT_PTR_ADDR, 1, &alarm_slot_ptr, sizeof(alarm_slot_ptr), 1000);
+  HAL_I2C_Mem_Write(EEPROM_I2C, EEPROM_ADDR, ALARM_SLOT_PTR_ADDR, 2, &alarm_slot_ptr, sizeof(alarm_slot_ptr), 1000);
 
   // Delay to allow the EEPROM module to complete the Page Write operation
   //    Neccesary delay cycle calculation:
@@ -953,7 +955,7 @@ void Alarm_Slot_Pointer_Set (void)
   //     +  1 [Stop Condition by Host] 
   //     =  38 cycles  
   //    Neccesary delay time = 65 cycles / 400 kHz = 95 us = ~ 0.01 ms
-  HAL_Delay(1);
+  HAL_Delay(5);
 }
 
 /**
@@ -964,7 +966,7 @@ void Alarm_Slot_Pointer_Get (void)
 {
   // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
   //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-  HAL_I2C_Mem_Read(EEPROM_I2C, EEPROM_ADDR, ALARM_SLOT_PTR_ADDR, 1, &alarm_slot_ptr, sizeof(alarm_slot_ptr), 1000);
+  HAL_I2C_Mem_Read(EEPROM_I2C, EEPROM_ADDR, ALARM_SLOT_PTR_ADDR, 2, &alarm_slot_ptr, sizeof(alarm_slot_ptr), 1000);
 
   // Delay to allow the EEPROM module to complete the Random Read operation
   //    Neccesary delay cycle calculation:
@@ -1612,7 +1614,6 @@ void System_Alarm_Setup_Mode_Handle (BUTTON_DATA *button)
         // Update the start tick for the next hold cycle
         startTick1 = HAL_GetTick();
       } 
-      
       break;
 
       case 2: // BTN2: Decrement current value or scroll slots

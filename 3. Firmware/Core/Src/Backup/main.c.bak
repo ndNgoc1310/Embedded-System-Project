@@ -877,7 +877,7 @@ void Alarm_Get (uint8_t slot, volatile ALARM_DATA *alarm_get_data)
   //     +  1 [Stop Condition by Host] 
   //     =  75 cycles
   //    Neccesary delay time = 75 cycles / 400 kHz = 187.5 us = ~ 0.19 ms
-  HAL_Delay(1);
+  HAL_Delay(5);
 
   // Store the alarm values into the alarm variable
   alarm_get_data->second = 0;
@@ -930,7 +930,7 @@ void Alarm_Clear (uint8_t slot)
   //     +  1 [Stop Condition by Host] 
   //     =  65 cycles  
   //    Neccesary delay time = 65 cycles / 400 kHz = 162.5 us = ~ 0.17 ms
-  HAL_Delay(1);
+  HAL_Delay(5);
 }
 
 /**
@@ -953,7 +953,7 @@ void Alarm_Slot_Pointer_Set (void)
   //     +  1 [Stop Condition by Host] 
   //     =  38 cycles  
   //    Neccesary delay time = 65 cycles / 400 kHz = 95 us = ~ 0.01 ms
-  HAL_Delay(1);
+  HAL_Delay(5);
 }
 
 /**
