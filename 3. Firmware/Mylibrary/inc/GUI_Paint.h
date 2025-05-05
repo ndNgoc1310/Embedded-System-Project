@@ -68,6 +68,7 @@
 #include "DEV_Config.h"
 #include "fonts.h"
 #include "stdbool.h"
+#include "main.h"
 
 /**
  * Image attributes

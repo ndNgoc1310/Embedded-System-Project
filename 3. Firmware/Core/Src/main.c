@@ -33,10 +33,11 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "stdbool.h"
-#include "stdio.h"
-#include "string.h"
-#include "EPD_Test.h"
+#include "stdbool.h"  // Include standard boolean types
+#include "stdio.h"    // Include standard input/output functions
+#include "string.h"   // Include string manipulation functions
+#include "EPD_Test.h" // Include the EPD_Test header file for e-Paper display functions
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,29 +59,36 @@ typedef enum
   BUTTON_PRESSED,     // Button is pressed (LOW state)
 } BUTTON_STATE;
 
-// Enum for system modes
-//typedef enum {
-// DEFAULT_MODE,
-// TIME_SETUP_MODE,
-// ALARM_SETUP_MODE,
-// ALARM_VIEW_MODE,
-// ALARM_ACTIVE_MODE,
-// SYSTEM_OPTIONS_MODE
-//} SYSTEM_MODE;
+// // Enum for system modes
+// typedef enum {
+//   DEFAULT_MODE,
+//   TIME_SETUP_MODE,
+//   ALARM_SETUP_MODE,
+//   ALARM_VIEW_MODE,
+//   ALARM_ACTIVE_MODE,
+//   SYSTEM_OPTIONS_MODE
+// } SYSTEM_MODE;
 
-// Enum for system parameters to be selected for modification
+// Enum for parameter selection in Time Setup Mode
 typedef enum
 {
-  SET_MINUTE,   // Set minutes value
-  SET_HOUR,     // Set hours value
-  SET_DOW,      // Set day of the week value
-  SET_DOM,      // Set date of the month value
-  SET_MONTH,    // Set month value
-  SET_YEAR,     // Set year value
-  SET_DY_DT,    // Set day of week or date of month (1 = day of week, 0 = date of month, 2 = not used)
-  SET_DOW_DOM,  // Set day of the week or date of the month value
-  SET_ON_OFF,   // Set ON/OFF state
-} SYSTEM_PARAM_SELECT;
+  TIME_MINUTE,   // Set minutes value
+  TIME_HOUR,     // Set hours value
+  TIME_DOW,      // Set day of the week value
+  TIME_DOM,      // Set date of the month value
+  TIME_MONTH,    // Set month value
+  TIME_YEAR,     // Set year value
+} TIME_SETUP_CURSOR;
+
+// Enum for parameter selection in Alarm Setup Mode
+typedef enum
+{
+  ALARM_MINUTE,   // Set minutes value
+  ALARM_HOUR,     // Set hours value
+  ALARM_DY_DT,    // Set day of week or date of month (1 = day of week, 0 = date of month, 2 = not used)
+  ALARM_DOW_DOM,  // Set day of the week or date of the month value
+  ALARM_ON_OFF,   // Set ON/OFF state
+} ALARM_SETUP_CURSOR;
 
 // Structure of 7 one-byte unsigned characters to store time values
 typedef struct 
@@ -94,7 +102,7 @@ typedef struct
 	uint8_t year;         // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
 } TIME_DATA;
 
-// // Structure of 4 one-byte unsigned characters to store alarm values
+// Structure of 4 one-byte unsigned characters to store alarm values
 typedef struct
 {
   uint8_t           second;   // Seconds: 0-59 (MSB = 1 for ON, 0 for OFF)
@@ -116,19 +124,22 @@ typedef struct
   volatile bool   int_flag;   // Set when button interrupt is triggered
   volatile bool   press_flag; // Set when button is pressed
   volatile bool   hold_flag;  // Set when button is held down
-  volatile bool   latch;  // Set when button is pressed or held (once only)
+  volatile bool   latch;      // Set when button is pressed or held (once only)
 } BUTTON_DATA;
 
 // Struct for system state
 typedef struct
 {
-  SYSTEM_MODE         mode;         // Current system mode
-  SYSTEM_MODE         past_mode;    // Previous system mode
-  SYSTEM_PARAM_SELECT param_select; // Selected system parameter to be modified
-  uint8_t             cursor;       // Cursor of selection
+  SYSTEM_MODE         mode;               // Current system mode
+  SYSTEM_MODE         past_mode;          // Previous system mode
+  TIME_SETUP_CURSOR   time_setup_cursor;  // Cursor of selection for Time Setup Mode
+  ALARM_SETUP_CURSOR  alarm_setup_cursor; // Cursor of selection for Alarm Setup Mode
+  uint8_t             alarm_view_cursor;  // Cursor of selection for Alarm View Mode
+  uint8_t             system_opt_cursor;  // Cursor of selection for System Options Mode
+  uint8_t             battery_display;    // Battery percentage to be displayed: 100, 75, 50, 25, 0
 } SYSTEM_STATE;
 
-// Struct for system parameters to be modified
+// Struct for time parameters to be modified in Time Setup Mode
 typedef struct
 {
   uint8_t           minute;   // Minutes: 0-59
@@ -137,10 +148,17 @@ typedef struct
   uint8_t           dom;      // Date of the month: 1-31, or Day of the week: 1-7, or not used: 0
   uint8_t           month;    // Month: 1-12
   uint8_t           year;     // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
+} TIME_SETUP_DATA;
+
+// Struct for alarm parameters to be modified in Alarm Setup Mode
+typedef struct
+{
+  uint8_t           minute;   // Minutes: 0-59
+  uint8_t           hour;     // Hours: 0-23
   ALARM_DY_DT_MODE  dy_dt;    // Select: DAY_OF_WEEK_MODE, DATE_OF_MONTH_MODE, NOT_USED_MODE
   uint8_t           dow_dom;  // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31
   bool              on_off;   // true = ON, false = OFF
-} SYSTEM_PARAM_DATA;
+} ALARM_SETUP_DATA;
 
 /* USER CODE END PTD */
 
@@ -162,11 +180,11 @@ typedef struct
 // Number of alarms in the EEPROM module
 #define ALARM_SLOT_NUM 10 
 
-// Address of alarm slot pointer in EEPROM module (right next to the final alarm slot)
+// Address of alarm slot pointer in EEPROM module (right after the last alarm slot)
 #define ALARM_SLOT_PTR_ADDR (ALARM_SLOT_NUM * 4)
 
 // Active state of buttons
-#define BUTTON_ACTIVE GPIO_PIN_SET
+#define BUTTON_ACTIVE GPIO_PIN_RESET
 
 // Debounce threshold in milliseconds
 #define BUTTON_DEBOUNCE_DELAY 30
@@ -180,8 +198,11 @@ typedef struct
 // Number of system modes
 #define SYSTEM_MODE_NUM 6
 
-#define SYSTEM_CURSOR_MAX 9
+// Maximum value of the system cursor
+#define ALARM_VIEW_CURSOR_MAX 9
+#define SYSTEM_OPT_CURSOR_MAX 9
 
+// Delay for displaying the e-Paper screen in milliseconds
 #define DISPLAY_DELAY 500
 
 /* USER CODE END PD */
@@ -197,10 +218,9 @@ typedef struct
 
 /* SYSTEM ==========================================*/
 // Global variable to store the current system mode and selected parameter
-SYSTEM_STATE system_state = {DEFAULT_MODE, DEFAULT_MODE, SET_MINUTE};
-
-// Global variable to store the system parameters to be modified
-SYSTEM_PARAM_DATA system_param_data = {0};
+SYSTEM_STATE system_state = {0};
+TIME_SETUP_DATA time_setup_data = {0};
+ALARM_SETUP_DATA alarm_setup_data = {0};
 
 /* RTC & EEPROM ====================================*/
 // Variable to store the time values received from the RTC module every second
@@ -404,21 +424,6 @@ int main(void)
     Alarm_Get(i, &alarm_get_data[i]);
   }
 
-  // Set the initial system parameters to current time values and default settings for convenience
-  system_param_data =
-  (SYSTEM_PARAM_DATA)
-  {
-    time_get_data.minute,       // Minutes: 0-59
-    time_get_data.hour,         // Hours: 0-23
-    time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
-    time_get_data.dateofmonth,  // Date of the month: 1-31
-    time_get_data.month,        // Month: 1-12
-    time_get_data.year,         // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
-    NOT_USED_MODE,              // Select: DAY_OF_WEEK_MODE, DATE_OF_MONTH_MODE, NOT_USED_MODE
-    time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31
-    true                        // true = ON, false = OFF
-  };
-
   // Initialize the UART module to receive data
   //    HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
   HAL_UART_Receive_IT(&huart1, uart_rx_data, 2);
@@ -438,6 +443,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
+    // Call the button debounce handler for each button
     Button_Handle();
 
     // int a;
@@ -454,25 +460,35 @@ int main(void)
       //   void Alarm_Check (volatile TIME_DATA *time_get_data)
       Alarm_Check(&time_get_data);
 
-      // Reset the RTC Interrupt Flag
-      rtc_int_flag = false;
-
-      // Toggle the debug RTC interrupt flag for debugging purposes
+      // Debugging: Toggle the debug RTC interrupt flag for debugging purposes
       debug_rtc_int = !debug_rtc_int;
 
       // time_get = (TIME_DATA) time_get_data;    
       // default_mode(&a, &time_get.hour, &time_get.minute, &time_get.second);
+
+      // Check if the ADC interrupt flag is set (ADC Valid Flag)
+      if (adc_valid_flag)
+      {
+        // Re-enable the ADC interrupt to continue monitoring ADC values
+        HAL_ADC_Start_IT(&hadc1);
+
+        // Delay for 100ms to allow the ADC to stabilize
+        HAL_Delay(100);
+
+        // Track the battery percentage value at 5 different levels: 0, 25, 50, 75, 100
+        if ((battery_percentage % 25) == 0)
+        {
+          // Update the battery percentage value to be displayed
+          system_state.battery_display = battery_percentage;
+        }
+
+        // Reset the ADC interrupt flag
+        adc_valid_flag = false;
+      }
+
+      // Reset the RTC Interrupt Flag
+      rtc_int_flag = false;
     }
-
-    // Check if the ADC interrupt flag is set (ADC Valid Flag)
-    if (adc_valid_flag)
-	  {
-      // Re-enable the ADC interrupt to continue monitoring ADC values
-      HAL_ADC_Start_IT(&hadc1);
-
-      // Delay for 100ms to allow the ADC to stabilize
-      HAL_Delay(100);
-	  }
 
     // Check if the UART interrupt flag is set (UART Receive Flag)
     if (uart_rx_flag)
@@ -482,6 +498,9 @@ int main(void)
       
       // Delay for 100ms to allow the UART to stabilize
       HAL_Delay(100);
+
+      // Reset the UART interrupt flag
+      uart_rx_flag = false;
 	  }
 
   }
@@ -584,8 +603,6 @@ void Time_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom,
 	setTime[6] = Dec_To_BCD(year);
 
   // Send the array containing the time values to the RTC module through I2C interface at address 00h - 06h (size of value: 7 bytes)
-  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
-  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);	
   HAL_I2C_Mem_Write(DS3231_I2C, DS3231_ADDR, 0x00, 1, setTime, sizeof(setTime), 1000);
 
   // Delay for 1ms to allow the RTC module to process the data
@@ -603,8 +620,6 @@ void Time_Get (volatile TIME_DATA *time_get_data)
   uint8_t getTime[7];
 
   // Receive the time values from the RTC module through I2C interface, then store them into the blank array (size of value: 7 bytes)
-  // HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
-  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);  
   HAL_I2C_Mem_Read(DS3231_I2C, DS3231_ADDR, 0x00, 1, getTime, sizeof(getTime), 1000);
 
   // Delay for 1ms to allow the RTC module to process the data
@@ -714,16 +729,12 @@ void Time_Ctrl (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t do
   }
 
   // Send the array containing the RTC alarm mode setting to the RTC module through I2C interface at address 07h - 0Ah (size of value: 4 bytes)
-  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
-  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);	  
   HAL_I2C_Mem_Write(DS3231_I2C, DS3231_ADDR, 0x07, 1, ctrlTime, sizeof(ctrlTime), 1000);
 
   // Delay for 1ms to allow the RTC module to process the data
   HAL_Delay(1);
 
   // Send the alarm control mask bits to the RTC module through I2C interface at address 0Eh (size of value: 1 byte)
-  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
-  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);	  
   HAL_I2C_Mem_Write(DS3231_I2C, DS3231_ADDR, 0x0E, 1, &ctrlAlarm, sizeof(ctrlAlarm), 1000);
 
   // Delay for 1ms to allow the RTC module to process the data
@@ -782,33 +793,32 @@ void Time_Init (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom
 */
 void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_DY_DT_MODE dy_dt, bool on_off, uint8_t slot)
 {
-  // Internal address of the alarm in the EEPROM module (0-8192, or 13 bits)
-  uint16_t address = slot * 4;
-
-  // Add an ON/OFF (1 bit) signal into the alarm package by using the MSB of the second register
+  // Encode the ON/OFF state of the alarm into the alarm package
+  // By masking the 7th bit of the second register
   if (on_off)
   {
     sec += (1 << 7);
   }
 
-  // Add a [day of week] or [date of month] (1 bit) signal into the alarm package by using bit 6 of the dow_dom register
+  // Encode the day of week or date of month mode into the alarm package
+  // By masking the 7th and 6th bits of the dow_dom variable
   switch (dy_dt)
   {
     // Date of the month
     case DATE_OF_MONTH_MODE:
-      // Decoding: [Bit 7] = 1, [Bit 6] = 0
+      // Encoding: [Bit 7] = 1, [Bit 6] = 0
       dow_dom += (1 << 7);
       break;
 
     // Day of the week
     case DAY_OF_WEEK_MODE:
-      // Decoding: [Bit 7] = 1, [Bit 6] = 1
+      // Ending: [Bit 7] = 1, [Bit 6] = 1
       dow_dom += ((1 << 7) | (1 << 6));
       break;
 
     // Not used
     case NOT_USED_MODE:
-      // Decoding: [Bit 7] = 0, [Bit 6] = 0
+      // Encoding: [Bit 7] = 0, [Bit 6] = 0
       dow_dom += 0;
       break;
 
@@ -817,29 +827,17 @@ void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_D
       break;
   }
 
-  // A blank array (4 slots) to contain the alarm values
-  uint8_t setAlarm[4];
+  // Store the encoded alarm values into the blank array
+  uint8_t setAlarm[4] = {sec, min, hour, dow_dom};
   
-  // Store the alarm values into the blank array
-  setAlarm[0] = sec;
-  setAlarm[1] = min;
-  setAlarm[2] = hour;
-  setAlarm[3] = dow_dom;
+  // Calculate the internal address of the alarm in the EEPROM module (0-8192, or 13 bits)
+  // By multiplying the slot number by 4 (size of each alarm: 4 bytes)
+  uint16_t address = slot * 4;
 
-  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
-  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+  // Send the array containing the alarm values to the EEPROM module through I2C interface
   HAL_I2C_Mem_Write(EEPROM_I2C, EEPROM_ADDR, address, 2, setAlarm, sizeof(setAlarm), 1000);
 
   // Delay to allow the EEPROM module to complete the Page Write operation
-  //    Neccesary delay cycle calculation:
-  //        1 [Start Condition by Host] +
-  //     +  8 [Device Address Byte]     + 1 [ACK from Client]      +
-  //     +  8 [1st Word Address Byte]   + 1 [ACK from Client]      +
-  //     +  8 [2nd Word Address Byte]   + 1 [ACK from Client]      +
-  //     + {8 [1st Data Word]           + 1 [ACK from Client]} * 4 + 
-  //     +  1 [Stop Condition by Host] 
-  //     =  65 cycles  
-  //    Neccesary delay time = 65 cycles / 400 kHz = 162.5 us = ~ 0.17 ms
   HAL_Delay(5);
 }
 
@@ -857,24 +855,10 @@ void Alarm_Get (uint8_t slot, volatile ALARM_DATA *alarm_get_data)
   // A blank array (4 slots) to contain the alarm values received from the EEPROM module
   uint8_t getAlarm[4];
 
-  // HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
-  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+  // Receive the alarm values from the EEPROM module through I2C interface, then store them into the blank array (size of value: 4 bytes)
   HAL_I2C_Mem_Read(EEPROM_I2C, EEPROM_ADDR, address, 2, getAlarm, sizeof(getAlarm), 1000);
 
   // Delay to allow the EEPROM module to complete the Sequential Read operation
-  //    Neccesary delay cycle calculation:
-  //     {Dummy Write}
-  //        1 [Start Condition by Host] +
-  //     +  8 [Device Address Byte]     + 1 [ACK from Client]      +
-  //     +  8 [1st Word Address Byte]   + 1 [ACK from Client]      +
-  //     +  8 [2nd Word Address Byte]   + 1 [ACK from Client]      +
-  //     {Sequential Read}
-  //     +  1 [Start Condition by Host] +
-  //     +  8 [Device Address Byte]     + 1 [ACK from Client]      +
-  //     + {8 [1st Data Word]           + 1 [ACK from Client]} * 4 + 
-  //     +  1 [Stop Condition by Host] 
-  //     =  75 cycles
-  //    Neccesary delay time = 75 cycles / 400 kHz = 187.5 us = ~ 0.19 ms
   HAL_Delay(1);
 
   // Store the alarm values into the alarm variable
@@ -918,20 +902,10 @@ void Alarm_Clear (uint8_t slot)
   // A blank array (4 slots) to contain the alarm values to be cleared
   uint8_t clearAlarm[4] = {0, 0, 0, 0};
 
-  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
-  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+  // Write the blank array to the EEPROM module through I2C interface
   HAL_I2C_Mem_Write(EEPROM_I2C, EEPROM_ADDR, address, 2, clearAlarm, sizeof(clearAlarm), 1000);
 
   // Delay to allow the EEPROM module to complete the Page Write operation
-  //    Neccesary delay cycle calculation:
-  //        1 [Start Condition by Host] +
-  //     +  8 [Device Address Byte]     + 1 [ACK from Client]      +
-  //     +  8 [1st Word Address Byte]   + 1 [ACK from Client]      +
-  //     +  8 [2nd Word Address Byte]   + 1 [ACK from Client]      +
-  //     + {8 [1st Data Word]           + 1 [ACK from Client]} * 4 + 
-  //     +  1 [Stop Condition by Host] 
-  //     =  65 cycles  
-  //    Neccesary delay time = 65 cycles / 400 kHz = 162.5 us = ~ 0.17 ms
   HAL_Delay(5);
 }
 
@@ -941,20 +915,10 @@ void Alarm_Clear (uint8_t slot)
  */
 void Alarm_Slot_Pointer_Set (void)
 {
-  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
-  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+  // Write the alarm slot pointer value to the EEPROM module through I2C interface
   HAL_I2C_Mem_Write(EEPROM_I2C, EEPROM_ADDR, ALARM_SLOT_PTR_ADDR, 2, &alarm_slot_ptr, sizeof(alarm_slot_ptr), 1000);
 
   // Delay to allow the EEPROM module to complete the Page Write operation
-  //    Neccesary delay cycle calculation:
-  //        1 [Start Condition by Host] +
-  //     +  8 [Device Address Byte]     + 1 [ACK from Client]  +
-  //     +  8 [1st Word Address Byte]   + 1 [ACK from Client]  +
-  //     +  8 [2nd Word Address Byte]   + 1 [ACK from Client]  +
-  //     +  8 [1st Data Word]           + 1 [ACK from Client]} + 
-  //     +  1 [Stop Condition by Host] 
-  //     =  38 cycles  
-  //    Neccesary delay time = 65 cycles / 400 kHz = 95 us = ~ 0.01 ms
   HAL_Delay(5);
 }
 
@@ -964,24 +928,10 @@ void Alarm_Slot_Pointer_Set (void)
  */
 void Alarm_Slot_Pointer_Get (void)
 {
-  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
-  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+  // Read the alarm slot pointer from the EEPROM module through I2C interface
   HAL_I2C_Mem_Read(EEPROM_I2C, EEPROM_ADDR, ALARM_SLOT_PTR_ADDR, 2, &alarm_slot_ptr, sizeof(alarm_slot_ptr), 1000);
 
-  // Delay to allow the EEPROM module to complete the Random Read operation
-  //    Neccesary delay cycle calculation:
-  //     {Dummy Write}
-  //        1 [Start Condition by Host] +
-  //     +  8 [Device Address Byte]     + 1 [ACK from Client]  +
-  //     +  8 [1st Word Address Byte]   + 1 [ACK from Client]  +
-  //     +  8 [2nd Word Address Byte]   + 1 [ACK from Client]  +
-  //     {Random Read}
-  //     +  1 [Start Condition by Host] +
-  //     +  8 [Device Address Byte]     + 1 [ACK from Client]  +
-  //     +  8 [1st Data Word]           + 1 [ACK from Client]} + 
-  //     +  1 [Stop Condition by Host] 
-  //     =  48 cycles
-  //    Neccesary delay time = 75 cycles / 400 kHz = 0.12 ms
+  // Delay to allow the EEPROM module to complete the Sequential Read operation
   HAL_Delay(1);
 }
 
@@ -993,6 +943,7 @@ void Alarm_Slot_Pointer_Get (void)
 */
 void Alarm_Check (volatile TIME_DATA *time_get_data)
 {
+  // A blank array to contain the alarm values retrieved from the EEPROM module
   volatile ALARM_DATA alarmCheckData = {0};
 
   // Compare the current time with all available alarms in the EEPROM module
@@ -1046,7 +997,7 @@ void Alarm_Check (volatile TIME_DATA *time_get_data)
       continue;
     }
 
-    // If all the above checks pass, the alarm is activated
+    // Debugging: If all the above checks pass, the alarm is activated
     debug_alarm_activate_ctr++;
 
     // Stop checking time matching
@@ -1074,6 +1025,7 @@ void Button_Debounce(BUTTON_DATA *button)
     // Initial state: Button is released (HIGH)
     case BUTTON_RELEASED:
 
+      // Reset all flags and state variables
       button->press_flag = false;
       button->hold_flag = false;
       button->latch = false;
@@ -1165,7 +1117,7 @@ void Button_Handle (void)
   Button_Debounce(&button3);
   Button_Debounce(&button4);
 
-  
+  // Check which button is pressed or held and assign it to the button pointer
   if      (button0.press_flag || button0.hold_flag) button = &button0;
   else if (button1.press_flag || button1.hold_flag) button = &button1;
   else if (button2.press_flag || button2.hold_flag) button = &button2;
@@ -1173,7 +1125,7 @@ void Button_Handle (void)
   else if (button4.press_flag || button4.hold_flag) button = &button4;
   
 
-  // Debugging: Initialize the start tick for button hold detection
+  // Initialize the start tick for button hold detection
   uint32_t startTick = 0;
   
   // Debugging: Check if the button is pressed or held by increment its counter in activation
@@ -1240,13 +1192,12 @@ void System_Default_Mode_Handle (BUTTON_DATA *button)
 {
   switch (button->index) 
   {
-    // Button 0: If pressed, cycle through the modes; if held, do nothing (reserved for future use)
+    // Button 0: Reserved for future use
     case 0:
-      if      (button->press_flag)
+      if (button->press_flag)
       {
-        system_state.mode = (system_state.mode < (SYSTEM_MODE_NUM - 1)) ? (system_state.mode + 1) : 0;
+        // Reserved
       }
-
       else if (button->hold_flag)
       {
         // Reserved
@@ -1265,9 +1216,9 @@ void System_Default_Mode_Handle (BUTTON_DATA *button)
       }
       break;
 
-    // Button 2: Reserved for future use
+    // Button 2: If pressed, do nothing (reserved for future use); if held, do nothing (reserved for future use)
     case 2: 
-      if (button->press_flag)
+      if (button->press_flag) 
       {
         // Reserved
       }
@@ -1277,15 +1228,11 @@ void System_Default_Mode_Handle (BUTTON_DATA *button)
       }
       break;
     
-    // Button 3: If pressed, quick jump to Time Setup; if held, do nothing (reserved for future use)
+    // Button 3: If pressed, do nothing (reserved for future use); if held, do nothing (reserved for future use)
     case 3:
-      if (button->press_flag) 
+      if (button->press_flag)
       {
-        // Quick jump to Time Setup
-        system_state.mode = TIME_SETUP_MODE;
-
-        // Set the parameter select to the first parameter
-        system_state.param_select = SET_MINUTE;
+        // Reserved
       }
       else if (button->hold_flag)
       {
@@ -1293,15 +1240,29 @@ void System_Default_Mode_Handle (BUTTON_DATA *button)
       }
       break;
 
-    // Button 4: If pressed, quick jump to Alarm Setup; if held, do nothing (reserved for future use)
+    // Button 4: If pressed, cycle through the modes; if held, do nothing (reserved for future use)
     case 4:
       if (button->press_flag)
       {
-        // Quick jump to Alarm Setup
-        system_state.mode = ALARM_SETUP_MODE;
+        // system_state.mode = (system_state.mode < (SYSTEM_MODE_NUM - 1)) ? (system_state.mode + 1) : 0;
 
-        // Set the parameter select to the first parameter
-        system_state.param_select = SET_MINUTE;
+        // Quick jump to Time Setup mode
+        system_state.mode = TIME_SETUP_MODE;
+
+        // Set the Time Setup data to the current time values for convinience
+        time_setup_data =
+        (TIME_SETUP_DATA)
+        {
+          time_get_data.minute,       // Minutes: 0-59
+          time_get_data.hour,         // Hours: 0-23
+          time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+          time_get_data.dateofmonth,  // Date of the month: 1-31
+          time_get_data.month,        // Month: 1-12
+          time_get_data.year          // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
+        };
+
+        // Reset the cursor for the Time Setup mode to the first parameter (minute)
+        system_state.time_setup_cursor = TIME_MINUTE;
       }
       else if (button->hold_flag)
       {
@@ -1312,7 +1273,7 @@ void System_Default_Mode_Handle (BUTTON_DATA *button)
     default: 
       break;
   }
-
+  // Set the system past mode to default mode
   system_state.past_mode = DEFAULT_MODE;
 }
 
@@ -1325,59 +1286,24 @@ void System_Time_Setup_Mode_Handle (BUTTON_DATA *button)
 {
   switch (button->index) 
   {
-    // Button 0: If pressed, cycle through the system modes; if held, set the mode to default
-    case 0:
-      // If pressed, cycle through the time system modes, but the temporary setting data is still retained (avoid accidental press)
-      if (button->press_flag)
-      {
-        system_state.mode = (system_state.mode < (SYSTEM_MODE_NUM - 1)) ? (system_state.mode + 1) : 0;
-      }
-      
-      // If held, set the mode to default, 
-      // and refresh the system parameters to current time values and default settings for convenience
-      else if (button->hold_flag && !button->latch)
-      {
-        system_state.mode = DEFAULT_MODE; 
-        button->latch = true;
-
-        // Set the initial system parameters to current time values and default settings for convenience
-        system_param_data =
-        (SYSTEM_PARAM_DATA)
-        {
-          time_get_data.minute,       // Minutes: 0-59
-          time_get_data.hour,         // Hours: 0-23
-          time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
-          time_get_data.dateofmonth,  // Date of the month: 1-31
-          time_get_data.month,        // Month: 1-12
-          time_get_data.year,         // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
-          NOT_USED_MODE,              // Select: DAY_OF_WEEK_MODE, DATE_OF_MONTH_MODE, NOT_USED_MODE
-          time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31
-          true                        // true = ON, false = OFF
-        };
-      }
-      break;
-    
-    // Button 1: If pressed, increment the selected parameter; if held, increment continuously
-    case 1: 
+    // Button 0: If pressed, increment the selected parameter; if held, do nothing (reserved for future use)
+    case 0: 
       // Pointer to the selected parameter, its maximum value, and minimum value
       uint8_t *paramPtr1 = NULL;
       uint8_t maxValue1 = 0;    
       uint8_t minValue1 = 0;  
 
       // Determine the parameter to increment based on the current selection
-      switch (system_state.param_select)
+      switch (system_state.time_setup_cursor)
       {
-        case SET_MINUTE:  paramPtr1 = &system_param_data.minute;  maxValue1 = 59; minValue1 = 0; break;
-        case SET_HOUR:    paramPtr1 = &system_param_data.hour;    maxValue1 = 23; minValue1 = 0; break;
-        case SET_DOW:     paramPtr1 = &system_param_data.dow;     maxValue1 = 7;  minValue1 = 1; break;
-        case SET_DOM:     paramPtr1 = &system_param_data.dom;     maxValue1 = 31; minValue1 = 1; break;
-        case SET_MONTH:   paramPtr1 = &system_param_data.month;   maxValue1 = 12; minValue1 = 1; break;
-        case SET_YEAR:    paramPtr1 = &system_param_data.year;    maxValue1 = 99; minValue1 = 0; break;
+        case TIME_MINUTE:  paramPtr1 = &time_setup_data.minute;  maxValue1 = 59; minValue1 = 0; break;
+        case TIME_HOUR:    paramPtr1 = &time_setup_data.hour;    maxValue1 = 23; minValue1 = 0; break;
+        case TIME_DOW:     paramPtr1 = &time_setup_data.dow;     maxValue1 = 7;  minValue1 = 1; break;
+        case TIME_DOM:     paramPtr1 = &time_setup_data.dom;     maxValue1 = 31; minValue1 = 1; break;
+        case TIME_MONTH:   paramPtr1 = &time_setup_data.month;   maxValue1 = 12; minValue1 = 1; break;
+        case TIME_YEAR:    paramPtr1 = &time_setup_data.year;    maxValue1 = 99; minValue1 = 0; break;
         default: break;
       }
-
-      // Initialize the start tick for button 1 hold detection
-      uint32_t startTick1 = 0;
 
       // Check if the button is pressed or held
       if (button->press_flag) 
@@ -1389,44 +1315,44 @@ void System_Time_Setup_Mode_Handle (BUTTON_DATA *button)
           *paramPtr1 = (*paramPtr1 < maxValue1) ? (*paramPtr1 + 1) : minValue1;
         }
       }
-      else if (button->hold_flag) 
-      {
-        // If the button is held down, increment the parameter value continuously
-        if (HAL_GetTick() - startTick1 >= BUTTON_HOLD_CYCLE) 
-        {
-          if (paramPtr1) 
-          {
-            // Increment the parameter value, wrapping around if necessary
-            *paramPtr1 = (*paramPtr1 < maxValue1) ? (*paramPtr1 + 1) : minValue1;
-          }
+      // else if (button->hold_flag) 
+      // {
+      // // Initialize the start tick for button 1 hold detection
+      // uint32_t startTick1 = 0;
 
-          // Update the start tick for the next hold cycle
-          startTick1 = HAL_GetTick();
-        }
-      } 
+      //   // If the button is held down, increment the parameter value continuously
+      //   if (HAL_GetTick() - startTick1 >= BUTTON_HOLD_CYCLE) 
+      //   {
+      //     if (paramPtr1) 
+      //     {
+      //       // Increment the parameter value, wrapping around if necessary
+      //       *paramPtr1 = (*paramPtr1 < maxValue1) ? (*paramPtr1 + 1) : minValue1;
+      //     }
+
+      //     // Update the start tick for the next hold cycle
+      //     startTick1 = HAL_GetTick();
+      //   }
+      // } 
       break;
     
-      // Button 2: If pressed, decrement the selected parameter; if held, decrement continuously
-      case 2: 
+      // Button 1: If pressed, decrement the selected parameter; if held, do nothing (reserved for future use)
+      case 1: 
         // Pointer to the selected parameter, its maximum value, and minimum value
         uint8_t *paramPtr2 = NULL;
         uint8_t maxValue2 = 0;    
         uint8_t minValue2 = 0;  
 
         // Determine the parameter to decrement based on the current selection
-        switch (system_state.param_select)
+        switch (system_state.time_setup_cursor)
         {
-          case SET_MINUTE:  paramPtr2 = &system_param_data.minute;  maxValue2 = 59; minValue2 = 0; break;
-          case SET_HOUR:    paramPtr2 = &system_param_data.hour;    maxValue2 = 23; minValue2 = 0; break;
-          case SET_DOW:     paramPtr2 = &system_param_data.dow;     maxValue2 = 7;  minValue2 = 1; break;
-          case SET_DOM:     paramPtr2 = &system_param_data.dom;     maxValue2 = 31; minValue2 = 1; break;
-          case SET_MONTH:   paramPtr2 = &system_param_data.month;   maxValue2 = 12; minValue2 = 1; break;
-          case SET_YEAR:    paramPtr2 = &system_param_data.year;    maxValue2 = 99; minValue2 = 0; break;
+          case TIME_MINUTE:  paramPtr2 = &time_setup_data.minute;  maxValue2 = 59; minValue2 = 0; break;
+          case TIME_HOUR:    paramPtr2 = &time_setup_data.hour;    maxValue2 = 23; minValue2 = 0; break;
+          case TIME_DOW:     paramPtr2 = &time_setup_data.dow;     maxValue2 = 7;  minValue2 = 1; break;
+          case TIME_DOM:     paramPtr2 = &time_setup_data.dom;     maxValue2 = 31; minValue2 = 1; break;
+          case TIME_MONTH:   paramPtr2 = &time_setup_data.month;   maxValue2 = 12; minValue2 = 1; break;
+          case TIME_YEAR:    paramPtr2 = &time_setup_data.year;    maxValue2 = 99; minValue2 = 0; break;
           default: break;
         }
-
-        // Initialize the start tick for button 2 hold detection
-        uint32_t startTick2 = 0;
 
         // Check if the button is pressed or held
         if (button->press_flag) 
@@ -1438,73 +1364,42 @@ void System_Time_Setup_Mode_Handle (BUTTON_DATA *button)
             *paramPtr2 = (*paramPtr2 > minValue2) ? (*paramPtr2 - 1) : maxValue2;
           }
         }
-        else if (button->hold_flag) 
-        {
-          // If the button is held down, decrement the parameter value continuously
-          if (HAL_GetTick() - startTick2 >= BUTTON_HOLD_CYCLE) 
-          {
-            if (paramPtr2) 
-            {
-              // Decrement the parameter value, wrapping around if necessary
-              *paramPtr2 = (*paramPtr2 > minValue2) ? (*paramPtr2 - 1) : maxValue2;
-            }
+        // else if (button->hold_flag) 
+        // {
+        //   // Initialize the start tick for button 2 hold detection
+        //   uint32_t startTick2 = 0;
 
-            // Update the start tick for the next hold cycle
-            startTick2 = HAL_GetTick();
-          }
-        } 
+        //   // If the button is held down, decrement the parameter value continuously
+        //   if (HAL_GetTick() - startTick2 >= BUTTON_HOLD_CYCLE) 
+        //   {
+        //     if (paramPtr2) 
+        //     {
+        //       // Decrement the parameter value, wrapping around if necessary
+        //       *paramPtr2 = (*paramPtr2 > minValue2) ? (*paramPtr2 - 1) : maxValue2;
+        //     }
+
+        //     // Update the start tick for the next hold cycle
+        //     startTick2 = HAL_GetTick();
+        //   }
+        // } 
         break;
-    
-    // Button 3: If pressed, move to the next field; if held, set the time using the current parameter values
-    case 3: 
-      // If the button is pressed, move to the next parameter field, wrapping around if necessary
-      if(button->press_flag)
-      {
-        if (system_state.param_select == SET_YEAR)
-        {
-          system_state.param_select = SET_MINUTE;
-        }
-        else
-        {
-          system_state.param_select += 1;
-        }
-      }
 
-      // If the button is held down, set the time using the current parameter values
-      else if (button->hold_flag && !button->latch) 
-      {
-        // Set the time using the current parameter values
-        //    void Time_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
-        Time_Init
-        (
-          0, 
-          system_param_data.minute, 
-          system_param_data.hour, 
-          system_param_data.dow, 
-          system_param_data.dom, 
-          system_param_data.month, 
-          system_param_data.year
-        );
-
-        button->latch = true;
-
-        break;
-      }
-      break;
-
-    // Button 4: If pressed, move to the previous field; if held, do nothing (reserved for future use)
-    case 4: 
+    // Button 2: If pressed, set the time using the current parameter values; if held, do nothing (reserved for future use)
+    case 2: 
       // If the button is pressed, move to the previous parameter field, wrapping around if necessary
       if (button->press_flag)
       {
-        if (system_state.param_select == SET_MINUTE)
-        {
-          system_state.param_select = SET_YEAR;
-        }
-        else
-        {
-          system_state.param_select -= 1;
-        }   
+        // Set the time using the current parameter values
+        Time_Init
+        (
+          0, 
+          time_setup_data.minute, 
+          time_setup_data.hour, 
+          time_setup_data.dow, 
+          time_setup_data.dom, 
+          time_setup_data.month, 
+          time_setup_data.year
+        );
       }
       
       // If the button is held down, do nothing (reserved for future use)
@@ -1514,11 +1409,88 @@ void System_Time_Setup_Mode_Handle (BUTTON_DATA *button)
       }
       break;
 
+    // Button 3: If pressed, move to the next field; if held, do nothing (reserved for future use)
+    case 3: 
+      // If the button is pressed, move to the next parameter field, wrapping around if necessary
+      if(button->press_flag)
+      {
+        system_state.time_setup_cursor = (system_state.time_setup_cursor == TIME_YEAR) ? TIME_MINUTE : (system_state.time_setup_cursor + 1);
+      }
+
+      // // If the button is held down, set the time using the current parameter values
+      // else if (button->hold_flag && !button->latch) 
+      // {
+      //   // Set the time using the current parameter values
+      //   //    void Time_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
+      //   Time_Init
+      //   (
+      //     0, 
+      //     system_param_data.minute, 
+      //     system_param_data.hour, 
+      //     system_param_data.dow, 
+      //     system_param_data.dom, 
+      //     system_param_data.month, 
+      //     system_param_data.year
+      //   );
+
+      //   button->latch = true
+      break;
+
+    // Button 4: If pressed, cycle through the system modes; if held, do nothing (reserved for future use)
+    case 4:
+      // If pressed, cycle through the time system modes, but the temporary setting data is still retained (avoid accidental press)
+      if (button->press_flag)
+      {
+        // system_state.mode = (system_state.mode < (SYSTEM_MODE_NUM - 1)) ? (system_state.mode + 1) : 0;
+
+        // Cycle through the next system mode
+        system_state.mode = ALARM_SETUP_MODE;
+
+        // Set the Alarm Setup data to the current time values for convenience
+        alarm_setup_data =
+        (ALARM_SETUP_DATA)
+        {
+          time_get_data.minute,       // Minutes: 0-59
+          time_get_data.hour,         // Hours: 0-23
+          NOT_USED_MODE,              // Select: DAY_OF_WEEK_MODE, DATE_OF_MONTH_MODE, NOT_USED_MODE         
+          time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+          true                       	// Alarm ON/OFF state: 1 = ON, 0 = OFF
+        };
+        
+        // Reset the cursor for the Alarm Setup mode to the first parameter (minute)
+        system_state.alarm_setup_cursor = ALARM_MINUTE;
+
+        // Set the system past mode to time setup mode
+        system_state.past_mode = TIME_SETUP_MODE;
+      }
+
+      // // If held, set the mode to default, 
+      // // and refresh the system parameters to current time values and default settings for convenience
+      // else if (button->hold_flag && !button->latch)
+      // {
+      //   system_state.mode = DEFAULT_MODE; 
+      //   button->latch = true;
+
+      //   // Set the initial system parameters to current time values and default settings for convenience
+      //   system_param_data =
+      //   (SYSTEM_PARAM_DATA)
+      //   {
+      //     time_get_data.minute,       // Minutes: 0-59
+      //     time_get_data.hour,         // Hours: 0-23
+      //     time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+      //     time_get_data.dateofmonth,  // Date of the month: 1-31
+      //     time_get_data.month,        // Month: 1-12
+      //     time_get_data.year,         // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
+      //     NOT_USED_MODE,              // Select: DAY_OF_WEEK_MODE, DATE_OF_MONTH_MODE, NOT_USED_MODE
+      //     time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31
+      //     true                        // true = ON, false = OFF
+      //   };
+      // }
+      break;
+
     default: 
       break;
   }
-
-  system_state.past_mode = TIME_SETUP_MODE;
 }
 
 /**
@@ -1527,67 +1499,32 @@ void System_Time_Setup_Mode_Handle (BUTTON_DATA *button)
  * @retval None
  */
 void System_Alarm_Setup_Mode_Handle (BUTTON_DATA *button)
-{
+{ 
   switch (button->index) 
   {
-    // Button 0: If pressed, cycle through the system modes; if held, set the mode to default
-    case 0:
-      // If pressed, cycle through the time system modes, but the temporary setting data is still retained (avoid accidental press)
-      if (button->press_flag)
-      {
-        system_state.mode = (system_state.mode < (SYSTEM_MODE_NUM - 1)) ? (system_state.mode + 1) : 0;
-      }
-      
-      // If held, set the mode to default, 
-      // and refresh the system parameters to current time values and default settings for convenience
-      else if (button->hold_flag && !button->latch)
-      {
-        system_state.mode = DEFAULT_MODE; 
-        button->latch = true;
-
-        // Set the initial system parameters to current time values and default settings for convenience
-        system_param_data =
-        (SYSTEM_PARAM_DATA)
-        {
-          time_get_data.minute,       // Minutes: 0-59
-          time_get_data.hour,         // Hours: 0-23
-          time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
-          time_get_data.dateofmonth,  // Date of the month: 1-31
-          time_get_data.month,        // Month: 1-12
-          time_get_data.year,         // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
-          NOT_USED_MODE,              // Select: DAY_OF_WEEK_MODE, DATE_OF_MONTH_MODE, NOT_USED_MODE
-          time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31
-          true                        // true = ON, false = OFF
-        };
-      }
-      break;
-
-    // Button 1: If pressed, increment the selected parameter; if held, increment continuously
-    case 1: 
+    // Button 0: If pressed, increment the selected parameter; if held, do nothing (reserved for future use)
+    case 0: 
       // Pointer to the selected parameter, its maximum value, and minimum value
       uint8_t *paramPtr1 = NULL;
       uint8_t maxValue1 = 0;    
       uint8_t minValue1 = 0;  
 
       // Determine the parameter to increment based on the current selection
-      switch (system_state.param_select)
+      switch (system_state.alarm_setup_cursor)
       {
-        case SET_MINUTE:  paramPtr1 = &system_param_data.minute;  maxValue1 = 59; minValue1 = 0; break;
-        case SET_HOUR:    paramPtr1 = &system_param_data.hour;    maxValue1 = 23; minValue1 = 0; break;
-        case SET_DY_DT:   paramPtr1 = (uint8_t *)&system_param_data.dy_dt; maxValue1 = 2; minValue1 = 0; break;
-        case SET_DOW_DOM: paramPtr1 = &system_param_data.dow_dom; maxValue1 = 31; minValue1 = 1; break;
-        case SET_ON_OFF:  system_param_data.on_off = !system_param_data.on_off;                  break;
+        case ALARM_MINUTE:  paramPtr1 = &alarm_setup_data.minute;  maxValue1 = 59; minValue1 = 0; break;
+        case ALARM_HOUR:    paramPtr1 = &alarm_setup_data.hour;    maxValue1 = 23; minValue1 = 0; break;
+        case ALARM_DY_DT:   paramPtr1 = (uint8_t *)&alarm_setup_data.dy_dt; maxValue1 = 2; minValue1 = 0; break;
+        case ALARM_DOW_DOM: paramPtr1 = &alarm_setup_data.dow_dom; maxValue1 = 31; minValue1 = 1; break;
+        case ALARM_ON_OFF:  alarm_setup_data.on_off = !alarm_setup_data.on_off;                   break;
         default: break;
       }
 
-      if (system_state.param_select == SET_ON_OFF)
+      if (system_state.alarm_setup_cursor == ALARM_ON_OFF)
       {
         break;
       }
 
-      // Initialize the start tick for button 1 hold detection
-      uint32_t startTick1 = 0;
-      
       // Check if the button is pressed or held
       if (button->press_flag) 
       {
@@ -1598,58 +1535,59 @@ void System_Alarm_Setup_Mode_Handle (BUTTON_DATA *button)
           *paramPtr1 = (*paramPtr1 < maxValue1) ? (*paramPtr1 + 1) : minValue1;
         }
       }
-      else if (button->hold_flag) 
-      {
-        // If the button is held down, increment the parameter value continuously
-        if (HAL_GetTick() - startTick1 >= BUTTON_HOLD_CYCLE) 
-        {
-          // Increment the selected parameter value continuously
-          if (paramPtr1) 
-          {
-            // Increment the parameter value, wrapping around if necessary
-            *paramPtr1 = (*paramPtr1 < maxValue1) ? (*paramPtr1 + 1) : minValue1;
-          }
-        }
+      // else if (button->hold_flag) 
+      // {
+      //   // Initialize the start tick for button 1 hold detection
+      //   uint32_t startTick1 = 0;   
+        
+      //   // If the button is held down, increment the parameter value continuously
+      //   if (HAL_GetTick() - startTick1 >= BUTTON_HOLD_CYCLE) 
+      //   {
+      //     // Increment the selected parameter value continuously
+      //     if (paramPtr1) 
+      //     {
+      //       // Increment the parameter value, wrapping around if necessary
+      //       *paramPtr1 = (*paramPtr1 < maxValue1) ? (*paramPtr1 + 1) : minValue1;
+      //     }
+      //   }
 
-        // Update the start tick for the next hold cycle
-        startTick1 = HAL_GetTick();
-      } 
+      //   // Update the start tick for the next hold cycle
+      //   startTick1 = HAL_GetTick();
+      // } 
       break;
 
-      case 2: // BTN2: Decrement current value or scroll slots
-      {
+      // Button 1: If pressed, decrement the selected parameter; if held, do nothing (reserved for future use)
+      case 1: 
         // Pointer to the selected parameter, its maximum value, and minimum value
         uint8_t *paramPtr2 = NULL;
         uint8_t maxValue2 = 0;    
         uint8_t minValue2 = 0;  
 
         // Determine the parameter to decrement based on the current selection
-        switch (system_state.param_select)
+        switch (system_state.alarm_setup_cursor)
         {
-          case SET_MINUTE:  paramPtr2 = &system_param_data.minute;  maxValue2 = 59; minValue2 = 0; break;
-          case SET_HOUR:    paramPtr2 = &system_param_data.hour;    maxValue2 = 23; minValue2 = 0; break;
-          case SET_DY_DT:   paramPtr2 = (uint8_t *)&system_param_data.dy_dt; maxValue2 = 2; minValue2 = 0; break;
-          case SET_DOW_DOM: paramPtr2 = &system_param_data.dow_dom; maxValue2 = 31; minValue2 = 1; break;
-          case SET_ON_OFF:  system_param_data.on_off = !system_param_data.on_off;                  break;
+          case ALARM_MINUTE:  paramPtr2 = &alarm_setup_data.minute;  maxValue2 = 59; minValue2 = 0; break;
+          case ALARM_HOUR:    paramPtr2 = &alarm_setup_data.hour;    maxValue2 = 23; minValue2 = 0; break;
+          case ALARM_DY_DT:   paramPtr2 = (uint8_t *)&alarm_setup_data.dy_dt; maxValue2 = 2; minValue2 = 0; break;
+          case ALARM_DOW_DOM: paramPtr2 = &alarm_setup_data.dow_dom; maxValue2 = 31; minValue2 = 1; break;
+          case ALARM_ON_OFF:  alarm_setup_data.on_off = !alarm_setup_data.on_off;                  break;
           default: break;
         }
 
-        if (system_state.param_select == SET_ON_OFF)
+        // Check if the selected parameter is ON/OFF
+        if (system_state.alarm_setup_cursor == ALARM_ON_OFF)
         {
           break;
         }
-
-        // Initialize the start tick for button 2 hold detection
-        uint32_t startTick2 = 0;
 
         // Check if the button is pressed or held
         if (button->press_flag) 
         {
           // Check if the selected parameter is ON/OFF
-          if (system_state.param_select == SET_ON_OFF) 
+          if (system_state.alarm_setup_cursor == ALARM_ON_OFF)
           {
             // Toggle the on/off state of the alarm
-            system_param_data.on_off = !system_param_data.on_off;
+            alarm_setup_data.on_off = !alarm_setup_data.on_off;
           } 
           // Else, decrement the selected parameter value once for a button press
           else 
@@ -1662,56 +1600,41 @@ void System_Alarm_Setup_Mode_Handle (BUTTON_DATA *button)
             }
           }
         }
-        else if (button->hold_flag) 
-        {
-          // If the button is held down, decrement the parameter value continuously
-          if (HAL_GetTick() - startTick2 >= BUTTON_HOLD_CYCLE) 
-          {
-            // Check if the selected parameter is ON/OFF
-            if (system_state.param_select == SET_ON_OFF) 
-            {
-              // Toggle the on/off state of the alarm
-              system_param_data.on_off = !system_param_data.on_off;
-            } 
-            // Else, decrement the selected parameter value continuously
-            else 
-            {
-              // Decrement the selected parameter value continuously
-              if (paramPtr2) 
-              {
-                // Decrement the parameter value, wrapping around if necessary
-                *paramPtr2 = (*paramPtr2 > minValue2) ? (*paramPtr2 - 1) : maxValue2;
-              }
-            }
+        // else if (button->hold_flag) 
+        // {
+        //   // Initialize the start tick for button 2 hold detection
+        //   uint32_t startTick2 = 0;
 
-            // Update the start tick for the next hold cycle
-            startTick2 = HAL_GetTick();
-          }
-        } 
+        //   // If the button is held down, decrement the parameter value continuously
+        //   if (HAL_GetTick() - startTick2 >= BUTTON_HOLD_CYCLE) 
+        //   {
+        //     // Check if the selected parameter is ON/OFF
+        //     if (system_state.time_setup_cursor == SET_ON_OFF) 
+        //     {
+        //       // Toggle the on/off state of the alarm
+        //       system_param_data.on_off = !system_param_data.on_off;
+        //     } 
+        //     // Else, decrement the selected parameter value continuously
+        //     else 
+        //     {
+        //       // Decrement the selected parameter value continuously
+        //       if (paramPtr2) 
+        //       {
+        //         // Decrement the parameter value, wrapping around if necessary
+        //         *paramPtr2 = (*paramPtr2 > minValue2) ? (*paramPtr2 - 1) : maxValue2;
+        //       }
+        //     }
 
+        //     // Update the start tick for the next hold cycle
+        //     startTick2 = HAL_GetTick();
+        //   }
+        // } 
         break;
-      }
     
-    // Button 3: If pressed, move to the next field; if held, save the alarm and return to default mode
-    case 3:
-      // If the button is pressed, move to the next parameter field, wrapping around if necessary  
+    // Button 2: If pressed, save the alarm and return to default mode; if held, do nothing (reserved for future use)
+    case 2:
+      // If the button is pressed, save the alarm and return to default mode 
       if (button->press_flag)
-      {
-        if      (system_state.param_select == SET_HOUR)
-        {
-          system_state.param_select = SET_DY_DT;
-        }
-        else if (system_state.param_select == SET_ON_OFF)
-        {
-          system_state.param_select = SET_MINUTE;
-        }
-        else
-        {
-          system_state.param_select += 1;
-        }
-      }  
-      // If the button is held down, save the alarm and return to default mode
-      else if (button->hold_flag && !button->latch) 
       {
         // If the previous mode is Alarm View Mode
         // Use the system cursor instead to keep the alarm slot pointer unchanged
@@ -1722,16 +1645,16 @@ void System_Alarm_Setup_Mode_Handle (BUTTON_DATA *button)
           Alarm_Set
           (
             0,  
-            system_param_data.minute,
-            system_param_data.hour,
-            system_param_data.dow_dom,
-            system_param_data.dy_dt,
-            system_param_data.on_off,
-            system_state.cursor         // Save the alarm at the address where the cursor points at in Alarm View Mode
+            alarm_setup_data.minute,
+            alarm_setup_data.hour,
+            alarm_setup_data.dow_dom,
+            alarm_setup_data.dy_dt,
+            alarm_setup_data.on_off,
+            system_state.alarm_view_cursor         // Save the alarm at the address where the cursor points at in Alarm View Mode
           );
 
           // Update the newly set alarm data
-          Alarm_Get(system_state.cursor, &alarm_get_data[system_state.cursor]);
+          Alarm_Get(system_state.alarm_view_cursor, &alarm_get_data[system_state.alarm_view_cursor]);
         }
         else
         {
@@ -1740,11 +1663,11 @@ void System_Alarm_Setup_Mode_Handle (BUTTON_DATA *button)
           Alarm_Set
           (
             0,  
-            system_param_data.minute,
-            system_param_data.hour,
-            system_param_data.dow_dom,
-            system_param_data.dy_dt,
-            system_param_data.on_off,
+            alarm_setup_data.minute,
+            alarm_setup_data.hour,
+            alarm_setup_data.dow_dom,
+            alarm_setup_data.dy_dt,
+            alarm_setup_data.on_off,
             alarm_slot_ptr              // Pointer to the next available slot in the EEPROM module
           );
 
@@ -1757,49 +1680,120 @@ void System_Alarm_Setup_Mode_Handle (BUTTON_DATA *button)
           // Save the alarm pointer data to the EEPROM module
           Alarm_Slot_Pointer_Set();
         }
+      }
 
-        // Reset the button latch to avoid function replication
-        button->latch = true;
+      // If the button is held down, do nothing (reserved for future use)
+      else if (button->hold_flag) 
+      {
+        // Reserved
       }
       break;
 
-    case 4: // BTN4: Go back to previous field
-      if      (button->press_flag) 
+    // Button 3: If pressed, move to the next field; if held, do nothing (reserved for future use)
+    case 3:
+      // If the button is pressed, move to the next parameter field, wrapping around if necessary  
+      if (button->press_flag)
       {
-        if      (system_state.param_select == SET_DY_DT)
-        {
-          system_state.param_select = SET_HOUR;
-        }
-        else if (system_state.param_select == SET_MINUTE)
-        {
-          system_state.param_select = SET_ON_OFF;
-        }
-        else
-        {
-          system_state.param_select -= 1;
-        }                   
-      }
-      else if (button->hold_flag)
-      {
-        // Clear all alarms in the EEPROM module
-        for (int i = 0; i < alarm_slot_ptr; i++)
-        {
-          Alarm_Clear(i);
-          Alarm_Get(i, &alarm_get_data[i]);
-        }
+        system_state.alarm_setup_cursor = (system_state.alarm_setup_cursor == ALARM_ON_OFF) ? ALARM_MINUTE : (system_state.alarm_setup_cursor + 1);
+      }  
+      // // If the button is held down, save the alarm and return to default mode
+      // else if (button->hold_flag && !button->latch) 
+      // {
+      //   // If the previous mode is Alarm View Mode
+      //   // Use the system cursor instead to keep the alarm slot pointer unchanged
+      //   if (system_state.past_mode == ALARM_VIEW_MODE)
+      //   {
+      //     // Save the alarm to EEPROM and return to Default Mode
+      //     //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_DY_DT_MODE dy_dt, uint8_t on_off, uint8_t slot)
+      //     Alarm_Set
+      //     (
+      //       0,  
+      //       system_param_data.minute,
+      //       system_param_data.hour,
+      //       system_param_data.dow_dom,
+      //       system_param_data.dy_dt,
+      //       system_param_data.on_off,
+      //       system_state.cursor         // Save the alarm at the address where the cursor points at in Alarm View Mode
+      //     );
 
-        // Reset the alarm slot pointer
-        alarm_slot_ptr = 0;
-        Alarm_Slot_Pointer_Set();
+      //     // Update the newly set alarm data
+      //     Alarm_Get(system_state.cursor, &alarm_get_data[system_state.cursor]);
+      //   }
+      //   else
+      //   {
+      //     // Save the alarm to EEPROM and return to Default Mode
+      //     //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_DY_DT_MODE dy_dt, uint8_t on_off, uint8_t slot)
+      //     Alarm_Set
+      //     (
+      //       0,  
+      //       system_param_data.minute,
+      //       system_param_data.hour,
+      //       system_param_data.dow_dom,
+      //       system_param_data.dy_dt,
+      //       system_param_data.on_off,
+      //       alarm_slot_ptr              // Pointer to the next available slot in the EEPROM module
+      //     );
+
+      //     // Update the newly set alarm data
+      //     Alarm_Get(alarm_slot_ptr, &alarm_get_data[alarm_slot_ptr]);
+          
+      //     // Increment the pointer to the next available slot in the EEPROM module
+      //     alarm_slot_ptr = (alarm_slot_ptr < ALARM_SLOT_NUM) ? (alarm_slot_ptr + 1) : 0;
+
+      //     // Save the alarm pointer data to the EEPROM module
+      //     Alarm_Slot_Pointer_Set();
+      //   }
+
+      //   // Reset the button latch to avoid function replication
+      //   button->latch = true;
+      // }
+      break;
+    
+    // Button 4: If pressed, cycle through the system modes; if held, do nothing (reserved for future use)
+    case 4:
+      // If pressed, cycle through the time system modes, but the temporary setting data is still retained (avoid accidental press)
+      if (button->press_flag)
+      {
+        // system_state.mode = (system_state.mode < (SYSTEM_MODE_NUM - 1)) ? (system_state.mode + 1) : 0;
+        
+        // Cycle through the next system mode
+        system_state.mode = ALARM_VIEW_MODE;
+
+        // Reset the cursor for the Alarm View mode
+        system_state.alarm_view_cursor = 0; 
+
+        // Set the system past mode to alarm setup mode
+        system_state.past_mode = ALARM_SETUP_MODE;
       }
+      
+      // // If held, set the mode to default, 
+      // // and refresh the system parameters to current time values and default settings for convenience
+      // else if (button->hold_flag && !button->latch)
+      // {
+      //   system_state.mode = DEFAULT_MODE; 
+      //   button->latch = true;
+
+      //   // Set the initial system parameters to current time values and default settings for convenience
+      //   system_param_data =
+      //   (SYSTEM_PARAM_DATA)
+      //   {
+      //     time_get_data.minute,       // Minutes: 0-59
+      //     time_get_data.hour,         // Hours: 0-23
+      //     time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+      //     time_get_data.dateofmonth,  // Date of the month: 1-31
+      //     time_get_data.month,        // Month: 1-12
+      //     time_get_data.year,         // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
+      //     NOT_USED_MODE,              // Select: DAY_OF_WEEK_MODE, DATE_OF_MONTH_MODE, NOT_USED_MODE
+      //     time_get_data.dayofweek,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31
+      //     true                        // true = ON, false = OFF
+      //   };
+      // }
       break;
 
     default:
       // Reserved for future use
       break;
   }
-
-  system_state.past_mode = ALARM_ACTIVE_MODE;
 }
 
 /**
@@ -1809,32 +1803,161 @@ void System_Alarm_Setup_Mode_Handle (BUTTON_DATA *button)
  */
 void System_Alarm_View_Mode_Handle (BUTTON_DATA *button)
 { 
-  // Initially reset system cursor
-  system_state.cursor = 0;
-  
   // Handle button actions in alarm view mode
   switch (button->index) 
   {
-    // Button 0: If pressed, cycle through the time setup fields; if held, set the mode to default
+    // Button 0: If pressed, increment the selection cursor; if held, do nothing (reserved for future use)
     case 0:
-      // If pressed, cycle through the time setup fields
-      if (button->press_flag)
+      if      (button->press_flag)
       {
-        system_state.mode = (system_state.mode < (SYSTEM_MODE_NUM - 1)) ? (system_state.mode + 1) : 0;
+        system_state.alarm_view_cursor = (system_state.alarm_view_cursor == ALARM_VIEW_CURSOR_MAX) ? 0 : (system_state.alarm_view_cursor + 1);
       }
-      // If held, set the mode to default
-      else if (button->hold_flag && !button->latch)
+      else if (button->hold_flag)
       {
-        system_state.mode = DEFAULT_MODE; 
-        button->latch = true;
+        // Reserved
       }
       break;
 
-    // Button 1: If pressed, increment the selection cursor
+    // Button 1: If pressed, decrement the selection cursor; if held, do nothing (reserved for future use)
     case 1:
       if      (button->press_flag)
       {
-        system_state.cursor = (system_state.cursor < (SYSTEM_CURSOR_MAX - 1)) ? (system_state.cursor + 1) : 0;
+        system_state.alarm_view_cursor = (system_state.alarm_view_cursor == 0) ? ALARM_VIEW_CURSOR_MAX : (system_state.alarm_view_cursor - 1);
+      }
+      else if (button->hold_flag)
+      {
+        // Reserved
+      }
+      break;
+    
+    // Button 2: If pressed, toggle ON/OFF; if held, do nothing (reserved for future use)
+    case 2:
+      if      (button->press_flag)
+      {
+        // Retrieve the selected alarm data to system parameter data
+        alarm_setup_data.minute  = alarm_get_data[system_state.alarm_view_cursor].minute;
+        alarm_setup_data.hour    = alarm_get_data[system_state.alarm_view_cursor].hour;
+        alarm_setup_data.dy_dt   = alarm_get_data[system_state.alarm_view_cursor].dy_dt;
+        alarm_setup_data.dow_dom = alarm_get_data[system_state.alarm_view_cursor].dow_dom;
+        alarm_setup_data.on_off  = alarm_get_data[system_state.alarm_view_cursor].on_off;
+
+        // Toggle ON/OFF data
+        alarm_setup_data.on_off = !alarm_setup_data.on_off;
+
+        // Save the modified alarm to the EEPROM module
+        //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_DY_DT_MODE dy_dt, uint8_t on_off, uint8_t slot)
+        Alarm_Set
+        (
+          0,  
+          alarm_setup_data.minute,
+          alarm_setup_data.hour,
+          alarm_setup_data.dow_dom,
+          alarm_setup_data.dy_dt,
+          alarm_setup_data.on_off,
+          system_state.alarm_view_cursor   
+        );
+
+        // Update the newly set alarm data
+        Alarm_Get(system_state.alarm_view_cursor, &alarm_get_data[system_state.alarm_view_cursor]);
+      }
+      // else if (button->hold_flag)
+      // {
+      //   // Retrieve the selected alarm data to system parameter data
+      //   system_param_data.minute  = alarm_get_data[system_state.cursor].minute;
+      //   system_param_data.hour    = alarm_get_data[system_state.cursor].hour;
+      //   system_param_data.dy_dt   = alarm_get_data[system_state.cursor].dy_dt;
+      //   system_param_data.dow_dom = alarm_get_data[system_state.cursor].dow_dom;
+      //   system_param_data.on_off  = alarm_get_data[system_state.cursor].on_off;
+
+      //   // System switches to Alarm Setup Mode
+      //   system_state.mode = ALARM_SETUP_MODE;
+      // }
+      break;
+
+    // Button 3: If pressed, enter Alarm Setup Mode with selected alarm data preloaded (for editing); if held, do nothing (reserved for future use)
+    case 3: 
+      if      (button->press_flag)
+      {
+        // Retrieve the selected alarm data to system parameter data
+        alarm_setup_data.minute  = alarm_get_data[system_state.alarm_view_cursor].minute;
+        alarm_setup_data.hour    = alarm_get_data[system_state.alarm_view_cursor].hour;
+        alarm_setup_data.dy_dt   = alarm_get_data[system_state.alarm_view_cursor].dy_dt;
+        alarm_setup_data.dow_dom = alarm_get_data[system_state.alarm_view_cursor].dow_dom;
+        alarm_setup_data.on_off  = alarm_get_data[system_state.alarm_view_cursor].on_off;
+
+        // System switches to Alarm Setup Mode
+        system_state.mode = ALARM_SETUP_MODE;
+
+        // Set the system past mode to alarm view mode
+        system_state.past_mode = ALARM_VIEW_MODE;
+      }
+      // else if (button->hold_flag)
+      // {
+      //   // Clear current alarm
+      //   Alarm_Clear(system_state.cursor);
+
+      //   // Update alarm data
+      //   Alarm_Get(system_state.cursor, &alarm_get_data[system_state.cursor]);
+      // }
+      break;
+
+    // Button 4: If pressed, cycle through the time setup fields; if held, do nothing (reserved for future use)
+    case 4:
+      // If pressed, cycle to the next system mode
+      if (button->press_flag)
+      {
+        // Cycle through the next system mode
+        system_state.mode = SYSTEM_OPTIONS_MODE;
+        
+        // Set the system past mode to alarm view mode
+        system_state.past_mode = ALARM_VIEW_MODE;
+      }
+      // // If held, set the mode to default
+      // else if (button->hold_flag && !button->latch)
+      // {
+      //   system_state.mode = DEFAULT_MODE; 
+      //   button->latch = true;
+      // }
+      break;
+
+    default: 
+      break;
+  }
+}
+
+/**
+ * @brief  Handles the system options mode based on button actions.
+ * @param  button: Pointer to the BUTTON structure containing button state and index.
+ * @retval None
+ */
+void System_Options_Mode_Handle (BUTTON_DATA *button)
+{
+  switch (button->index) 
+  {
+    // Button 4: If pressed, cycle through the time setup fields; if held, do nothing (reserved for future use)
+    case 4:
+      // If pressed, cycle through the next system mode
+      if      (button->press_flag)
+      {
+        // system_state.mode = (system_state.mode < (SYSTEM_MODE_NUM - 1)) ? (system_state.mode + 1) : 0;
+
+        // Cycle through the next system mode
+        system_state.mode = DEFAULT_MODE;
+
+        // Set the system past mode to system options mode
+        system_state.past_mode = SYSTEM_OPTIONS_MODE;
+      }
+      // // If held, set the mode to default
+      // else if (button->hold_flag)
+      // {
+      //   system_state.mode = DEFAULT_MODE;
+      // }
+      break;
+
+    case 0:
+      if      (button->press_flag)
+      {
+        system_state.system_opt_cursor = (system_state.system_opt_cursor == SYSTEM_OPT_CURSOR_MAX) ? 0 : (system_state.system_opt_cursor + 1);
       }
       else if (button->hold_flag)
       {
@@ -1842,11 +1965,10 @@ void System_Alarm_View_Mode_Handle (BUTTON_DATA *button)
       }
       break;
 
-    // Button 2: If pressed, decrement the selection cursor
-    case 2:
+    case 1:
       if      (button->press_flag)
       {
-        system_state.cursor = (system_state.cursor > 0) ? (system_state.cursor - 1) : SYSTEM_CURSOR_MAX;
+        system_state.system_opt_cursor = (system_state.system_opt_cursor == 0) ? SYSTEM_OPT_CURSOR_MAX : (system_state.system_opt_cursor - 1);
       }
       else if (button->hold_flag)
       {
@@ -1854,63 +1976,25 @@ void System_Alarm_View_Mode_Handle (BUTTON_DATA *button)
       }
       break;
     
-    // Button 3: If pressed, toggle ON/OFF; if held, enter Alarm Setup Mode with selected alarm data preloaded (for editing)
-    case 3:
+    case 2:
       if      (button->press_flag)
       {
-        // Retrieve the selected alarm data to system parameter data
-        system_param_data.minute  = alarm_get_data[system_state.cursor].minute;
-        system_param_data.hour    = alarm_get_data[system_state.cursor].hour;
-        system_param_data.dy_dt   = alarm_get_data[system_state.cursor].dy_dt;
-        system_param_data.dow_dom = alarm_get_data[system_state.cursor].dow_dom;
-        system_param_data.on_off  = alarm_get_data[system_state.cursor].on_off;
 
-        // Toggle ON/OFF data
-        system_param_data.on_off = !system_param_data.on_off;
-
-        // Save the modified alarm to the EEPROM module
-        //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_DY_DT_MODE dy_dt, uint8_t on_off, uint8_t slot)
-        Alarm_Set
-        (
-          0,  
-          system_param_data.minute,
-          system_param_data.hour,
-          system_param_data.dow_dom,
-          system_param_data.dy_dt,
-          system_param_data.on_off,
-          system_state.cursor   
-        );
-
-        // Update the newly set alarm data
-        Alarm_Get(system_state.cursor, &alarm_get_data[system_state.cursor]);
       }
       else if (button->hold_flag)
       {
-        // Retrieve the selected alarm data to system parameter data
-        system_param_data.minute  = alarm_get_data[system_state.cursor].minute;
-        system_param_data.hour    = alarm_get_data[system_state.cursor].hour;
-        system_param_data.dy_dt   = alarm_get_data[system_state.cursor].dy_dt;
-        system_param_data.dow_dom = alarm_get_data[system_state.cursor].dow_dom;
-        system_param_data.on_off  = alarm_get_data[system_state.cursor].on_off;
 
-        // System switches to Alarm Setup Mode
-        system_state.mode = ALARM_SETUP_MODE;
       }
       break;
 
-    // Button 4: If held, clear current alarm
-    case 4: 
+    case 3: 
       if      (button->press_flag)
       {
 
       }
       else if (button->hold_flag)
       {
-        // Clear current alarm
-        Alarm_Clear(system_state.cursor);
 
-        // Update alarm data
-        Alarm_Get(system_state.cursor, &alarm_get_data[system_state.cursor]);
       }
       break;
 
@@ -1918,7 +2002,8 @@ void System_Alarm_View_Mode_Handle (BUTTON_DATA *button)
       break;
   }
 
-  system_state.past_mode = ALARM_VIEW_MODE;
+  // Set the system past mode to system options mode
+  system_state.past_mode = SYSTEM_OPTIONS_MODE;
 }
 
 /**
@@ -1931,19 +2016,19 @@ void System_Alarm_Active_Mode_Handle (BUTTON_DATA *button)
   // Handle button actions in alarm active mode
   switch (button->index) 
   {
-    // Button 0: If pressed, cycle through the time setup fields; if held, set the mode to default
-    case 0:
+    // Button 4: If pressed, cycle through the time setup fields; if held, do nothing (reserved for future use)
+    case 4:
       // If pressed, cycle through the time setup fields
       if (button->press_flag)
       {
         system_state.mode = (system_state.mode < (SYSTEM_MODE_NUM - 1)) ? (system_state.mode + 1) : 0;
       }
-      // If held, set the mode to default
-      else if (button->hold_flag && !button->latch)
-      {
-        system_state.mode = DEFAULT_MODE; 
-        button->latch = true;
-      }
+      // // If held, set the mode to default
+      // else if (button->hold_flag && !button->latch)
+      // {
+      //   system_state.mode = DEFAULT_MODE; 
+      //   button->latch = true;
+      // }
       break;
 
     case 1:
@@ -1979,7 +2064,7 @@ void System_Alarm_Active_Mode_Handle (BUTTON_DATA *button)
       }
       break;
 
-    case 4: 
+    case 0: 
       if      (button->press_flag)
       {
 
@@ -1994,83 +2079,8 @@ void System_Alarm_Active_Mode_Handle (BUTTON_DATA *button)
       break;
   }
 
+  // Set the system past mode to alarm active mode
   system_state.past_mode = ALARM_ACTIVE_MODE;
-}
-
-/**
- * @brief  Handles the system options mode based on button actions.
- * @param  button: Pointer to the BUTTON structure containing button state and index.
- * @retval None
- */
-void System_Options_Mode_Handle (BUTTON_DATA *button)
-{
-  // Handle button actions in system options mode
-  switch (button->index) 
-  {
-    // Button 0: If pressed, cycle through the time setup fields; if held, set the mode to default
-    case 0:
-      // If pressed, cycle through the time setup fields
-      if      (button->press_flag)
-      {
-        system_state.mode = (system_state.mode < (SYSTEM_MODE_NUM - 1)) ? (system_state.mode + 1) : 0;
-      }
-
-      // If held, set the mode to default
-      else if (button->hold_flag)
-      {
-        system_state.mode = DEFAULT_MODE;
-      }
-      break;
-
-    case 1:
-      if      (button->press_flag)
-      {
-
-      }
-      else if (button->hold_flag)
-      {
-
-      }
-      break;
-
-    case 2:
-      if      (button->press_flag)
-      {
-
-      }
-      else if (button->hold_flag)
-      {
-
-      }
-      break;
-    
-    case 3:
-      if      (button->press_flag)
-      {
-
-      }
-      else if (button->hold_flag)
-      {
-
-      }
-      break;
-
-    case 4: 
-      if      (button->press_flag)
-      {
-
-      }
-      else if (button->hold_flag)
-      {
-
-      }
-      break;
-
-    default: 
-      break;
-  }
-
-  system_state.past_mode = SYSTEM_OPTIONS_MODE;
 }
 
 /**

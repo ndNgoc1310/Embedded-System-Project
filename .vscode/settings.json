@@ -2,7 +2,8 @@
     "C_Cpp.errorSquiggles": "disabled",
     "C_Cpp.default.compilerPath": "d:\\OneDrive\\BKLearning\\Git\\Github Desktop\\Embedded-System-Project\\Program\\Core\\Src\\main.c",
     "files.associations": {
-        "string.h": "c"
+        "string.h": "c",
+        "stdio.h": "c"
     },
     "stm32-for-vscode.openOCDPath": false,
     "stm32-for-vscode.makePath": false,
