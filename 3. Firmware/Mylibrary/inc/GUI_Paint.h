@@ -190,48 +190,134 @@ typedef enum {
     ALARM_ACTIVE_MODE,
     SYSTEM_OPTIONS_MODE
   } SYSTEM_MODE;
-extern SYSTEM_MODE sSystem_mode;
+  extern SYSTEM_MODE sSystem_mode;
+  // flag system to detect
+  typedef struct 
+{
+  uint8_t flag_DEFAULT_MODE;
+  uint8_t flag_TIME_SETUP_MODE;
+  uint8_t flag_ALARM_VIEW_MODE;
+  uint8_t flag_ALARM_SETUP_MODE;
+  uint8_t flag_SYSTEM_SETUP_MODE;
+} FLAG_SYSTEM;
+extern FLAG_SYSTEM flag_sSystem_mode;
 /*Time alarm setup mode */
+// ALARM_DY_DT_MODE
+typedef enum
+{
+  DAY_OF_WEEK_MODE,
+  DATE_OF_MONTH_MODE,
+  NOT_USED_MODE
+} ALARM_DY_DT_MODE;
 // struct parameter
 typedef struct
 {
   uint8_t           second;   // Seconds: 0-59
   uint8_t           minute;   // Minutes: 0-59
   uint8_t           hour;     // Hours: 0-23
-  uint8_t           dow;      // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31
-  uint8_t           dom;      // Date of the month: 1-31, or Day of the week: 1-7, or not used: 0
-  uint8_t           month;    // Month: 1-12
-  uint8_t           year;     // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
+  ALARM_DY_DT_MODE  dy_dt; 
+  uint8_t           dow_dom;      // Date of the month: 1-31, or Day of the week: 1-7, or not used: 0
   bool              on_off;   // true = ON, false = OFF
-} SYSTEM_PARAM_DATA_ALARM_SETUP_MODE;
+} ALARM_DATA_SETUP_MODE;
 
-extern SYSTEM_PARAM_DATA_ALARM_SETUP_MODE sParam_data_alarm_setup_mode_1;
-extern SYSTEM_PARAM_DATA_ALARM_SETUP_MODE sParam_data_alarm_setup_mode_2;
-extern SYSTEM_PARAM_DATA_ALARM_SETUP_MODE sParam_data_alarm_setup_mode_3;
-extern SYSTEM_PARAM_DATA_ALARM_SETUP_MODE sParam_data_alarm_setup_mode_4;
-extern SYSTEM_PARAM_DATA_ALARM_SETUP_MODE sParam_data_alarm_setup_mode_5;
-extern SYSTEM_PARAM_DATA_ALARM_SETUP_MODE sParam_data_alarm_setup_mode_6;
-extern SYSTEM_PARAM_DATA_ALARM_SETUP_MODE sParam_data_alarm_setup_mode_7;
-extern SYSTEM_PARAM_DATA_ALARM_SETUP_MODE sParam_data_alarm_setup_mode_8;
-extern SYSTEM_PARAM_DATA_ALARM_SETUP_MODE sParam_data_alarm_setup_mode_9;
-extern SYSTEM_PARAM_DATA_ALARM_SETUP_MODE sParam_data_alarm_setup_mode_10;
+extern ALARM_DATA_SETUP_MODE sParam_data_alarm_setup_mode_1;
+extern ALARM_DATA_SETUP_MODE sParam_data_alarm_setup_mode_2;
+extern ALARM_DATA_SETUP_MODE sParam_data_alarm_setup_mode_3;
+extern ALARM_DATA_SETUP_MODE sParam_data_alarm_setup_mode_4;
+extern ALARM_DATA_SETUP_MODE sParam_data_alarm_setup_mode_5;
+extern ALARM_DATA_SETUP_MODE sParam_data_alarm_setup_mode_6;
+extern ALARM_DATA_SETUP_MODE sParam_data_alarm_setup_mode_7;
+extern ALARM_DATA_SETUP_MODE sParam_data_alarm_setup_mode_8;
+extern ALARM_DATA_SETUP_MODE sParam_data_alarm_setup_mode_9;
+extern ALARM_DATA_SETUP_MODE sParam_data_alarm_setup_mode_10;
 // system view
 typedef struct 
 {
-    SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *sParam_data_alarm_setup_mode_1;
-    SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *sParam_data_alarm_setup_mode_2;
-    SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *sParam_data_alarm_setup_mode_3;
-    SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *sParam_data_alarm_setup_mode_4;
-    SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *sParam_data_alarm_setup_mode_5;
-    SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *sParam_data_alarm_setup_mode_6;
-    SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *sParam_data_alarm_setup_mode_7;
-    SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *sParam_data_alarm_setup_mode_8;
-    SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *sParam_data_alarm_setup_mode_9;
-    SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *sParam_data_alarm_setup_mode_10;
+    ALARM_DATA_SETUP_MODE *sParam_data_alarm_setup_mode_1;
+    ALARM_DATA_SETUP_MODE *sParam_data_alarm_setup_mode_2;
+    ALARM_DATA_SETUP_MODE *sParam_data_alarm_setup_mode_3;
+    ALARM_DATA_SETUP_MODE *sParam_data_alarm_setup_mode_4;
+    ALARM_DATA_SETUP_MODE *sParam_data_alarm_setup_mode_5;
+    ALARM_DATA_SETUP_MODE *sParam_data_alarm_setup_mode_6;
+    ALARM_DATA_SETUP_MODE *sParam_data_alarm_setup_mode_7;
+    ALARM_DATA_SETUP_MODE *sParam_data_alarm_setup_mode_8;
+    ALARM_DATA_SETUP_MODE *sParam_data_alarm_setup_mode_9;
+    ALARM_DATA_SETUP_MODE *sParam_data_alarm_setup_mode_10;
 } SYSTEM_PARAM_DATA_ALARM_VIEW_MODE;
 
 extern SYSTEM_PARAM_DATA_ALARM_VIEW_MODE sParam_data_alarm_view_mode;
 
+// Time set up
+typedef struct 
+{
+	uint8_t second;       // Seconds: 0-59
+	uint8_t minute;       // Minutes: 0-59
+	uint8_t hour;         // Hours: 0-23    
+	uint8_t dayofweek;    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+	uint8_t dateofmonth;  // Date of the month: 1-31
+	uint8_t month;        // Month: 1-12
+	uint8_t year;         // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
+} TIME_DATA;
+extern TIME_DATA time_get_data;
+// TIME SET UP
+typedef struct
+{
+  uint8_t           minute;   // Minutes: 0-59
+  uint8_t           hour;     // Hours: 0-23
+  uint8_t           dow;      // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31
+  uint8_t           dom;      // Date of the month: 1-31, or Day of the week: 1-7, or not used: 0
+  uint8_t           month;    // Month: 1-12
+  uint8_t           year;     // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
+} TIME_SETUP_DATA;
+extern TIME_SETUP_DATA time_setup_data;
+// TIme set cursor
+typedef enum
+{
+  TIME_MINUTE,   // Set minutes value
+  TIME_HOUR,     // Set hours value
+  TIME_DOW,      // Set day of the week value
+  TIME_DOM,      // Set date of the month value
+  TIME_MONTH,    // Set month value
+  TIME_YEAR,     // Set year value
+} TIME_SETUP_CURSOR;
+// ALARM SETUP CURSOR
+typedef enum
+{
+  ALARM_MINUTE,   // Set minutes value
+  ALARM_HOUR,     // Set hours value
+  ALARM_DY_DT,    // Set day of week or date of month (1 = day of week, 0 = date of month, 2 = not used)
+  ALARM_DOW_DOM,  // Set day of the week or date of the month value
+  ALARM_ON_OFF,   // Set ON/OFF state
+} ALARM_SETUP_CURSOR;
+// SYSTEM_OPT_CURSOR
+typedef enum
+{
+  CLEAR_ALL_ALARM,
+  CONTRIBUTOR_INFO,
+} SYSTEM_OPT_CURSOR;
+
+// SYSTEM STATE
+typedef struct
+{
+  SYSTEM_MODE         mode;               // Current system mode
+  SYSTEM_MODE         past_mode;          // Previous system mode
+  TIME_SETUP_CURSOR   time_setup_cursor;  // Cursor of selection for Time Setup Mode
+  ALARM_SETUP_CURSOR  alarm_setup_cursor; // Cursor of selection for Alarm Setup Mode
+  uint8_t             alarm_view_cursor;  // Cursor of selection for Alarm View Mode
+  SYSTEM_OPT_CURSOR   system_opt_cursor;  // Cursor of selection for System Options Mode
+  uint8_t             battery_display;    // Battery percentage to be displayed: 100, 75, 50, 25, 0
+} SYSTEM_STATE;
+extern SYSTEM_STATE system_state;
+// ALARM_SETUP_DATA
+typedef struct
+{
+  uint8_t           minute;   // Minutes: 0-59
+  uint8_t           hour;     // Hours: 0-23
+  ALARM_DY_DT_MODE  dy_dt;    // Select: DAY_OF_WEEK_MODE, DATE_OF_MONTH_MODE, NOT_USED_MODE
+  uint8_t           dow_dom;  // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31
+  bool              on_off;   // true = ON, false = OFF
+} ALARM_SETUP_DATA;
+extern ALARM_SETUP_DATA alarm_setup_data;
 //init and Clear
 void Paint_NewImage(UBYTE *image, UWORD Width, UWORD Height, UWORD Rotate, UWORD Color);
 void Paint_SelectImage(UBYTE *image);

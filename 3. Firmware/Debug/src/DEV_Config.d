@@ -1,6 +1,6 @@
 src/DEV_Config.o: \
- C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/src/DEV_Config.c \
- C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/DEV_Config.h \
+ C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/src/DEV_Config.c \
+ C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/DEV_Config.h \
  ../Core/Inc/main.h ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  ../Core/Inc/stm32f1xx_hal_conf.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
@@ -28,7 +28,7 @@ src/DEV_Config.o: \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/DEV_Config.h:
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/DEV_Config.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 ../Core/Inc/stm32f1xx_hal_conf.h:

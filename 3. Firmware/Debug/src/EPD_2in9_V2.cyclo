@@ -1,19 +1,19 @@
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:130:13:EPD_2IN9_V2_Reset	1
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:145:13:EPD_2IN9_V2_SendCommand	1
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:158:13:EPD_2IN9_V2_SendData	1
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:170:6:EPD_2IN9_V2_ReadBusy	2
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:183:13:EPD_2IN9_V2_LUT	2
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:192:13:EPD_2IN9_V2_LUT_by_host	1
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:212:13:EPD_2IN9_V2_TurnOnDisplay	1
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:220:13:EPD_2IN9_V2_TurnOnDisplay_Partial	1
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:232:13:EPD_2IN9_V2_SetWindows	1
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:249:13:EPD_2IN9_V2_SetCursor	1
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:263:6:EPD_2IN9_V2_Init	1
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:292:6:EPD_2IN9_V2_Init_Fast	1
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:324:6:EPD_2IN9_V2_Gray4_Init	1
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:356:6:EPD_2IN9_V2_Clear	3
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:378:6:EPD_2IN9_V2_Display	2
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:389:6:EPD_2IN9_V2_Display_Base	3
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:406:6:EPD_2IN9_V2_4GrayDisplay	23
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:489:6:EPD_2IN9_V2_Display_Partial	2
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:535:6:EPD_2IN9_V2_Sleep	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:130:13:EPD_2IN9_V2_Reset	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:145:13:EPD_2IN9_V2_SendCommand	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:158:13:EPD_2IN9_V2_SendData	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:170:6:EPD_2IN9_V2_ReadBusy	2
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:183:13:EPD_2IN9_V2_LUT	2
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:192:13:EPD_2IN9_V2_LUT_by_host	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:212:13:EPD_2IN9_V2_TurnOnDisplay	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:220:13:EPD_2IN9_V2_TurnOnDisplay_Partial	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:232:13:EPD_2IN9_V2_SetWindows	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:249:13:EPD_2IN9_V2_SetCursor	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:263:6:EPD_2IN9_V2_Init	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:292:6:EPD_2IN9_V2_Init_Fast	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:324:6:EPD_2IN9_V2_Gray4_Init	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:356:6:EPD_2IN9_V2_Clear	3
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:378:6:EPD_2IN9_V2_Display	2
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:389:6:EPD_2IN9_V2_Display_Base	3
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:406:6:EPD_2IN9_V2_4GrayDisplay	23
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:489:6:EPD_2IN9_V2_Display_Partial	2
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2.c:535:6:EPD_2IN9_V2_Sleep	1

@@ -1,0 +1,399 @@
+06:30:19 **** Incremental Build of configuration Debug for project 3. Firmware ****
+make -j8 all 
+arm-none-eabi-gcc "C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I"C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/inc" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"src/EPD_2in9_V2_test.d" -MT"src/EPD_2in9_V2_test.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "src/EPD_2in9_V2_test.o"
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c: In function 'time_setup_mode':
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1120:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1120 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1121:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1121 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1127:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1127 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1128:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1128 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1136:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1136 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1144:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1144 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1158:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1158 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1159:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1159 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1166:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1166 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1167:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1167 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1180:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1180 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1181:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1181 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1187:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1187 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1188:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1188 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1195:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1195 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1196:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1196 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1204:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1204 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1211:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1211 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1212:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1212 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1220:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1220 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1228:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1228 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1235:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1235 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1236:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1236 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1244:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1244 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1250:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1250 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1251:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1251 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1258:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1258 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1259:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1259 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1266:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1266 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1267:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1267 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c: In function 'draw_day':
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1411:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1411 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1412:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1412 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1418:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1418 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1419:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1419 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1427:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1427 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1435:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1435 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1449:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1449 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1450:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1450 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1457:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1457 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1458:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1458 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1471:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1471 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1472:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1472 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1478:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1478 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1479:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1479 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1486:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1486 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1487:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1487 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1495:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1495 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1502:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1502 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1503:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1503 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1511:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1511 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1519:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1519 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1526:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1526 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1527:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1527 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1535:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1535 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1541:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1541 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1542:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1542 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1549:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1549 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1550:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1550 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1557:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1557 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1558:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1558 |         month_string[4] = NULL;
+      |                         ^
+arm-none-eabi-gcc -o "3. Firmware.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="3. Firmware.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 3. Firmware.elf
+ 
+arm-none-eabi-size  3.\ Firmware.elf 
+arm-none-eabi-objdump -h -S 3.\ Firmware.elf  > "3. Firmware.list"
+   text	   data	    bss	    dec	    hex	filename
+  64556	    744	   2520	  67820	  108ec	3. Firmware.elf
+Finished building: default.size.stdout
+ 
+Finished building: 3. Firmware.list
+ 
+06:39:12 **** Incremental Build of configuration Debug for project 3. Firmware ****
+make -j8 all 
+arm-none-eabi-gcc "C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I"C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/inc" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"src/EPD_2in9_V2_test.d" -MT"src/EPD_2in9_V2_test.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "src/EPD_2in9_V2_test.o"
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c: In function 'time_setup_mode':
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1120:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1120 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1121:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1121 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1127:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1127 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1128:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1128 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1136:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1136 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1144:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1144 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1158:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1158 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1159:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1159 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1166:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1166 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1167:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1167 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1180:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1180 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1181:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1181 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1187:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1187 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1188:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1188 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1195:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1195 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1196:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1196 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1204:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1204 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1211:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1211 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1212:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1212 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1220:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1220 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1228:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1228 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1235:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1235 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1236:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1236 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1244:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1244 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1250:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1250 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1251:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1251 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1258:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1258 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1259:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1259 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1266:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1266 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1267:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1267 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c: In function 'draw_day':
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1411:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1411 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1412:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1412 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1418:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1418 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1419:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1419 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1427:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1427 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1435:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1435 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1449:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1449 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1450:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1450 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1457:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1457 |         day_string[3] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1458:23: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1458 |         day_string[4] = NULL;
+      |                       ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1471:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1471 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1472:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1472 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1478:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1478 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1479:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1479 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1486:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1486 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1487:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1487 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1495:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1495 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1502:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1502 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1503:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1503 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1511:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1511 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1519:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1519 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1526:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1526 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1527:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1527 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1535:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1535 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1541:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1541 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1542:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1542 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1549:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1549 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1550:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1550 |         month_string[4] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1557:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1557 |         month_string[3] = NULL;
+      |                         ^
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1558:25: warning: assignment to 'char' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+ 1558 |         month_string[4] = NULL;
+      |                         ^
+arm-none-eabi-gcc -o "3. Firmware.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="3. Firmware.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 3. Firmware.elf
+ 
+arm-none-eabi-size  3.\ Firmware.elf 
+arm-none-eabi-objdump -h -S 3.\ Firmware.elf  > "3. Firmware.list"
+   text	   data	    bss	    dec	    hex	filename
+  64556	    744	   2520	  67820	  108ec	3. Firmware.elf
+Finished building: default.size.stdout
+ 
+Finished building: 3. Firmware.list
+ 
+06:39:32 **** Incremental Build of configuration Debug for project 3. Firmware ****
+make -j8 all 
+arm-none-eabi-size  3.\ Firmware.elf 
+   text	   data	    bss	    dec	    hex	filename
+  64556	    744	   2520	  67820	  108ec	3. Firmware.elf
+Finished building: default.size.stdout
+ 

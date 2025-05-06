@@ -33,12 +33,12 @@
 		<link>
 			<name>inc</name>
 			<type>2</type>
-			<location>C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/inc</location>
+			<location>C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/inc</location>
 		</link>
 		<link>
 			<name>src</name>
 			<type>2</type>
-			<location>C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src</location>
+			<location>C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src</location>
 		</link>
 	</linkedResources>
 </projectDescription>

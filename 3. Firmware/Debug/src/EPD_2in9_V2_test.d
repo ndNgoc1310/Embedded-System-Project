@@ -1,7 +1,7 @@
 src/EPD_2in9_V2_test.o: \
- C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/src/EPD_2in9_V2_test.c \
- C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/EPD_Test.h \
- C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/DEV_Config.h \
+ C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/src/EPD_2in9_V2_test.c \
+ C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/EPD_Test.h \
+ C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/DEV_Config.h \
  ../Core/Inc/main.h ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  ../Core/Inc/stm32f1xx_hal_conf.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
@@ -29,13 +29,13 @@ src/EPD_2in9_V2_test.o: \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
- C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/GUI_Paint.h \
- C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/fonts.h \
- C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/imagedata.h \
- C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/Debug.h \
- C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/EPD_2in9_V2.h
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/EPD_Test.h:
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/DEV_Config.h:
+ C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/GUI_Paint.h \
+ C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/fonts.h \
+ C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/imagedata.h \
+ C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/Debug.h \
+ C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/EPD_2in9_V2.h
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/EPD_Test.h:
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/DEV_Config.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 ../Core/Inc/stm32f1xx_hal_conf.h:
@@ -64,8 +64,8 @@ C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h:
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/GUI_Paint.h:
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/fonts.h:
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/imagedata.h:
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/Debug.h:
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github\ Desktop/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/EPD_2in9_V2.h:
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/GUI_Paint.h:
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/fonts.h:
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/imagedata.h:
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/Debug.h:
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3.\ Firmware/Mylibrary/inc/EPD_2in9_V2.h:
