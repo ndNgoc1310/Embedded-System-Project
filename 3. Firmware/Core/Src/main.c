@@ -284,12 +284,40 @@ uint16_t battery_percentage;
 // Flag for UART interrupt (UART Receive Flag)
 volatile bool uart_rx_flag = false;
 
-// Variable for UART receive data: hour and minute
-uint8_t uart_rx_data[2];
+// Flag for UART transmit interrupt (Transmit Flag)
+volatile bool uart_tx_flag = false;
 
-// Variable to store hour and minute values received from the UART module
-uint8_t uart_rx_hour;
-uint8_t uart_rx_minute;
+// Variable for UART receive data
+uint8_t uart_rx_data[7];
+
+// Variable for UART transmit data
+uint8_t uart_tx_data[7];
+
+// Variables to store decoded values received from the UART module
+uint8_t uart_hour;      //uart_rx_data[0]; this can also be used to set the mode of the UART module
+uint8_t uart_minute;    //uart_rx_data[1]
+uint8_t uart_dow;       //uart_rx_data[5]
+uint8_t uart_day;       //uart_rx_data[2]; this can also be used to define the day of the week in mode 3
+uint8_t uart_month;     //uart_rx_data[3]
+uint8_t uart_year;      //uart_rx_data[4]
+uint8_t uart_alarmNum;	//uart_rx_data[5] number of the alarm (alarm number1/ alarm number2/...)
+uint8_t uart_alarmSta;	//uart_rx_data[6] status of the alarm (on/off)
+
+// Variable to store mask values for the modes of the UART module
+//    0. Quit Mode:     0b11000000 
+//    1. Time Setup:    0b11110000 (ON)/ 0b11000000 (OFF)
+//    2. Alarm Setup    0b01110000 (ON)/ 0b11000000 (OFF)
+//    3. Update Alarms: 0b11111111
+uint8_t uart_mode;		  
+                        
+// Variable to indicate the mode of the UART module (1, 2, or 3)
+uint8_t uart_appMode = 0;
+
+// Variable to store the number of alarms sent to the App (0-10)
+uint8_t sentCount = 0; 
+
+//Variables for alarms:
+uint8_t alarm_Info[10][7]; // 10 alarms, each alarm has 7 values (hour, minute, day, month, year, number, status)
 
 /* BUZZER ======================================*/
 // Buzzer cycle number
@@ -463,7 +491,7 @@ int main(void)
 
   // Initialize the UART module to receive data
   //    HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
-  HAL_UART_Receive_IT(&huart1, uart_rx_data, 2);
+  HAL_UART_Receive_IT(&huart1, uart_rx_data, 7);
 
   // Initialize the ADC module to monitor battery voltage
   //    HAL_ADC_Start_IT(ADC_HandleTypeDef *hadc);
@@ -480,7 +508,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    // Call the button debounce handler for each button
+    // Call the button handler for each button if any button is pressed (int_flag is set)
     while (button0.int_flag || button1.int_flag || button2.int_flag || button3.int_flag || button4.int_flag)
     {
       Button_Handle();
@@ -535,19 +563,69 @@ int main(void)
       System_Alarm_Active_Mode_Handle(&button0);
     }
 
+    // Check for UART mode change
+    //    0. Quit Mode:     0b11000000
+    //    1. Time Setup:    0b11110000 (ON)/ 0b11000000 (OFF)
+    //    2. Alarm Setup:   0b01110000 (ON)/ 0b11000000 (OFF)
+    //    3. Update Alarms: 0b11111111
+    if      (uart_mode == 0b11110000 || uart_rx_data[1] == 0b11110000)      //240 mode1
+    {
+      // Set the UART mode to 1 (Time Setup Mode)
+      uart_appMode = 1;
+    }
+    else if (uart_mode == 0b01110000 || uart_rx_data[1] == 0b01110000)      //112 mode 2
+    {
+      // Set the UART mode to 2 (Alarm Setup Mode)
+      uart_appMode = 2;
+    }
+    else if (uart_mode == 0b11000000 || uart_rx_data[1] == 0b11000000)      //quit mode
+    {
+      // Set the UART mode to 0 (Quit Mode)
+      uart_appMode = 0;
+    }    
+
     // Check if the UART interrupt flag is set (UART Receive Flag)
     if (uart_rx_flag)
-	  {
-      // Re-enable the UART interrupt to continue receiving data
-      HAL_UART_Receive_IT(&huart1,uart_rx_data,2); 
+    {
+      // Set UART mode to the first byte of received data
+      uart_mode = uart_rx_data[0];
       
-      // Delay for 1ms to allow the UART to stabilize
-      HAL_Delay(1);
+      // For update alarms from STM32 to App
+      if (uart_rx_data[0] == 0b11111111) //Transmit signal from App to STM32
+      {
+        uart_tx_flag = 1; //Set the flag to transmit data to App
+        // HAL_Delay(50);                     // Delay for 50ms to allow the UART to stabilize
+        // uart_tx_flag  = 1;
+        //uart_rx_data[0] = 0b00000000; // Reset the uart_rx_data array to avoid sending the same data again
+      }
 
-      // Reset the UART interrupt flag
-      uart_rx_flag = false;
-	  }
+      // Re-enable the UART interrupt to continue receiving data
+      HAL_UART_Receive_IT(&huart1, uart_rx_data, 7);
 
+      // Delay for 50ms to allow the UART to stabilize
+      HAL_Delay(50);
+    }
+ 
+    // Check if the UART transmit flag is set (Transmit Flag)
+    if (uart_tx_flag)
+    {
+      for (int i = 0; i < 10; i++)            // Alarm 0 - 9
+      {
+        for (int j = 0; j < 7; j++)           // Alarm details 0 - 6 (hour, minute, day, month, year, number, status)
+        {
+          uart_tx_data[j] = alarm_Info[i][j]; // Store the alarm information into the uart_tx_data array
+        }
+        
+        // Delay for 50ms to allow the UART to stabilize
+        HAL_Delay(50);      
+        
+        // Transmit the alarm information to the App through UART
+        HAL_UART_Transmit_IT(&huart1, uart_tx_data, 7);
+
+        // Delay for 50ms to allow the UART to stabilize
+        HAL_Delay(50);                        
+      }
+    }
   }
   /* USER CODE END 3 */
 }
@@ -2341,7 +2419,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 }
 
 /**
-  * @brief  Callback function to handle UART interrupts.
+  * @brief  Callback function to handle UART receive interrupts.
   * @param  huart: Pointer to the UART handle.
   * @retval None
 */
@@ -2352,11 +2430,53 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   if(huart->Instance == USART1)
   {
     // Store the received data into the uart_rx_data array
-    uart_rx_hour = uart_rx_data[0];
-    uart_rx_minute = uart_rx_data[1];
+    uart_hour 	  = uart_rx_data[0];
+    uart_minute   = uart_rx_data[1];
+    uart_dow      = uart_rx_data[5];
+    uart_day 	    = uart_rx_data[2];
+    uart_month	  = uart_rx_data[3];
+    uart_year 	  = uart_rx_data[4];
+    uart_alarmNum = uart_rx_data[5];
+    uart_alarmSta = uart_rx_data[6];
+
+    // For mode 2:
+    if (uart_appMode == 2)
+    {
+      for (int i = 0; i < 7; i++)
+      {
+        alarm_Info[uart_alarmNum-1][i] = uart_rx_data[i]; // Store the alarm information in the array. Alarm number is uart_alarmNum, information is uart_rx_data[i]
+      }
+    }
 
     // Set the UART receive flag
     uart_rx_flag = 1;
+  }
+}
+
+/**
+  * @brief  Callback function to handle UART transmit complete interrupts.
+  * @param  huart: Pointer to the UART handle.
+  * @retval None
+*/
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+  // Verify the UART instance to ensure the callback is for USART1
+  // If the UART instance is USART1, set the UART transmit flag
+  if(huart->Instance == USART1)
+  {
+    // Set the UART transmit flag to indicate that the data has been sent
+    sentCount += 1;
+
+    if (sentCount == 10) // If 10 alarms are sent, reset the sentCount variable
+    {
+      sentCount = 0;
+      uart_tx_flag = 0; // Reset the UART transmit flag
+      uart_rx_data[0] = 0b01110000;
+    }
+    else
+    {
+      uart_tx_flag = 1;
+    }
   }
 }
 
