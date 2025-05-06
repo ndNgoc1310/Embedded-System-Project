@@ -209,9 +209,6 @@ typedef struct
 #define ALARM_VIEW_CURSOR_MAX 9
 #define SYSTEM_OPT_CURSOR_MAX 1
 
-// Delay for displaying the e-Paper screen in milliseconds
-#define DISPLAY_DELAY 500
-
 // Active state of the buzzer
 #define BUZZER_ACTIVE GPIO_PIN_RESET
 #define BUZZER_INACTIVE GPIO_PIN_SET
@@ -484,8 +481,11 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
     // Call the button debounce handler for each button
-    Button_Handle();
-
+    while (button0.int_flag || button1.int_flag || button2.int_flag || button3.int_flag || button4.int_flag)
+    {
+      Button_Handle();
+    }
+    
     // Check if the RTC Interrupt Flag is set (RTC Interrupt Flag) on PB4 (Activated every second)
     if (rtc_int_flag)
     {
@@ -1042,26 +1042,28 @@ void Alarm_Check (volatile TIME_DATA *time_get_data)
       continue;
     }
 
+    if (!alarm_active_flag)
+    {
+      debug_alarm_check_ctr += 1;
 
-    debug_alarm_check_ctr += 1;
+      // Reset the buzzer cycle number
+      buzzer_cycle = 0; 
 
-    // Reset the buzzer cycle number
-    buzzer_cycle = 0; 
+      // Reset the buzzer phase number
+      buzzer_phase = 0; 
 
-    // Reset the buzzer phase number
-    buzzer_phase = 0; 
+      // Set the system past mode to the current mode
+      system_state.past_mode = system_state.mode;
 
-    // Set the system past mode to the current mode
-    system_state.past_mode = system_state.mode;
+      // Set the system state to alarm active mode
+      system_state.mode = ALARM_ACTIVE_MODE;
 
-    // Set the system state to alarm active mode
-    system_state.mode = ALARM_ACTIVE_MODE;
+      // Set the buzzer tick to the current tick
+      buzzer_tick = HAL_GetTick();
 
-    // Set the buzzer tick to the current tick
-    buzzer_tick = HAL_GetTick();
-
-    // Set the alarm active flag to true
-    alarm_active_flag = true; 
+      // Set the alarm active flag to true
+      alarm_active_flag = true; 
+    }
     
     // Stop checking time matching
     // to make sure that only one alarm can be activated at a time
@@ -1131,8 +1133,8 @@ void Alarm_Ring (void)
     // Return to the previous mode
     system_state.mode = system_state.past_mode; 
 
-    // // Set the system past mode to alarm active mode
-    // system_state.past_mode = ALARM_ACTIVE_MODE; 
+    // Set the system past mode to alarm active mode
+    system_state.past_mode = ALARM_ACTIVE_MODE; 
 
     // Reset the buzzer
     HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, BUZZER_INACTIVE); 
@@ -1177,7 +1179,7 @@ void Button_Debounce(BUTTON_DATA *button)
     // Waiting state: Button is pressed (LOW) but not yet confirmed
     case BUTTON_WAITING:
       // Check if debounce delay has passed
-      if (HAL_GetTick() - button->start_tick >= (BUTTON_DEBOUNCE_DELAY + DISPLAY_DELAY)) 
+      if (HAL_GetTick() - button->start_tick >= BUTTON_DEBOUNCE_DELAY) 
       {
         // Check if button is still pressed (LOW state) after debounce delay
         if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) == BUTTON_ACTIVE) 
@@ -1200,7 +1202,7 @@ void Button_Debounce(BUTTON_DATA *button)
       if (HAL_GPIO_ReadPin(button->gpio_port, button->gpio_pin) != BUTTON_ACTIVE) 
       {
         // Check if press duration is less than hold threshold
-        if (HAL_GetTick() - button->start_tick < (BUTTON_HOLD_TH + DISPLAY_DELAY))
+        if (HAL_GetTick() - button->start_tick < BUTTON_HOLD_TH)
         {
           // Set press flag for short press
           button->press_flag = true;
@@ -1213,7 +1215,7 @@ void Button_Debounce(BUTTON_DATA *button)
         button->state = BUTTON_RELEASED;
       }
       // Check if button is held down for long press
-      else if ((HAL_GetTick() - button->start_tick >= (BUTTON_HOLD_TH + DISPLAY_DELAY)) && !button->hold_flag)
+      else if ((HAL_GetTick() - button->start_tick >= BUTTON_HOLD_TH) && !button->hold_flag)
       {
         // Set hold flag for long press
         button->hold_flag = true;
@@ -1375,7 +1377,7 @@ void System_Default_Mode_Handle (BUTTON_DATA *button)
 
     // Button 4: If pressed, cycle through the modes; if held, do nothing (reserved for future use)
     case 4:
-      if (button->press_flag or (button->hold_flag && !button->latch))
+      if (button->press_flag || (button->hold_flag && !button->latch))
       {
         // system_state.mode = (system_state.mode < (SYSTEM_MODE_NUM - 1)) ? (system_state.mode + 1) : 0;
 
@@ -2187,8 +2189,8 @@ void System_Alarm_Active_Mode_Handle (BUTTON_DATA *button)
         // Return to the previous mode
         system_state.mode = system_state.past_mode; 
 
-        // // Set the system past mode to alarm active mode
-        // system_state.past_mode = ALARM_ACTIVE_MODE; 
+        // Set the system past mode to alarm active mode
+        system_state.past_mode = ALARM_ACTIVE_MODE; 
 
         // Reset the buzzer
         HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, BUZZER_INACTIVE); 
@@ -2210,8 +2212,8 @@ void System_Alarm_Active_Mode_Handle (BUTTON_DATA *button)
         // Return to the previous mode
         system_state.mode = system_state.past_mode; 
 
-        // // Set the system past mode to alarm active mode
-        // system_state.past_mode = ALARM_ACTIVE_MODE; 
+        // Set the system past mode to alarm active mode
+        system_state.past_mode = ALARM_ACTIVE_MODE; 
 
         // Reset the buzzer
         HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, BUZZER_INACTIVE); 
@@ -2232,8 +2234,8 @@ void System_Alarm_Active_Mode_Handle (BUTTON_DATA *button)
         // Return to the previous mode
         system_state.mode = system_state.past_mode; 
 
-        // // Set the system past mode to alarm active mode
-        // system_state.past_mode = ALARM_ACTIVE_MODE; 
+        // Set the system past mode to alarm active mode
+        system_state.past_mode = ALARM_ACTIVE_MODE; 
 
         // Reset the buzzer
         HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, BUZZER_INACTIVE); 
@@ -2254,8 +2256,8 @@ void System_Alarm_Active_Mode_Handle (BUTTON_DATA *button)
         // Return to the previous mode
         system_state.mode = system_state.past_mode; 
 
-        // // Set the system past mode to alarm active mode
-        // system_state.past_mode = ALARM_ACTIVE_MODE; 
+        // Set the system past mode to alarm active mode
+        system_state.past_mode = ALARM_ACTIVE_MODE; 
 
         // Reset the buzzer
         HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, BUZZER_INACTIVE); 
@@ -2276,8 +2278,8 @@ void System_Alarm_Active_Mode_Handle (BUTTON_DATA *button)
         // Return to the previous mode
         system_state.mode = system_state.past_mode; 
 
-        // // Set the system past mode to alarm active mode
-        // system_state.past_mode = ALARM_ACTIVE_MODE; 
+        // Set the system past mode to alarm active mode
+        system_state.past_mode = ALARM_ACTIVE_MODE; 
 
         // Reset the buzzer
         HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, BUZZER_INACTIVE); 
