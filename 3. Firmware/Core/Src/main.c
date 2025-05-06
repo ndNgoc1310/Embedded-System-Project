@@ -90,6 +90,13 @@ typedef enum
   ALARM_ON_OFF,   // Set ON/OFF state
 } ALARM_SETUP_CURSOR;
 
+// Enum for parameter selection in System Options Mode
+typedef enum
+{
+  CLEAR_ALL_ALARM,
+  CONTRIBUTOR_INFO,
+} SYSTEM_OPT_CURSOR;
+
 // Structure of 7 one-byte unsigned characters to store time values
 typedef struct 
 {
@@ -135,7 +142,7 @@ typedef struct
   TIME_SETUP_CURSOR   time_setup_cursor;  // Cursor of selection for Time Setup Mode
   ALARM_SETUP_CURSOR  alarm_setup_cursor; // Cursor of selection for Alarm Setup Mode
   uint8_t             alarm_view_cursor;  // Cursor of selection for Alarm View Mode
-  uint8_t             system_opt_cursor;  // Cursor of selection for System Options Mode
+  SYSTEM_OPT_CURSOR   system_opt_cursor;  // Cursor of selection for System Options Mode
   uint8_t             battery_display;    // Battery percentage to be displayed: 100, 75, 50, 25, 0
 } SYSTEM_STATE;
 
@@ -184,7 +191,7 @@ typedef struct
 #define ALARM_SLOT_PTR_ADDR (ALARM_SLOT_NUM * 4)
 
 // Active state of buttons
-#define BUTTON_ACTIVE GPIO_PIN_RESET
+#define BUTTON_ACTIVE GPIO_PIN_SET
 
 // Debounce threshold in milliseconds
 #define BUTTON_DEBOUNCE_DELAY 30
@@ -200,10 +207,22 @@ typedef struct
 
 // Maximum value of the system cursor
 #define ALARM_VIEW_CURSOR_MAX 9
-#define SYSTEM_OPT_CURSOR_MAX 9
+#define SYSTEM_OPT_CURSOR_MAX 1
 
 // Delay for displaying the e-Paper screen in milliseconds
 #define DISPLAY_DELAY 500
+
+// Active state of the buzzer
+#define BUZZER_ACTIVE GPIO_PIN_RESET
+#define BUZZER_INACTIVE GPIO_PIN_SET
+
+// Buzzer cycle number for alarm sound
+#define BUZZER_CYCLE_NUM 10
+
+// Buzzer delay in milliseconds
+#define BUZZER_SHORT_DELAY 100
+#define BUZZER_MEDIUM_DELAY 300
+#define BUZZER_LONG_DELAY 500
 
 /* USER CODE END PD */
 
@@ -236,8 +255,12 @@ uint8_t alarm_slot_ptr;
 volatile bool rtc_int_flag = false;
 
 // Debugging: Track the number of alarm activations
-uint8_t debug_alarm_activate_ctr = 0;
 volatile bool debug_rtc_int = false;
+
+uint8_t debug_alarm_check_ctr = 0; // Counter for the number of RTC interrupts
+
+// Flag to indicate if the alarm is active
+bool alarm_active_flag = false; 
 
 /* BUTTON ========================================*/
 // Debugging: Track if the button is pressed or not
@@ -270,6 +293,16 @@ uint8_t uart_rx_data[2];
 // Variable to store hour and minute values received from the UART module
 uint8_t uart_rx_hour;
 uint8_t uart_rx_minute;
+
+/* BUZZER ======================================*/
+// Buzzer cycle number
+uint8_t buzzer_cycle = 0; 
+
+// Buzzer phase number
+uint8_t buzzer_phase = 0; 
+
+// Start time of the buzzer cycle
+uint32_t buzzer_tick = 0; 
 
 /* USER CODE END PV */
 
@@ -304,8 +337,11 @@ void Alarm_Get (uint8_t slot, volatile ALARM_DATA *alarm_get_data);
 // Function to clear a single alarm from the EEPROM module
 void Alarm_Clear (uint8_t slot);
 
-// // Function to check the alarms
+// Function to check the alarms
 void Alarm_Check (volatile TIME_DATA *time_get_data);
+
+// Function to handle the alarm ringing
+void Alarm_Ring (void);
 
 // Functions to handle alarm slot pointer
 void Alarm_Slot_Pointer_Set (void);
@@ -366,19 +402,22 @@ int main(void)
   MX_USART1_UART_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-  
-//  // Set time to the RTC module through I2C interface (Run only once after reset the RTC).
-//  //    void Time_Set(uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
-//  Time_Set
-//  (
-//     0, // Seconds: 0-59
-//    26, // Minutes: 0-59
-//    11, // Hours: 0-23
-//     4, // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
-//    18, // Date of the month: 1-31
-//     4, // Month: 1-12
-//    25  // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
-//  );
+
+  // Initially reset the buzzer
+  HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, BUZZER_INACTIVE); 
+
+  // // Set time to the RTC module through I2C interface (Run only once after reset the RTC).
+  // //    void Time_Set(uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom, uint8_t month, uint8_t year)
+  // Time_Set
+  // (
+  //    0, // Seconds: 0-59
+  //   22, // Minutes: 0-59
+  //   23, // Hours: 0-23
+  //    2, // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+  //    5, // Date of the month: 1-31
+  //    5, // Month: 1-12
+  //   25  // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
+  // );
 
   // Initialize RTC module (Run only once after reset the RTC).
   Time_Ctrl 
@@ -398,9 +437,10 @@ int main(void)
   // for (int i = 0; i < ALARM_SLOT_NUM; i++)
   // {
   //   Alarm_Clear(i);
-  //   alarm_slot_ptr = 0;
-  //   Alarm_Slot_Pointer_Set();
+  //   Alarm_Get(i, &alarm_get_data[i]);
   // }
+  // alarm_slot_ptr = 0;
+  // Alarm_Slot_Pointer_Set();
 
   // // Store values of a single alarm to the next available address on the EEPROM module
   // //    void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_DY_DT_MODE dy_dt, bool on_off, uint8_t slot)
@@ -446,10 +486,6 @@ int main(void)
     // Call the button debounce handler for each button
     Button_Handle();
 
-    // int a;
-    // a = 1;
-    // TIME_DATA time_get;
-
     // Check if the RTC Interrupt Flag is set (RTC Interrupt Flag) on PB4 (Activated every second)
     if (rtc_int_flag)
     {
@@ -463,7 +499,6 @@ int main(void)
       // Debugging: Toggle the debug RTC interrupt flag for debugging purposes
       debug_rtc_int = !debug_rtc_int;
 
-      // time_get = (TIME_DATA) time_get_data;    
       // default_mode(&a, &time_get.hour, &time_get.minute, &time_get.second);
 
       // Check if the ADC interrupt flag is set (ADC Valid Flag)
@@ -472,8 +507,8 @@ int main(void)
         // Re-enable the ADC interrupt to continue monitoring ADC values
         HAL_ADC_Start_IT(&hadc1);
 
-        // Delay for 100ms to allow the ADC to stabilize
-        HAL_Delay(100);
+        // Delay for 1ms to allow the ADC to stabilize
+        HAL_Delay(1);
 
         // Track the battery percentage value at 5 different levels: 0, 25, 50, 75, 100
         if ((battery_percentage % 25) == 0)
@@ -490,14 +525,24 @@ int main(void)
       rtc_int_flag = false;
     }
 
+    // Check if the alarm is active
+    if (alarm_active_flag)
+    {
+      // Call the alarm ringing function
+      Alarm_Ring();
+
+      // Call the system alarm active mode handler to track if any button is pressed
+      System_Alarm_Active_Mode_Handle(&button0);
+    }
+
     // Check if the UART interrupt flag is set (UART Receive Flag)
     if (uart_rx_flag)
 	  {
       // Re-enable the UART interrupt to continue receiving data
       HAL_UART_Receive_IT(&huart1,uart_rx_data,2); 
       
-      // Delay for 100ms to allow the UART to stabilize
-      HAL_Delay(100);
+      // Delay for 1ms to allow the UART to stabilize
+      HAL_Delay(1);
 
       // Reset the UART interrupt flag
       uart_rx_flag = false;
@@ -997,12 +1042,100 @@ void Alarm_Check (volatile TIME_DATA *time_get_data)
       continue;
     }
 
-    // Debugging: If all the above checks pass, the alarm is activated
-    debug_alarm_activate_ctr++;
 
+    debug_alarm_check_ctr += 1;
+
+    // Reset the buzzer cycle number
+    buzzer_cycle = 0; 
+
+    // Reset the buzzer phase number
+    buzzer_phase = 0; 
+
+    // Set the system past mode to the current mode
+    system_state.past_mode = system_state.mode;
+
+    // Set the system state to alarm active mode
+    system_state.mode = ALARM_ACTIVE_MODE;
+
+    // Set the buzzer tick to the current tick
+    buzzer_tick = HAL_GetTick();
+
+    // Set the alarm active flag to true
+    alarm_active_flag = true; 
+    
     // Stop checking time matching
     // to make sure that only one alarm can be activated at a time
     break;
+  }
+}
+
+/**
+  * @brief  Handle the alarm activation by ringing the buzzer and updating the system state.
+  * @retval None
+*/
+void Alarm_Ring (void)
+{
+  // Check if the buzzer cycle number is less than or equal to the maximum cycle number
+  if (buzzer_cycle <= BUZZER_CYCLE_NUM)
+  {
+    // Check if the buzzer phase number is less than or equal to the maximum phase number
+    if (buzzer_phase <= 4)
+    {
+      // Check if the buzzer tick is within the specified delay time
+      if      ((buzzer_phase == 0) && (HAL_GetTick() - buzzer_tick <= BUZZER_SHORT_DELAY))
+      {
+        // Turn on the buzzer for a short duration
+        HAL_GPIO_WritePin(GPIOB, BUZZER_Pin, BUZZER_ACTIVE);
+      }
+      else if ((buzzer_phase == 1) && (HAL_GetTick() - buzzer_tick <= BUZZER_SHORT_DELAY))
+      {
+        // Turn off the buzzer for a short duration
+        HAL_GPIO_WritePin(GPIOB, BUZZER_Pin, BUZZER_INACTIVE);
+      }
+      else if ((buzzer_phase == 3) && (HAL_GetTick() - buzzer_tick <= BUZZER_MEDIUM_DELAY))
+      {
+        // Turn on the buzzer for a medium duration
+        HAL_GPIO_WritePin(GPIOB, BUZZER_Pin, BUZZER_ACTIVE);
+      }
+      else if ((buzzer_phase == 4) && (HAL_GetTick() - buzzer_tick <= BUZZER_LONG_DELAY))
+      {
+        // Turn off the buzzer for a long duration
+        HAL_GPIO_WritePin(GPIOB, BUZZER_Pin, BUZZER_INACTIVE);
+      }
+      else
+      {
+        // Reset the tick for the next phase
+        buzzer_tick = HAL_GetTick(); 
+
+        // Move to the next phase
+        buzzer_phase++; 
+      }
+    }
+    else
+    {
+      // Reset the tick for the next cycle
+      buzzer_tick = HAL_GetTick(); 
+
+      // Reset the phase counter
+      buzzer_phase = 0; 
+
+      // Move to the next cycle
+      buzzer_cycle++; 
+    }
+  }
+  else
+  {
+    // Stop ringing the alarm
+    alarm_active_flag = false; 
+
+    // Return to the previous mode
+    system_state.mode = system_state.past_mode; 
+
+    // // Set the system past mode to alarm active mode
+    // system_state.past_mode = ALARM_ACTIVE_MODE; 
+
+    // Reset the buzzer
+    HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, BUZZER_INACTIVE); 
   }
 }
 
@@ -1242,12 +1375,15 @@ void System_Default_Mode_Handle (BUTTON_DATA *button)
 
     // Button 4: If pressed, cycle through the modes; if held, do nothing (reserved for future use)
     case 4:
-      if (button->press_flag)
+      if (button->press_flag or (button->hold_flag && !button->latch))
       {
         // system_state.mode = (system_state.mode < (SYSTEM_MODE_NUM - 1)) ? (system_state.mode + 1) : 0;
 
-        // Quick jump to Time Setup mode
+        // Cycle to the next mode in the system state
         system_state.mode = TIME_SETUP_MODE;
+
+        // Set the system past mode to default mode
+        system_state.past_mode = DEFAULT_MODE;
 
         // Set the Time Setup data to the current time values for convinience
         time_setup_data =
@@ -1263,18 +1399,18 @@ void System_Default_Mode_Handle (BUTTON_DATA *button)
 
         // Reset the cursor for the Time Setup mode to the first parameter (minute)
         system_state.time_setup_cursor = TIME_MINUTE;
+
+        button->latch = true;
       }
-      else if (button->hold_flag)
-      {
-        // Reserved
-      }
+      // else if (button->hold_flag)
+      // {
+      //   // Reserved
+      // }
       break;
 
     default: 
       break;
   }
-  // Set the system past mode to default mode
-  system_state.past_mode = DEFAULT_MODE;
 }
 
 /**
@@ -1446,6 +1582,9 @@ void System_Time_Setup_Mode_Handle (BUTTON_DATA *button)
         // Cycle through the next system mode
         system_state.mode = ALARM_SETUP_MODE;
 
+        // Set the system past mode to time setup mode
+        system_state.past_mode = TIME_SETUP_MODE;
+
         // Set the Alarm Setup data to the current time values for convenience
         alarm_setup_data =
         (ALARM_SETUP_DATA)
@@ -1459,9 +1598,6 @@ void System_Time_Setup_Mode_Handle (BUTTON_DATA *button)
         
         // Reset the cursor for the Alarm Setup mode to the first parameter (minute)
         system_state.alarm_setup_cursor = ALARM_MINUTE;
-
-        // Set the system past mode to time setup mode
-        system_state.past_mode = TIME_SETUP_MODE;
       }
 
       // // If held, set the mode to default, 
@@ -1759,11 +1895,11 @@ void System_Alarm_Setup_Mode_Handle (BUTTON_DATA *button)
         // Cycle through the next system mode
         system_state.mode = ALARM_VIEW_MODE;
 
-        // Reset the cursor for the Alarm View mode
-        system_state.alarm_view_cursor = 0; 
-
         // Set the system past mode to alarm setup mode
         system_state.past_mode = ALARM_SETUP_MODE;
+
+        // Reset the cursor for the Alarm View mode
+        system_state.alarm_view_cursor = 0; 
       }
       
       // // If held, set the mode to default, 
@@ -1908,7 +2044,7 @@ void System_Alarm_View_Mode_Handle (BUTTON_DATA *button)
       {
         // Cycle through the next system mode
         system_state.mode = SYSTEM_OPTIONS_MODE;
-        
+
         // Set the system past mode to alarm view mode
         system_state.past_mode = ALARM_VIEW_MODE;
       }
@@ -1934,6 +2070,77 @@ void System_Options_Mode_Handle (BUTTON_DATA *button)
 {
   switch (button->index) 
   {
+    // Button 0: If pressed, increment the selection cursor; if held, do nothing (reserved for future use)
+    case 0:
+      if      (button->press_flag)
+      {
+        system_state.system_opt_cursor = (system_state.system_opt_cursor == SYSTEM_OPT_CURSOR_MAX) ? 0 : (system_state.system_opt_cursor + 1);
+      }
+      else if (button->hold_flag)
+      {
+        // Reserved
+      }
+      break;
+    
+    // Button 1: If pressed, decrement the selection cursor; if held, do nothing (reserved for future use)
+    case 1:
+      if      (button->press_flag)
+      {
+        system_state.system_opt_cursor = (system_state.system_opt_cursor == 0) ? SYSTEM_OPT_CURSOR_MAX : (system_state.system_opt_cursor - 1);
+      }
+      else if (button->hold_flag)
+      {
+        // Reserved
+      }
+      break;
+    
+    // Button 2: If pressed, operate the selected option; if held, do nothing (reserved for future use)
+    case 2:
+      if      (button->press_flag)
+      {
+        switch (system_state.system_opt_cursor)
+        {
+          case CLEAR_ALL_ALARM:
+            for (int i = 0; i < ALARM_SLOT_NUM; i++)
+            {
+              // Clear all alarms in the EEPROM module
+              Alarm_Clear(i);
+
+              // Update the alarm data
+              Alarm_Get(i, &alarm_get_data[i]);
+            }
+            // Reset the alarm slot pointer to 0
+            alarm_slot_ptr = 0;
+
+            // Save the alarm slot pointer data to the EEPROM module
+            Alarm_Slot_Pointer_Set();
+            break;
+
+          case CONTRIBUTOR_INFO:
+            // Display contributor information
+            break;
+
+          default:
+            break;
+        }
+      }
+      else if (button->hold_flag)
+      {
+        // Reserved
+      }
+      break;
+
+    case 3: 
+      if      (button->press_flag)
+      {
+
+      }
+      else if (button->hold_flag)
+      {
+        // Reserved
+      }
+      break;
+    
     // Button 4: If pressed, cycle through the time setup fields; if held, do nothing (reserved for future use)
     case 4:
       // If pressed, cycle through the next system mode
@@ -1954,56 +2161,9 @@ void System_Options_Mode_Handle (BUTTON_DATA *button)
       // }
       break;
 
-    case 0:
-      if      (button->press_flag)
-      {
-        system_state.system_opt_cursor = (system_state.system_opt_cursor == SYSTEM_OPT_CURSOR_MAX) ? 0 : (system_state.system_opt_cursor + 1);
-      }
-      else if (button->hold_flag)
-      {
-
-      }
-      break;
-
-    case 1:
-      if      (button->press_flag)
-      {
-        system_state.system_opt_cursor = (system_state.system_opt_cursor == 0) ? SYSTEM_OPT_CURSOR_MAX : (system_state.system_opt_cursor - 1);
-      }
-      else if (button->hold_flag)
-      {
-
-      }
-      break;
-    
-    case 2:
-      if      (button->press_flag)
-      {
-
-      }
-      else if (button->hold_flag)
-      {
-
-      }
-      break;
-
-    case 3: 
-      if      (button->press_flag)
-      {
-
-      }
-      else if (button->hold_flag)
-      {
-
-      }
-      break;
-
     default: 
       break;
   }
-
-  // Set the system past mode to system options mode
-  system_state.past_mode = SYSTEM_OPTIONS_MODE;
 }
 
 /**
@@ -2016,71 +2176,121 @@ void System_Alarm_Active_Mode_Handle (BUTTON_DATA *button)
   // Handle button actions in alarm active mode
   switch (button->index) 
   {
-    // Button 4: If pressed, cycle through the time setup fields; if held, do nothing (reserved for future use)
-    case 4:
+    // Button 0: If pressed, stop ringing the alarm; if held, do nothing (reserved for future use)
+    case 0:
       // If pressed, cycle through the time setup fields
       if (button->press_flag)
       {
-        system_state.mode = (system_state.mode < (SYSTEM_MODE_NUM - 1)) ? (system_state.mode + 1) : 0;
+        // Stop ringing the alarm
+        alarm_active_flag = false; 
+
+        // Return to the previous mode
+        system_state.mode = system_state.past_mode; 
+
+        // // Set the system past mode to alarm active mode
+        // system_state.past_mode = ALARM_ACTIVE_MODE; 
+
+        // Reset the buzzer
+        HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, BUZZER_INACTIVE); 
       }
-      // // If held, set the mode to default
-      // else if (button->hold_flag && !button->latch)
-      // {
-      //   system_state.mode = DEFAULT_MODE; 
-      //   button->latch = true;
-      // }
+      // If held, do nothing (reserved for future use)
+      else if (button->hold_flag && !button->latch)
+      {
+        // Reserved
+      }
       break;
 
+    // Button 1: If pressed, stop ringing the alarm; if held, do nothing (reserved for future use)
     case 1:
       if      (button->press_flag)
       {
+        // Stop ringing the alarm
+        alarm_active_flag = false;  
 
+        // Return to the previous mode
+        system_state.mode = system_state.past_mode; 
+
+        // // Set the system past mode to alarm active mode
+        // system_state.past_mode = ALARM_ACTIVE_MODE; 
+
+        // Reset the buzzer
+        HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, BUZZER_INACTIVE); 
       }
       else if (button->hold_flag)
       {
-
+        // Reserved 
       }
       break;
 
+    // Button 2: If pressed, stop ringing the alarm; if held, do nothing (reserved for future use)
     case 2:
       if      (button->press_flag)
       {
+        // Stop ringing the alarm
+        alarm_active_flag = false;  
 
+        // Return to the previous mode
+        system_state.mode = system_state.past_mode; 
+
+        // // Set the system past mode to alarm active mode
+        // system_state.past_mode = ALARM_ACTIVE_MODE; 
+
+        // Reset the buzzer
+        HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, BUZZER_INACTIVE); 
       }
       else if (button->hold_flag)
       {
-
+        // Reserved
       }
       break;
     
+    // Button 3: If pressed, stop ringing the alarm; if held, do nothing (reserved for future use)
     case 3:
       if      (button->press_flag)
       {
+        // Stop ringing the alarm
+        alarm_active_flag = false;  
 
+        // Return to the previous mode
+        system_state.mode = system_state.past_mode; 
+
+        // // Set the system past mode to alarm active mode
+        // system_state.past_mode = ALARM_ACTIVE_MODE; 
+
+        // Reset the buzzer
+        HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, BUZZER_INACTIVE); 
       }
       else if (button->hold_flag)
       {
-
+        // Reserved
       }
       break;
 
-    case 0: 
+    // Button 4: If pressed, stop ringing the alarm; if held, do nothing (reserved for future use)
+    case 4: 
       if      (button->press_flag)
       {
+        // Stop ringing the alarm
+        alarm_active_flag = false;  
 
+        // Return to the previous mode
+        system_state.mode = system_state.past_mode; 
+
+        // // Set the system past mode to alarm active mode
+        // system_state.past_mode = ALARM_ACTIVE_MODE; 
+
+        // Reset the buzzer
+        HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, BUZZER_INACTIVE); 
       }
       else if (button->hold_flag)
       {
-
+        // Reserved
       }
       break;
 
     default: 
       break;
   }
-
-  // Set the system past mode to alarm active mode
-  system_state.past_mode = ALARM_ACTIVE_MODE;
 }
 
 /**
