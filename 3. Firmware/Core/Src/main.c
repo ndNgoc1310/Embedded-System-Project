@@ -447,6 +447,9 @@ int main(void)
   MX_USART1_UART_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
+
+  bool uartDoneFlag = false;
+
     // Initially reset the buzzer
   HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, BUZZER_INACTIVE); 
 //  // Set time to the RTC module through I2C interface (Run only once after reset the RTC).
@@ -661,21 +664,31 @@ int main(void)
     //    1. Time Setup:    0b11110000 (ON)/ 0b11000000 (OFF)
     //    2. Alarm Setup:   0b01110000 (ON)/ 0b11000000 (OFF)
     //    3. Update Alarms: 0b11111111
-    if      (uart_mode == 0b11110000 || uart_rx_data[1] == 0b11110000)      //240 mode1
+    if      (uart_mode == 0b11110000 || uart_rx_data[1] == 0b11110000)    
     {
       // Set the UART mode to 1 (Time Setup Mode)
       uart_appMode = 1;
+      uartDoneFlag = false;
     }
-    else if (uart_mode == 0b01110000 || uart_rx_data[1] == 0b01110000)      //112 mode 2
+    else if (uart_mode == 0b01110000 || uart_rx_data[1] == 0b01110000)     
     {
       // Set the UART mode to 2 (Alarm Setup Mode)
       uart_appMode = 2;
+      uartDoneFlag = false;
     }
-    else if (uart_mode == 0b11000000 || uart_rx_data[1] == 0b11000000)      //quit mode
+    else if (uart_mode == 0b11111111 || uart_rx_data[1] == 0b11111111)      
+    {
+      // Set the UART mode to 3 (Update Alarms Mode)
+      uart_appMode = 3;
+      uartDoneFlag = false;
+    }
+    else if (uart_mode == 0b11000000 || uart_rx_data[1] == 0b11000000)      
     {
       // Set the UART mode to 0 (Quit Mode)
       uart_appMode = 0;
+      uartDoneFlag = false;
     }    
+
     // Check if the UART interrupt flag is set (UART Receive Flag)
     if (uart_rx_flag)
 	  { 
@@ -683,17 +696,90 @@ int main(void)
       // Re-enable the UART interrupt to continue receiving data
       HAL_Delay(100);
 
-    
-      if (uart_rx_data[0] == 0b11111111) //Transmit signal from App to STM32
+      if (!uartDoneFlag)
       {
-        uart_tx_flag = 1; //Set the flag to transmit data to App
-        HAL_Delay(50);                     // Delay for 50ms to allow the UART to stabilize
-        // uart_tx_flag  = 1;
-        //uart_rx_data[0] = 0b00000000; // Reset the uart_rx_data array to avoid sending the same data again
+        switch (uart_appMode)
+        {
+          // Time Setup Mode
+          case 1:
+            // Decode the received data and set the time values
+            uart_hour   = uart_rx_data[0]; //uart_rx_data[0] = hour
+            uart_minute = uart_rx_data[1]; //uart_rx_data[1] = minute
+            uart_dow    = uart_rx_data[5] + 1; //uart_rx_data[5] = day of the week (1-7)
+            uart_day    = uart_rx_data[2]; //uart_rx_data[2] = date of the month (1-31)
+            uart_month  = uart_rx_data[3]; //uart_rx_data[3] = month (1-12)
+            uart_year   = uart_rx_data[4]; //uart_rx_data[4] = year (0-99)
+
+            // Set the time to the RTC module through I2C interface
+            Time_Init
+            (
+              0,           // Seconds: 0-59
+              uart_minute, // Minutes: 0-59
+              uart_hour,   // Hours: 0-23
+              uart_dow,    // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+              uart_day,    // Date of the month: 1-31
+              uart_month,  // Month: 1-12
+              uart_year    // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
+            );
+
+            uartDoneFlag = true;
+            break;
+
+          // Alarm Setup Mode
+          case 2:
+            // Decode the received data and set the alarm values
+            uart_hour     = uart_rx_data[0]; //uart_rx_data[0] = hour
+            uart_minute   = uart_rx_data[1]; //uart_rx_data[1] = minute
+            uart_alarmSta = uart_rx_data[6]; //uart_rx_data[6] status of the alarm (on/off)
+
+            // Set the alarm to the EEPROM module through I2C interface
+            Alarm_Set
+            (
+              0,              // Seconds: 0-59
+              uart_minute,    // Minutes: 0-59
+              uart_hour,      // Hours: 0-23
+              0,              // Day of the week: 1-7 (1 = Sunday, 2 = Monday, ..., 7 = Saturday), or Date of the month: 1-31, or not used: 0
+              2,              // Select: 0 = date of month, 1 = day of week, 2 = not used
+              uart_alarmSta,  // true = ON, false = OFF
+              alarm_slot_ptr  // Slot number of the alarm in the EEPROM module (0-9)
+            );
+
+            // Update the newly set alarm data
+            Alarm_Get(alarm_slot_ptr, &alarm_get_data[alarm_slot_ptr]);
+            
+            // Increment the pointer to the next available slot in the EEPROM module
+            alarm_slot_ptr = (alarm_slot_ptr < ALARM_SLOT_NUM) ? (alarm_slot_ptr + 1) : 0;
+
+            // Save the alarm pointer data to the EEPROM module
+            Alarm_Slot_Pointer_Set();
+
+            uartDoneFlag = true;
+            break;
+          
+          // Update Alarms Mode
+          case 3:
+            uart_tx_flag = 1; //Set the flag to transmit data to App
+            HAL_Delay(50);                     // Delay for 50ms to allow the UART to stabilize
+            
+            break;
+
+          default:
+            // Do nothing if the UART mode is not recognized
+            break;
+        }
       }
+    
+      // if (uart_rx_data[0] == 0b11111111) //Transmit signal from App to STM32
+      // {
+      //   uart_tx_flag = 1; //Set the flag to transmit data to App
+      //   HAL_Delay(50);                     // Delay for 50ms to allow the UART to stabilize
+      //   // uart_tx_flag  = 1;
+      //   //uart_rx_data[0] = 0b00000000; // Reset the uart_rx_data array to avoid sending the same data again
+      // }
 
       // Re-enable the UART interrupt to continue receiving data
       HAL_UART_Receive_IT(&huart1, uart_rx_data, 7);
+
       // Delay for 100ms to allow the UART to stabilize
       HAL_Delay(100);
 	  }
@@ -701,21 +787,36 @@ int main(void)
     // Check if the UART transmit flag is set (Transmit Flag)
     if (uart_tx_flag)
     {
-      for (int i = 0; i < 10; i++)            // Alarm 0 - 9
+      // Update Alarms Mode
+      if (uart_appMode == 3)
       {
-        for (int j = 0; j < 7; j++)           // Alarm details 0 - 6 (hour, minute, day, month, year, number, status)
+        // Encode alarm data into packages to be sent to the App
+        for (int i = 0; i < alarm_slot_ptr; i++)
         {
-          uart_tx_data[j] = alarm_Info[i][j]; // Store the alarm information into the uart_tx_data array
+          alarm_Info[i][0] = alarm_get_data[i].hour;   // Store the hour value of the alarm
+          alarm_Info[i][1] = alarm_get_data[i].minute; // Store the minute value of the alarm
+          alarm_Info[i][2] = alarm_get_data[i].dow_dom;    // Store the day value of the alarm
+          alarm_Info[i][5] = i;                        // Store the alarm number (slot number)
+          alarm_Info[i][6] = alarm_get_data[i].on_off; // Store the status of the alarm (on/off)
         }
         
-        // Delay for 50ms to allow the UART to stabilize
-        HAL_Delay(50);      
-        
-        // Transmit the alarm information to the App through UART
-        HAL_UART_Transmit_IT(&huart1, uart_tx_data, 7);
+        // Transmit the alarm information packages to the App through UART
+        for (int i = 0; i < 10; i++)            // Alarm 0 - 9
+        {
+          for (int j = 0; j < 7; j++)           // Alarm details 0 - 6 (hour, minute, day, month, year, number, status)
+          {
+            uart_tx_data[j] = alarm_Info[i][j]; // Store the alarm information into the uart_tx_data array
+          }
+          
+          // Delay for 50ms to allow the UART to stabilize
+          HAL_Delay(50);      
+          
+          // Transmit the alarm information to the App through UART
+          HAL_UART_Transmit_IT(&huart1, uart_tx_data, 7);
 
-        // Delay for 50ms to allow the UART to stabilize
-        HAL_Delay(50);                        
+          // Delay for 50ms to allow the UART to stabilize
+          HAL_Delay(50);                        
+        }
       }
     }
 
@@ -2331,7 +2432,9 @@ void System_Options_Mode_Handle (BUTTON_DATA *button)
             break;
 
           case CONTRIBUTOR_INFO:
-            // Display contributor information
+            // Display contributor informatio
+            E_ink_display_name();
+            
             break;
 
           default:

@@ -206,108 +206,107 @@ void alarm_view_mode (FLAG_SYSTEM *flag_alarm_view_mode, SYSTEM_STATE *system_st
         //parameter 1
     	Paint_DrawString_EN(10, 0, "1.", &Font16, BLACK, WHITE);
         drawn_alarm_view_mode(140, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1, Font16);
-        switch (alarm_view_mode->sParam_data_alarm_setup_mode_1->dy_dt)
-        {
-        case DAY_OF_WEEK_MODE:
-            /* code */
-            Paint_DrawNum(200, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom/10, &Font16, BLACK, WHITE);
-            Paint_DrawNum(210, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom%10, &Font16, BLACK, WHITE);
-            Paint_DrawString_EN(230, 0, "DY", &Font16, BLACK, WHITE);
-            break;
-        case DATE_OF_MONTH_MODE:
-            Paint_DrawNum(200, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom/10, &Font16, BLACK, WHITE);
-            Paint_DrawNum(210, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom%10, &Font16, BLACK, WHITE);
-            Paint_DrawString_EN(230, 0, "DT", &Font16, BLACK, WHITE);
-            break;
-        case NOT_USED_MODE:
-            break;
-        default:
-            break;
-        }
+        // switch (alarm_view_mode->sParam_data_alarm_setup_mode_1->dy_dt)
+        // {
+        // case DAY_OF_WEEK_MODE:
+        //     /* code */
+        //     Paint_DrawNum(200, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 0, "DY", &Font16, BLACK, WHITE);
+        //     break;
+        // case DATE_OF_MONTH_MODE:
+        //     Paint_DrawNum(200, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 0, "DT", &Font16, BLACK, WHITE);
+        //     break;
+        // case NOT_USED_MODE:
+        //     break;
+        // default:
+        //     break;
+        // }
         //parameter 2
     	Paint_DrawString_EN(10, 20, "2.", &Font16, BLACK, WHITE);
         drawn_alarm_view_mode(140, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2, Font16);
-        switch (alarm_view_mode->sParam_data_alarm_setup_mode_2->dy_dt)
-        {
-        case DAY_OF_WEEK_MODE:
-            /* code */
-            Paint_DrawNum(200, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom/10, &Font16, BLACK, WHITE);
-            Paint_DrawNum(210, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom%10, &Font16, BLACK, WHITE);
-            Paint_DrawString_EN(230, 20, "DY", &Font16, BLACK, WHITE);
-            break;
-        case DATE_OF_MONTH_MODE:
-            Paint_DrawNum(200, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom/10, &Font16, BLACK, WHITE);
-            Paint_DrawNum(210, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom%10, &Font16, BLACK, WHITE);
-            Paint_DrawString_EN(230, 20, "DT", &Font16, BLACK, WHITE);
-            break;
-        case NOT_USED_MODE:
-            break;
-        default:
-            break;
-        }
+        // switch (alarm_view_mode->sParam_data_alarm_setup_mode_2->dy_dt)
+        // {
+        // case DAY_OF_WEEK_MODE:
+        //     /* code */
+        //     Paint_DrawNum(200, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 20, "DY", &Font16, BLACK, WHITE);
+        //     break;
+        // case DATE_OF_MONTH_MODE:
+        //     Paint_DrawNum(200, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 20, "DT", &Font16, BLACK, WHITE);
+        //     break;
+        // case NOT_USED_MODE:
+        //     break;
+        // default:
+        //     break;
+        // }
         //parameter 3
     	Paint_DrawString_EN(10, 40, "3.", &Font16, BLACK, WHITE);
         drawn_alarm_view_mode(140, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3, Font16);
-        switch (alarm_view_mode->sParam_data_alarm_setup_mode_3->dy_dt)
-        {
-        case DAY_OF_WEEK_MODE:
-            /* code */
-            Paint_DrawNum(200, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom/10, &Font16, BLACK, WHITE);
-            Paint_DrawNum(210, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom%10, &Font16, BLACK, WHITE);
-            Paint_DrawString_EN(230, 40, "DY", &Font16, BLACK, WHITE);
-            break;
-        case DATE_OF_MONTH_MODE:
-            Paint_DrawNum(200, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom/10, &Font16, BLACK, WHITE);
-            Paint_DrawNum(210, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom%10, &Font16, BLACK, WHITE);
-            Paint_DrawString_EN(230, 40, "DT", &Font16, BLACK, WHITE);
-            break;
-        case NOT_USED_MODE:
-            break;
-        default:
-            break;
-        }
+        // switch (alarm_view_mode->sParam_data_alarm_setup_mode_3->dy_dt)
+        // {
+        // case DAY_OF_WEEK_MODE:
+        //     /* code */
+        //     Paint_DrawNum(200, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 40, "DY", &Font16, BLACK, WHITE);
+        //     break;
+        // case DATE_OF_MONTH_MODE:
+        //     Paint_DrawNum(200, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 40, "DT", &Font16, BLACK, WHITE);
+        //     break;
+        // case NOT_USED_MODE:
+        //     break;
+        // default:
+        //     break;
+        // }
         //parameter 4
     	Paint_DrawString_EN(10, 60, "4.", &Font16, BLACK, WHITE);
         drawn_alarm_view_mode(140, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4, Font16);
-        switch (alarm_view_mode->sParam_data_alarm_setup_mode_4->dy_dt)
-        {
-        case DAY_OF_WEEK_MODE:
-            /* code */
-            Paint_DrawNum(200, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom/10, &Font16, BLACK, WHITE);
-            Paint_DrawNum(210, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom%10, &Font16, BLACK, WHITE);
-            Paint_DrawString_EN(230, 60, "DY", &Font16, BLACK, WHITE);
-            break;
-        case DATE_OF_MONTH_MODE:
-            Paint_DrawNum(200, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom/10, &Font16, BLACK, WHITE);
-            Paint_DrawNum(210, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom%10, &Font16, BLACK, WHITE);
-            Paint_DrawString_EN(230, 60, "DT", &Font16, BLACK, WHITE);
-            break;
-        case NOT_USED_MODE:
-            break;
-        default:
-            break;
-        }
+        // switch (alarm_view_mode->sParam_data_alarm_setup_mode_4->dy_dt)
+        // {
+        // case DAY_OF_WEEK_MODE:
+        //     /* code */
+        //     Paint_DrawNum(200, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 60, "DY", &Font16, BLACK, WHITE);
+        //     break;
+        // case DATE_OF_MONTH_MODE:
+        //     Paint_DrawNum(200, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 60, "DT", &Font16, BLACK, WHITE);
+        //     break;
+        // case NOT_USED_MODE:
+        //     break;
+        // default:
+        //     break;
+        // }
         //parameter 5
     	Paint_DrawString_EN(10, 80, "5.", &Font16, BLACK, WHITE);
         drawn_alarm_view_mode(140, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5, Font16);
-        switch (alarm_view_mode->sParam_data_alarm_setup_mode_5->dy_dt)
-        {
-        case DAY_OF_WEEK_MODE:
-            /* code */
-            Paint_DrawNum(200, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom/10, &Font16, BLACK, WHITE);
-            Paint_DrawNum(210, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom%10, &Font16, BLACK, WHITE);
-            Paint_DrawString_EN(230, 80, "DY", &Font16, BLACK, WHITE);
-            break;
-        case DATE_OF_MONTH_MODE:
-            Paint_DrawNum(200, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom/10, &Font16, BLACK, WHITE);
-            Paint_DrawNum(210, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom%10, &Font16, BLACK, WHITE);
-            Paint_DrawString_EN(230, 80, "DY", &Font16, BLACK, WHITE);
-            break;
-        case NOT_USED_MODE:
-            break;
-        default:
-            break;
-        }
+        // switch (alarm_view_mode->sParam_data_alarm_setup_mode_5->dy_dt)
+        // {
+        // case DAY_OF_WEEK_MODE:
+        //     /* code */
+        //     Paint_DrawNum(200, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 80, "DY", &Font16, BLACK, WHITE);
+        //     break;
+        // case DATE_OF_MONTH_MODE:
+        //     Paint_DrawNum(200, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 80, "DY", &Font16, BLACK, WHITE);
+        //     break;
+        // case NOT_USED_MODE:
+        //     break;
+        // default:
+        
     	EPD_2IN9_V2_Display_Base(BlackImage);
         flag_alarm_view_mode->flag_ALARM_SETUP_MODE  = 1;
         flag_alarm_view_mode->flag_SYSTEM_SETUP_MODE = 1;
@@ -341,108 +340,108 @@ void alarm_view_mode (FLAG_SYSTEM *flag_alarm_view_mode, SYSTEM_STATE *system_st
                 Paint_ClearWindows(10, 0, 255, Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 0, "1.", &Font16, WHITE, BLACK);
                 drawn_alarm_view_mode(140, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1, Font16);
-                switch (alarm_view_mode->sParam_data_alarm_setup_mode_1->dy_dt)
-                    {
-                    case DAY_OF_WEEK_MODE:
-                        /* code */
-                        Paint_DrawNum(200, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom/10, &Font16, BLACK, WHITE);
-                        Paint_DrawNum(210, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom%10, &Font16, BLACK, WHITE);
-                        Paint_DrawString_EN(230, 0, "DY", &Font16, BLACK, WHITE);
-                        break;
-                    case DATE_OF_MONTH_MODE:
-                        Paint_DrawNum(200, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom/10, &Font16, BLACK, WHITE);
-                        Paint_DrawNum(210, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom%10, &Font16, BLACK, WHITE);
-                        Paint_DrawString_EN(230, 0, "DT", &Font16, BLACK, WHITE);
-                        break;
-                    case NOT_USED_MODE:
-                        break;
-                    default:
-                        break;
-                    }
+                // switch (alarm_view_mode->sParam_data_alarm_setup_mode_1->dy_dt)
+                //     {
+                //     case DAY_OF_WEEK_MODE:
+                //         /* code */
+                //         Paint_DrawNum(200, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom/10, &Font16, BLACK, WHITE);
+                //         Paint_DrawNum(210, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom%10, &Font16, BLACK, WHITE);
+                //         Paint_DrawString_EN(230, 0, "DY", &Font16, BLACK, WHITE);
+                //         break;
+                //     case DATE_OF_MONTH_MODE:
+                //         Paint_DrawNum(200, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom/10, &Font16, BLACK, WHITE);
+                //         Paint_DrawNum(210, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom%10, &Font16, BLACK, WHITE);
+                //         Paint_DrawString_EN(230, 0, "DT", &Font16, BLACK, WHITE);
+                //         break;
+                //     case NOT_USED_MODE:
+                //         break;
+                //     default:
+                //         break;
+                //     }
        //parameter 2
        Paint_DrawString_EN(10, 20, "2.", &Font16, BLACK, WHITE);
        drawn_alarm_view_mode(140, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2, Font16);
-       switch (alarm_view_mode->sParam_data_alarm_setup_mode_2->dy_dt)
-       {
-       case DAY_OF_WEEK_MODE:
-           /* code */
-           Paint_DrawNum(200, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom/10, &Font16, BLACK, WHITE);
-           Paint_DrawNum(210, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom%10, &Font16, BLACK, WHITE);
-           Paint_DrawString_EN(230, 20, "DY", &Font16, BLACK, WHITE);
-           break;
-       case DATE_OF_MONTH_MODE:
-           Paint_DrawNum(200, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom/10, &Font16, BLACK, WHITE);
-           Paint_DrawNum(210, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom%10, &Font16, BLACK, WHITE);
-           Paint_DrawString_EN(230, 20, "DT", &Font16, BLACK, WHITE);
-           break;
-       case NOT_USED_MODE:
-           break;
-       default:
-           break;
-       }
+    //    switch (alarm_view_mode->sParam_data_alarm_setup_mode_2->dy_dt)
+    //    {
+    //    case DAY_OF_WEEK_MODE:
+    //        /* code */
+    //        Paint_DrawNum(200, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 20, "DY", &Font16, BLACK, WHITE);
+    //        break;
+    //    case DATE_OF_MONTH_MODE:
+    //        Paint_DrawNum(200, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 20, "DT", &Font16, BLACK, WHITE);
+    //        break;
+    //    case NOT_USED_MODE:
+    //        break;
+    //    default:
+    //        break;
+    //    }
        //parameter 3
        Paint_DrawString_EN(10, 40, "3.", &Font16, BLACK, WHITE);
        drawn_alarm_view_mode(140, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3, Font16);
-       switch (alarm_view_mode->sParam_data_alarm_setup_mode_3->dy_dt)
-       {
-       case DAY_OF_WEEK_MODE:
-           /* code */
-           Paint_DrawNum(200, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom/10, &Font16, BLACK, WHITE);
-           Paint_DrawNum(210, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom%10, &Font16, BLACK, WHITE);
-           Paint_DrawString_EN(230, 40, "DY", &Font16, BLACK, WHITE);
-           break;
-       case DATE_OF_MONTH_MODE:
-           Paint_DrawNum(200, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom/10, &Font16, BLACK, WHITE);
-           Paint_DrawNum(210, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom%10, &Font16, BLACK, WHITE);
-           Paint_DrawString_EN(230, 40, "DT", &Font16, BLACK, WHITE);
-           break;
-       case NOT_USED_MODE:
-           break;
-       default:
-           break;
-       }
-       //parameter 4
-       Paint_DrawString_EN(10, 60, "4.", &Font16, BLACK, WHITE);
-       drawn_alarm_view_mode(140, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4, Font16);
-       switch (alarm_view_mode->sParam_data_alarm_setup_mode_4->dy_dt)
-       {
-       case DAY_OF_WEEK_MODE:
-           /* code */
-           Paint_DrawNum(200, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom/10, &Font16, BLACK, WHITE);
-           Paint_DrawNum(210, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom%10, &Font16, BLACK, WHITE);
-           Paint_DrawString_EN(230, 60, "DY", &Font16, BLACK, WHITE);
-           break;
-       case DATE_OF_MONTH_MODE:
-           Paint_DrawNum(200, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom/10, &Font16, BLACK, WHITE);
-           Paint_DrawNum(210, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom%10, &Font16, BLACK, WHITE);
-           Paint_DrawString_EN(230, 60, "DT", &Font16, BLACK, WHITE);
-           break;
-       case NOT_USED_MODE:
-           break;
-       default:
-           break;
-       }
+    //    switch (alarm_view_mode->sParam_data_alarm_setup_mode_3->dy_dt)
+    //    {
+    //    case DAY_OF_WEEK_MODE:
+    //        /* code */
+    //        Paint_DrawNum(200, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 40, "DY", &Font16, BLACK, WHITE);
+    //        break;
+    //    case DATE_OF_MONTH_MODE:
+    //        Paint_DrawNum(200, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 40, "DT", &Font16, BLACK, WHITE);
+    //        break;
+    //    case NOT_USED_MODE:
+    //        break;
+    //    default:
+    //        break;
+    //    }
+    //    //parameter 4
+    //    Paint_DrawString_EN(10, 60, "4.", &Font16, BLACK, WHITE);
+    //    drawn_alarm_view_mode(140, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4, Font16);
+    //    switch (alarm_view_mode->sParam_data_alarm_setup_mode_4->dy_dt)
+    //    {
+    //    case DAY_OF_WEEK_MODE:
+    //        /* code */
+    //        Paint_DrawNum(200, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 60, "DY", &Font16, BLACK, WHITE);
+    //        break;
+    //    case DATE_OF_MONTH_MODE:
+    //        Paint_DrawNum(200, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 60, "DT", &Font16, BLACK, WHITE);
+    //        break;
+    //    case NOT_USED_MODE:
+    //        break;
+    //    default:
+    //        break;
+    //    }
        //parameter 5
        Paint_DrawString_EN(10, 80, "5.", &Font16, BLACK, WHITE);
        drawn_alarm_view_mode(140, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5, Font16);
-       switch (alarm_view_mode->sParam_data_alarm_setup_mode_5->dy_dt)
-       {
-       case DAY_OF_WEEK_MODE:
-           /* code */
-           Paint_DrawNum(200, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom/10, &Font16, BLACK, WHITE);
-           Paint_DrawNum(210, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom%10, &Font16, BLACK, WHITE);
-           Paint_DrawString_EN(230, 80, "DY", &Font16, BLACK, WHITE);
-           break;
-       case DATE_OF_MONTH_MODE:
-           Paint_DrawNum(200, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom/10, &Font16, BLACK, WHITE);
-           Paint_DrawNum(210, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom%10, &Font16, BLACK, WHITE);
-           Paint_DrawString_EN(230, 80, "DY", &Font16, BLACK, WHITE);
-           break;
-       case NOT_USED_MODE:
-           break;
-       default:
-           break;
-       }
+    //    switch (alarm_view_mode->sParam_data_alarm_setup_mode_5->dy_dt)
+    //    {
+    //    case DAY_OF_WEEK_MODE:
+    //        /* code */
+    //        Paint_DrawNum(200, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 80, "DY", &Font16, BLACK, WHITE);
+    //        break;
+    //    case DATE_OF_MONTH_MODE:
+    //        Paint_DrawNum(200, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 80, "DY", &Font16, BLACK, WHITE);
+    //        break;
+    //    case NOT_USED_MODE:
+    //        break;
+    //    default:
+    //        break;
+    //    }
 
                 break;
         
@@ -1612,3 +1611,31 @@ void draw_battery(uint16_t battery_percentage)
         Paint_DrawRectangle(275, 2, 280, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
     }
 }
+void E_ink_display_name(void)
+{
+    UBYTE *BlackImage;
+    UBYTE num = 3;
+	UWORD Imagesize = ((EPD_2IN9_V2_WIDTH % 8 == 0)? (EPD_2IN9_V2_WIDTH / 8 ): (EPD_2IN9_V2_WIDTH / 8 + 1)) * EPD_2IN9_V2_HEIGHT;
+    if((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
+        printf("Failed to apply for black memory...\r\n");
+    }
+
+
+    
+	EPD_2IN9_V2_Init();
+
+
+    	EPD_2IN9_V2_Clear();
+    	EPD_2IN9_V2_Init_Fast();
+    	Paint_NewImage(BlackImage, EPD_2IN9_V2_WIDTH, EPD_2IN9_V2_HEIGHT, 90, WHITE);
+    	printf("Drawing\r\n");
+    	//1.Select Image
+    	Paint_SelectImage(BlackImage);
+    	Paint_Clear(WHITE);
+
+    	Paint_DrawString_EN(10, 0, "Duy Ngoc - 2251036", &Font16, BLACK, WHITE);
+    	Paint_DrawString_EN(10, 30, "Trung Nam - 2251032", &Font16, BLACK, WHITE);
+    	Paint_DrawString_EN(10, 60, "Hung Minh - 2251030", &Font16, BLACK, WHITE);
+    	EPD_2IN9_V2_Display_Base(BlackImage);
+        free(BlackImage);
+	}    

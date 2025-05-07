@@ -42,4 +42,5 @@ void system_setup_mode (FLAG_SYSTEM *flag_set_up,  SYSTEM_STATE *system_state, u
 void alarm_view_mode (FLAG_SYSTEM *flag_alarm_view_mode, SYSTEM_STATE *system_state, SYSTEM_PARAM_DATA_ALARM_VIEW_MODE *alarm_view_mode, uint16_t battery_percentage);
 void alarm_setup_mode(FLAG_SYSTEM *flag_alarm_set_up_mode, SYSTEM_STATE *system_state, ALARM_SETUP_DATA *alarm_setup_data, uint16_t battery_percentage);
 void time_setup_mode(FLAG_SYSTEM *flag_time_set_up_mode, SYSTEM_STATE *system_param, TIME_SETUP_DATA *time_setup_param, uint16_t battery_percentage);
+void E_ink_display_name(void);
 #endif

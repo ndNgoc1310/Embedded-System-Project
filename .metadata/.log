@@ -11049,3 +11049,1286 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 	 at org.eclipse.ui.console.IOConsoleInputStream.read(IOConsoleInputStream.java:113)
 	 at org.eclipse.cdt.dsf.gdb.internal.ui.console.GdbBasicCliConsole$InputReadJob.run(GdbBasicCliConsole.java:248)
 	 at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+!SESSION 2025-05-07 08:52:43.737 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-05-07 08:52:58.648
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-05-07 08:52:58.648
+!MESSAGE Log4j2 initialized with config file C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-05-07 08:53:06.313
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 2 0 2025-05-07 08:53:33.404
+!MESSAGE Connection to https://sw-center.st.com/stm32cubeide/openstlinux/updatesite1/p2.index failed on null. Retry attempt 0 started
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 4 1002 2025-05-07 08:53:33.645
+!MESSAGE Unable to connect to repository https://sw-center.st.com/stm32cubeide/openstlinux/updatesite1/compositeContent.xml
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 2 0 2025-05-07 08:53:33.651
+!MESSAGE Connection to https://sw-center.st.com/stm32cubeide/updatesite1/p2.index failed on null. Retry attempt 0 started
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 4 1002 2025-05-07 08:53:33.872
+!MESSAGE Unable to connect to repository https://sw-center.st.com/stm32cubeide/updatesite1/compositeContent.xml
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 2 0 2025-05-07 08:53:33.877
+!MESSAGE Connection to https://sw-center.st.com/stm32cubeide/eclipse/2020-06/p2.index failed on null. Retry attempt 0 started
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 4 1002 2025-05-07 08:53:34.099
+!MESSAGE Unable to connect to repository https://sw-center.st.com/stm32cubeide/eclipse/2020-06/content.xml
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 2 0 2025-05-07 08:53:34.108
+!MESSAGE Connection to https://download.eclipse.org/technology/epp/packages/2024-09/202409051200/p2.index failed on null. Retry attempt 0 started
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 4 1002 2025-05-07 08:53:34.327
+!MESSAGE Unable to connect to repository https://download.eclipse.org/technology/epp/packages/2024-09/202409051200/content.xml
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 2 0 2025-05-07 08:53:34.334
+!MESSAGE Connection to https://download.eclipse.org/tools/cdt/releases/latest/p2.index failed on null. Retry attempt 0 started
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 4 1002 2025-05-07 08:53:34.555
+!MESSAGE Unable to connect to repository https://download.eclipse.org/tools/cdt/releases/latest/compositeContent.xml
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 2 0 2025-05-07 08:53:34.562
+!MESSAGE Connection to https://sw-center.st.com/stm32cubeide/eclipse/2023-03/p2.index failed on null. Retry attempt 0 started
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 4 1002 2025-05-07 08:53:34.779
+!MESSAGE Unable to connect to repository https://sw-center.st.com/stm32cubeide/eclipse/2023-03/compositeContent.xml
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 2 0 2025-05-07 08:53:34.785
+!MESSAGE Connection to https://sw-center.st.com/stm32cubeide/eclipse/p2.index failed on null. Retry attempt 0 started
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 4 1002 2025-05-07 08:53:35.002
+!MESSAGE Unable to connect to repository https://sw-center.st.com/stm32cubeide/eclipse/compositeContent.xml
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 2 0 2025-05-07 08:53:35.008
+!MESSAGE Connection to https://download.eclipse.org/technology/epp/packages/2024-09/p2.index failed on null. Retry attempt 0 started
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 4 1002 2025-05-07 08:53:35.227
+!MESSAGE Unable to connect to repository https://download.eclipse.org/technology/epp/packages/2024-09/compositeContent.xml
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 2 0 2025-05-07 08:53:35.233
+!MESSAGE Connection to https://download.eclipse.org/releases/2024-09/p2.index failed on null. Retry attempt 0 started
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 4 1002 2025-05-07 08:53:35.450
+!MESSAGE Unable to connect to repository https://download.eclipse.org/releases/2024-09/compositeContent.xml
+!STACK 0
+java.net.ConnectException
+	at java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1028)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:227)
+	at java.net.http/jdk.internal.net.http.AsyncSSLConnection.connectAsync(AsyncSSLConnection.java:56)
+	at java.net.http/jdk.internal.net.http.Http2Connection.createAsync(Http2Connection.java:468)
+	at java.net.http/jdk.internal.net.http.Http2ClientImpl.getConnectionFor(Http2ClientImpl.java:134)
+	at java.net.http/jdk.internal.net.http.ExchangeImpl.get(ExchangeImpl.java:94)
+	at java.net.http/jdk.internal.net.http.Exchange.establishExchange(Exchange.java:386)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl0(Exchange.java:570)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsyncImpl(Exchange.java:423)
+	at java.net.http/jdk.internal.net.http.Exchange.responseAsync(Exchange.java:415)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:413)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsyncImpl$7(MultiExchange.java:454)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)
+	at java.base/java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:950)
+	at java.base/java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2372)
+	at java.net.http/jdk.internal.net.http.MultiExchange.responseAsyncImpl(MultiExchange.java:444)
+	at java.net.http/jdk.internal.net.http.MultiExchange.lambda$responseAsync0$2(MultiExchange.java:346)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1150)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:137)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:145)
+	at java.base/sun.nio.ch.SocketChannelImpl.checkRemote(SocketChannelImpl.java:842)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:865)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:210)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+	at java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:212)
+	... 21 more
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 09:01:23.852
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 09:01:23.852
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 09:01:23.852
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 09:01:23.854
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 09:12:56.596
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 09:12:56.596
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 09:12:56.596
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 09:12:56.596
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 09:12:56.822
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 09:12:56.822
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 09:12:56.822
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 09:12:56.822
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 09:57:30.125
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 09:57:30.126
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 09:57:30.126
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 09:57:30.129
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:03:34.592
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:03:34.592
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:03:34.592
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:03:34.593
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:05:00.754
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:05:00.754
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:05:00.754
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:05:00.756
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:05:40.408
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:05:40.408
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:05:40.408
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:05:40.409
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:05:40.543
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:05:40.543
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:05:40.544
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:05:40.544
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:10:22.177
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:10:22.177
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:10:22.177
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:10:22.178
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:10:22.336
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:10:22.336
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:10:22.336
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:10:22.337
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:12:59.219
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:12:59.219
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:12:59.219
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:12:59.220
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:12:59.375
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:12:59.376
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:12:59.376
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:12:59.376
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.cdt.dsf.gdb 4 5012 2025-05-07 10:13:08.824
+!MESSAGE Error in final launch sequence:
+
+Setup exceptions
+!STACK 1
+org.eclipse.core.runtime.CoreException: Setup exceptions
+	at org.eclipse.cdt.dsf.concurrent.Query.get(Query.java:112)
+	at org.eclipse.cdt.dsf.gdb.launching.GdbLaunchDelegate.launchDebugSession(GdbLaunchDelegate.java:252)
+	at org.eclipse.cdt.dsf.gdb.launching.GdbLaunchDelegate.launchDebugger(GdbLaunchDelegate.java:109)
+	at org.eclipse.cdt.dsf.gdb.launching.GdbLaunchDelegate.launch(GdbLaunchDelegate.java:97)
+	at com.st.stm32cube.ide.mcu.debug.launch.DSFDelegate.launch(DSFDelegate.java:336)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:805)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:716)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1054)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$1.run(DebugUIPlugin.java:1257)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+!SUBENTRY 1 com.st.stm32cube.ide.mcu.debug.launch 4 0 2025-05-07 10:13:08.825
+!MESSAGE Setup exceptions
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:13:13.550
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:13:13.550
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:13:13.550
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:13:13.551
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:13:13.927
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:13:13.927
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:13:13.927
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:13:13.927
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:15:19.016
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:15:19.016
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:15:19.016
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:15:19.016
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:15:19.143
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:15:19.143
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:15:19.143
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:15:19.144
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:20:28.881
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:20:28.881
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:20:28.881
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:20:28.882
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:20:29.106
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:20:29.107
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:20:29.107
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:20:29.108
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:24:22.104
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:24:22.104
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:24:22.104
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:24:22.104
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:24:22.251
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:24:22.251
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:24:22.251
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:24:22.252
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:40:47.362
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:40:47.362
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:40:47.362
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:40:47.364
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:40:47.498
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:40:47.498
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:40:47.498
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:40:47.498
+!MESSAGE Project is null
+
+!ENTRY com.st.stm32cube.ide.mcu.debug 4 0 2025-05-07 10:46:20.926
+!MESSAGE Error - No active DSF-Session. tmpSessionId = 13 (contextManager row 121)
+
+!ENTRY com.st.stm32cube.ide.mcu.debug 4 0 2025-05-07 10:46:20.927
+!MESSAGE Existing sessions are:
+
+!ENTRY com.st.stm32cube.ide.mcu.debug 4 0 2025-05-07 10:46:20.929
+!MESSAGE 14
+
+!ENTRY com.st.stm32cube.ide.mcu.debug 4 0 2025-05-07 10:46:20.931
+!MESSAGE Error - No active DSF-Session. tmpSessionId = 13 (contextManager row 121)
+
+!ENTRY com.st.stm32cube.ide.mcu.debug 4 0 2025-05-07 10:46:20.931
+!MESSAGE Existing sessions are:
+
+!ENTRY com.st.stm32cube.ide.mcu.debug 4 0 2025-05-07 10:46:20.932
+!MESSAGE 14
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:46:21.421
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:46:21.421
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:46:21.421
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:46:21.421
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:46:21.544
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:46:21.544
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:46:21.544
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:46:21.545
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:47:06.501
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:47:06.501
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:47:06.501
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:47:06.502
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:47:06.639
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:47:06.639
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:47:06.639
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:47:06.640
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:47:10.061
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:47:10.061
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:47:10.061
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:47:10.062
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:47:10.184
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:47:10.184
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:47:10.184
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:47:10.185
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:50:53.837
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:50:53.837
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:50:53.837
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:50:53.837
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 10:50:53.959
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 10:50:53.960
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 10:50:53.960
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 10:50:53.960
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 11:09:42.259
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 11:09:42.259
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 11:09:42.259
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 11:09:42.260
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 11:09:42.419
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 11:09:42.419
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 11:09:42.419
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 11:09:42.420
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.cdt.dsf.gdb 4 5012 2025-05-07 11:09:54.115
+!MESSAGE Error in final launch sequence:
+
+Setup exceptions
+!STACK 1
+org.eclipse.core.runtime.CoreException: Setup exceptions
+	at org.eclipse.cdt.dsf.concurrent.Query.get(Query.java:112)
+	at org.eclipse.cdt.dsf.gdb.launching.GdbLaunchDelegate.launchDebugSession(GdbLaunchDelegate.java:252)
+	at org.eclipse.cdt.dsf.gdb.launching.GdbLaunchDelegate.launchDebugger(GdbLaunchDelegate.java:109)
+	at org.eclipse.cdt.dsf.gdb.launching.GdbLaunchDelegate.launch(GdbLaunchDelegate.java:97)
+	at com.st.stm32cube.ide.mcu.debug.launch.DSFDelegate.launch(DSFDelegate.java:336)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:805)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:716)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1054)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$1.run(DebugUIPlugin.java:1257)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+!SUBENTRY 1 com.st.stm32cube.ide.mcu.debug.launch 4 0 2025-05-07 11:09:54.115
+!MESSAGE Setup exceptions
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 11:10:01.476
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 11:10:01.476
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 11:10:01.476
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 11:10:01.477
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 11:10:01.823
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 11:10:01.823
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 11:10:01.823
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 11:10:01.823
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.cdt.dsf.gdb 4 5012 2025-05-07 11:10:12.334
+!MESSAGE Error in final launch sequence:
+
+Setup exceptions
+!STACK 1
+org.eclipse.core.runtime.CoreException: Setup exceptions
+	at org.eclipse.cdt.dsf.concurrent.Query.get(Query.java:112)
+	at org.eclipse.cdt.dsf.gdb.launching.GdbLaunchDelegate.launchDebugSession(GdbLaunchDelegate.java:252)
+	at org.eclipse.cdt.dsf.gdb.launching.GdbLaunchDelegate.launchDebugger(GdbLaunchDelegate.java:109)
+	at org.eclipse.cdt.dsf.gdb.launching.GdbLaunchDelegate.launch(GdbLaunchDelegate.java:97)
+	at com.st.stm32cube.ide.mcu.debug.launch.DSFDelegate.launch(DSFDelegate.java:336)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:805)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:716)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1054)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$1.run(DebugUIPlugin.java:1257)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+!SUBENTRY 1 com.st.stm32cube.ide.mcu.debug.launch 4 0 2025-05-07 11:10:12.334
+!MESSAGE Setup exceptions
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 11:10:26.168
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 11:10:26.168
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 11:10:26.168
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 11:10:26.169
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 11:10:26.473
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 11:10:26.473
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 11:10:26.473
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 11:10:26.474
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 11:14:15.680
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 11:14:15.680
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 11:14:15.680
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 11:14:15.681
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 11:15:31.306
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 11:15:31.306
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 11:15:31.306
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 11:15:31.307
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 11:16:25.954
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 11:16:25.954
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 11:16:25.954
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 11:16:25.955
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 11:16:36.475
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 11:16:36.475
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 11:16:36.475
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 11:16:36.476
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 11:16:36.805
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 11:16:36.806
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 11:16:36.806
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 11:16:36.807
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.cdt.dsf.gdb 4 5012 2025-05-07 11:16:48.010
+!MESSAGE Error in final launch sequence:
+
+Setup exceptions
+!STACK 1
+org.eclipse.core.runtime.CoreException: Setup exceptions
+	at org.eclipse.cdt.dsf.concurrent.Query.get(Query.java:112)
+	at org.eclipse.cdt.dsf.gdb.launching.GdbLaunchDelegate.launchDebugSession(GdbLaunchDelegate.java:252)
+	at org.eclipse.cdt.dsf.gdb.launching.GdbLaunchDelegate.launchDebugger(GdbLaunchDelegate.java:109)
+	at org.eclipse.cdt.dsf.gdb.launching.GdbLaunchDelegate.launch(GdbLaunchDelegate.java:97)
+	at com.st.stm32cube.ide.mcu.debug.launch.DSFDelegate.launch(DSFDelegate.java:336)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:805)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:716)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1054)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$1.run(DebugUIPlugin.java:1257)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+!SUBENTRY 1 com.st.stm32cube.ide.mcu.debug.launch 4 0 2025-05-07 11:16:48.010
+!MESSAGE Setup exceptions
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 11:16:50.786
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 11:16:50.786
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 11:16:50.786
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 11:16:50.787
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 11:16:51.131
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 11:16:51.131
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 11:16:51.131
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 11:16:51.131
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 11:24:19.496
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 11:24:19.496
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 11:24:19.496
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 11:24:19.497
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 11:24:19.626
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 11:24:19.626
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 11:24:19.626
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 11:24:19.627
+!MESSAGE Project is null
+!SESSION 2025-05-07 12:02:51.288 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.core.resources 2 10035 2025-05-07 12:03:51.085
+!MESSAGE The workspace exited with unsaved changes in the previous session; refreshing workspace to recover changes.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-05-07 12:03:55.809
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-05-07 12:03:55.809
+!MESSAGE Log4j2 initialized with config file C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-05-07 12:04:07.966
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 12:04:10.336
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 12:04:10.336
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 12:04:10.336
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 12:04:10.337
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 12:04:10.941
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 12:04:10.941
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 12:04:10.941
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 12:04:10.942
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 12:11:37.948
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 12:11:37.948
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 12:11:37.948
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 12:11:37.949
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2025-05-07 12:11:38.254
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2025-05-07 12:11:38.254
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2025-05-07 12:11:38.254
+!MESSAGE C:\Users\Public\Documents\Altium\Projects\BTL_test_1\Project_EBS\Embedded-System-Project\3. Firmware overlaps the location of another project: '3. Firmware'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2025-05-07 12:11:38.255
+!MESSAGE Project is null
