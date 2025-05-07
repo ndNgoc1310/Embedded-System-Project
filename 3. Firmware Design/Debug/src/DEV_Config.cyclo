@@ -1,0 +1,9 @@
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/DEV_Config.c:36:6:DEV_SPI_WriteByte	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/DEV_Config.c:41:6:DEV_SPI_Write_nByte	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/DEV_Config.c:46:6:DEV_GPIO_Mode	2
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/DEV_Config.c:64:6:DEV_GPIO_Init	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/DEV_Config.c:73:6:DEV_SPI_Init	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/DEV_Config.c:82:6:DEV_SPI_SendData	3
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/DEV_Config.c:107:7:DEV_SPI_ReadData	3
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/DEV_Config.c:132:5:DEV_Module_Init	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/DEV_Config.c:141:6:DEV_Module_Exit	1
