@@ -1,21 +1,21 @@
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:92:6:Paint_NewImage	4
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:124:6:Paint_SelectImage	1
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:134:6:Paint_SetRotate	5
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:144:6:Paint_SetScale	8
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:165:6:Paint_SetMirroring	7
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:184:6:Paint_SetPixel	20
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:263:6:Paint_Clear	11
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:298:6:Paint_ClearWindows	3
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:317:6:Paint_DrawPoint	10
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:357:6:Paint_DrawLine	13
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:415:6:Paint_DrawRectangle	7
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:448:6:Paint_DrawCircle	9
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:517:6:Paint_DrawChar	10
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:566:6:Paint_DrawString_EN	6
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:611:6:Paint_DrawString_CN	22
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:707:6:Paint_DrawNum	5
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:750:6:Paint_DrawNumDecimals	8
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:809:6:Paint_DrawTime	1
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:835:6:Paint_DrawBitMap	3
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:860:6:Paint_DrawBitMap_Paste	5
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:954:6:Paint_DrawBitMap_Block	3
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:92:6:Paint_NewImage	4
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:124:6:Paint_SelectImage	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:134:6:Paint_SetRotate	5
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:144:6:Paint_SetScale	8
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:165:6:Paint_SetMirroring	7
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:184:6:Paint_SetPixel	20
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:263:6:Paint_Clear	11
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:298:6:Paint_ClearWindows	3
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:317:6:Paint_DrawPoint	10
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:357:6:Paint_DrawLine	13
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:415:6:Paint_DrawRectangle	7
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:448:6:Paint_DrawCircle	9
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:517:6:Paint_DrawChar	10
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:566:6:Paint_DrawString_EN	6
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:611:6:Paint_DrawString_CN	22
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:707:6:Paint_DrawNum	5
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:750:6:Paint_DrawNumDecimals	8
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:809:6:Paint_DrawTime	1
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:835:6:Paint_DrawBitMap	3
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:860:6:Paint_DrawBitMap_Paste	5
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/GUI_Paint.c:954:6:Paint_DrawBitMap_Block	3

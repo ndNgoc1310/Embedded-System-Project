@@ -29,184 +29,12 @@
 ******************************************************************************/
 #include "EPD_Test.h"
 #include "EPD_2in9_V2.h"
-void drawn_alarm_view_mode(uint16_t Xstart, uint16_t Ystart, SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *sParam_data_alarm_setup_mode, sFONT Font);
-void drawn_alarm_setup_mode(uint16_t Xstart, uint16_t Ystart, SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *sParam_data_alarm_setup_mode, sFONT Font);
-int EPD_test(void)
-{
-    printf("EPD_2IN9_V2_test Demo\r\n");
-    if(DEV_Module_Init()!=0){
-        return -1;
-    }
+void drawn_alarm_view_mode(uint16_t Xstart, uint16_t Ystart, ALARM_DATA_SETUP_MODE *sParam_data_alarm_setup_mode, sFONT Font);
+void drawn_alarm_setup_mode(uint16_t Xstart, uint16_t Ystart, ALARM_DATA_SETUP_MODE *sParam_data_alarm_setup_mode, sFONT Font);
+void draw_battery(uint16_t battery_percentage);
+void draw_day(uint16_t day, uint16_t date, uint16_t month, uint16_t year);
 
-    printf("e-Paper Init and Clear...\r\n");
-	EPD_2IN9_V2_Init();
-    EPD_2IN9_V2_Clear();
-    DEV_Delay_ms(1000);
-
-    //Create a new image cache
-    UBYTE *BlackImage;
-    UWORD Imagesize = ((EPD_2IN9_V2_WIDTH % 8 == 0)? (EPD_2IN9_V2_WIDTH / 8 ): (EPD_2IN9_V2_WIDTH / 8 + 1)) * EPD_2IN9_V2_HEIGHT;
-    if((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
-        printf("Failed to apply for black memory...\r\n");
-        return -1;
-    }
-    printf("Paint_NewImage\r\n");
-    Paint_NewImage(BlackImage, EPD_2IN9_V2_WIDTH, EPD_2IN9_V2_HEIGHT, 90, WHITE);
-	Paint_Clear(WHITE);
-
-#if 1  //show image for array  
-    Paint_NewImage(BlackImage, EPD_2IN9_V2_WIDTH, EPD_2IN9_V2_HEIGHT, 90, WHITE);  
-    printf("show image for array\r\n");
-    Paint_SelectImage(BlackImage);
-    Paint_Clear(WHITE);
-    Paint_DrawBitMap(gImage_2in9);
-
-    EPD_2IN9_V2_Display(BlackImage);
-    DEV_Delay_ms(3000);
-#endif
-
-#if 1  // Drawing on the image
-    EPD_2IN9_V2_Init_Fast();
-	Paint_NewImage(BlackImage, EPD_2IN9_V2_WIDTH, EPD_2IN9_V2_HEIGHT, 90, WHITE);  	
-    printf("Drawing\r\n");
-    //1.Select Image
-    Paint_SelectImage(BlackImage);
-    Paint_Clear(WHITE);
-	
-    // 2.Drawing on the image
-    printf("Drawing:BlackImage\r\n");
-    /*
-    Paint_DrawPoint(10, 80, BLACK, DOT_PIXEL_1X1, DOT_STYLE_DFT);
-    Paint_DrawPoint(10, 90, BLACK, DOT_PIXEL_2X2, DOT_STYLE_DFT);
-    Paint_DrawPoint(10, 100, BLACK, DOT_PIXEL_3X3, DOT_STYLE_DFT);
-
-    Paint_DrawLine(20, 70, 70, 120, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
-    Paint_DrawLine(70, 70, 20, 120, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
-
-    Paint_DrawRectangle(20, 70, 70, 120, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-    Paint_DrawRectangle(80, 70, 130, 120, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-
-    Paint_DrawCircle(45, 95, 20, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-    Paint_DrawCircle(105, 95, 20, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-
-    Paint_DrawLine(85, 95, 125, 95, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-    Paint_DrawLine(105, 75, 105, 115, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-*/
-    Paint_DrawString_EN(10, 0, "Duy Ngoc - 2251036", &Font16, BLACK, WHITE);
-    Paint_DrawString_EN(10, 30, "Trung Nam - 2251032", &Font16, BLACK, WHITE);
-    Paint_DrawString_EN(10, 60, "Hung Minh - 2251030", &Font16, BLACK, WHITE);
-
-
-//    Paint_DrawNum(10, 33, 123456789, &Font12, BLACK, WHITE);
-//    Paint_DrawNum(10, 50, 987654321, &Font16, WHITE, BLACK);
-
-    //Paint_DrawString_CN(130, 0, "���abc", &Font12CN, BLACK, WHITE);
-    //Paint_DrawString_CN(130, 20, "΢ѩ����", &Font24CN, WHITE, BLACK);
-
-    EPD_2IN9_V2_Display_Base(BlackImage);
-    DEV_Delay_ms(3000);
-#endif
-
-#if 1   //Partial refresh, example shows time    		
-	Paint_NewImage(BlackImage, EPD_2IN9_V2_WIDTH, EPD_2IN9_V2_HEIGHT, 90, WHITE);  
-    printf("Partial refresh\r\n");
-    Paint_SelectImage(BlackImage);
-	
-    PAINT_TIME sPaint_time;
-    sPaint_time.Hour = 12;
-    sPaint_time.Min = 34;
-    sPaint_time.Sec = 56;
-    UBYTE num = 10;
-    for (;;) {
-        sPaint_time.Sec = sPaint_time.Sec + 1;
-        if (sPaint_time.Sec == 60) {
-            sPaint_time.Min = sPaint_time.Min + 1;
-            sPaint_time.Sec = 0;
-            if (sPaint_time.Min == 60) {
-                sPaint_time.Hour =  sPaint_time.Hour + 1;
-                sPaint_time.Min = 0;
-                if (sPaint_time.Hour == 24) {
-                    sPaint_time.Hour = 0;
-                    sPaint_time.Min = 0;
-                    sPaint_time.Sec = 0;
-                }
-            }
-        }
-        Paint_ClearWindows(150, 80, 150 + Font20.Width * 7, 80 + Font20.Height, WHITE);
-        Paint_DrawTime(150, 80, &sPaint_time, &Font20, WHITE, BLACK);
-
-        num = num - 1;
-        if(num == 0) {
-            break;
-        }
-		EPD_2IN9_V2_Display_Partial(BlackImage);
-        DEV_Delay_ms(500);//Analog clock 1s
-    }
-#endif
-
-#if 1 // show image for array
-//    free(BlackImage);
-//    printf("show Gray------------------------\r\n");
-//    Imagesize = ((EPD_2IN9_V2_WIDTH % 4 == 0)? (EPD_2IN9_V2_WIDTH / 4 ): (EPD_2IN9_V2_WIDTH / 4 + 1)) * EPD_2IN9_V2_HEIGHT;
-//    if((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
-//        printf("Failed to apply for black memory...\r\n");
-//        return -1;
-//    }
-//    EPD_2IN9_V2_Gray4_Init();
-//    printf("4 grayscale display\r\n");
-//    Paint_NewImage(BlackImage, EPD_2IN9_V2_WIDTH, EPD_2IN9_V2_HEIGHT, 90, WHITE);
-//    Paint_SetScale(4);
-//    Paint_Clear(0xff);
-//
-//    Paint_DrawPoint(10, 80, GRAY4, DOT_PIXEL_1X1, DOT_STYLE_DFT);
-//    Paint_DrawPoint(10, 90, GRAY4, DOT_PIXEL_2X2, DOT_STYLE_DFT);
-//    Paint_DrawPoint(10, 100, GRAY4, DOT_PIXEL_3X3, DOT_STYLE_DFT);
-//    Paint_DrawLine(20, 70, 70, 120, GRAY4, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
-//    Paint_DrawLine(70, 70, 20, 120, GRAY4, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
-//    Paint_DrawRectangle(20, 70, 70, 120, GRAY4, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-//    Paint_DrawRectangle(80, 70, 130, 120, GRAY4, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-//    Paint_DrawCircle(45, 95, 20, GRAY4, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-//    Paint_DrawCircle(105, 95, 20, GRAY2, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-//    Paint_DrawLine(85, 95, 125, 95, GRAY4, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-//    Paint_DrawLine(105, 75, 105, 115, GRAY4, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-//    Paint_DrawString_EN(10, 0, "waveshare", &Font16, GRAY4, GRAY1);
-//    Paint_DrawString_EN(10, 20, "hello world", &Font12, GRAY3, GRAY1);
-//    Paint_DrawNum(10, 33, 123456789, &Font12, GRAY4, GRAY2);
-//    Paint_DrawNum(10, 50, 987654321, &Font16, GRAY1, GRAY4);
-//    Paint_DrawString_CN(150, 0,"���abc", &Font12CN, GRAY4, GRAY1);
-//    Paint_DrawString_CN(150, 20,"���abc", &Font12CN, GRAY3, GRAY2);
-//    Paint_DrawString_CN(150, 40,"���abc", &Font12CN, GRAY2, GRAY3);
-//    Paint_DrawString_CN(150, 60,"���abc", &Font12CN, GRAY1, GRAY4);
-//    Paint_DrawString_CN(150, 80, "΢ѩ����", &Font24CN, GRAY1, GRAY4);
-//    EPD_2IN9_V2_4GrayDisplay(BlackImage);
-//    DEV_Delay_ms(3000);
-//
-//    Paint_NewImage(BlackImage, EPD_2IN9_V2_WIDTH, EPD_2IN9_V2_HEIGHT, 0, WHITE);
-//    Paint_SetScale(4);
-//    Paint_Clear(WHITE);
-//    Paint_DrawBitMap(gImage_2in9_4Gray);
-//    EPD_2IN9_V2_4GrayDisplay(BlackImage);
-//    DEV_Delay_ms(3000);
-
-#endif
-    
-//	printf("Clear...\r\n");
-//	EPD_2IN9_V2_Init();
-//    EPD_2IN9_V2_Clear();
-	
-    printf("Goto Sleep...\r\n");
-    EPD_2IN9_V2_Sleep();
-//    free(BlackImage);
-//    BlackImage = NULL;
-    DEV_Delay_ms(2000);//important, at least 2s
-    // close 5V
-    printf("close 5V, Module enters 0 power consumption ...\r\n");
-    //DEV_Module_Exit();
-    return 0;
-}
-
-// it is the screen display time with the list of name
-void default_mode(int *flag_main_screen, uint8_t *hour, uint8_t *minute, uint8_t *second)
+void default_mode(FLAG_SYSTEM *flag_default_mode, TIME_DATA *time_get_data, uint16_t battery_percentage)
 {
 	UBYTE *BlackImage;
 
@@ -215,8 +43,9 @@ void default_mode(int *flag_main_screen, uint8_t *hour, uint8_t *minute, uint8_t
         printf("Failed to apply for black memory...\r\n");
     }
 
-	EPD_2IN9_V2_Init();
-
+    EPD_2IN9_V2_Init_Fast();
+    if(flag_default_mode ->flag_DEFAULT_MODE == 1)
+    {
 		EPD_2IN9_V2_Init();
     	EPD_2IN9_V2_Clear();
     	EPD_2IN9_V2_Init_Fast();
@@ -231,55 +60,36 @@ void default_mode(int *flag_main_screen, uint8_t *hour, uint8_t *minute, uint8_t
     	// 2.Drawing on the image
     	printf("Drawing:BlackImage\r\n");
 
-    	Paint_DrawString_EN(10, 0, "Duy Ngoc - 2251036", &Font16, BLACK, WHITE);
-    	Paint_DrawString_EN(10, 30, "Trung Nam - 2251032", &Font16, BLACK, WHITE);
-    	Paint_DrawString_EN(10, 60, "Hung Minh - 2251030", &Font16, BLACK, WHITE);
+    	// Paint_DrawString_EN(10, 0, "Duy Ngoc - 2251036", &Font16, BLACK, WHITE);
+    	// Paint_DrawString_EN(10, 30, "Trung Nam - 2251032", &Font16, BLACK, WHITE);
+    	// Paint_DrawString_EN(10, 60, "Hung Minh - 2251030", &Font16, BLACK, WHITE);
+
+    	Paint_DrawString_EN(35, 40, "ChronoSync: Embedded Digital CLOCK ", &Font12, BLACK, WHITE);
 
 
-
-//      printf("Paint_NewImage\r\n");
-//      Paint_NewImage(BlackImage, EPD_2IN9_V2_WIDTH, EPD_2IN9_V2_HEIGHT, 90, WHITE);
-//      printf("Partial refresh\r\n");
-//      Paint_SelectImage(BlackImage);
-//
-//      PAINT_TIME sPaint_time;
-//      sPaint_time.Hour = hour;
-//      sPaint_time.Min = minute;
-//      sPaint_time.Sec = second;
-//
-//      Paint_ClearWindows(150, 80, 150 + Font20.Width * 7, 80 + Font20.Height, WHITE);
-//      Paint_DrawTime(150, 80, &sPaint_time, &Font20, WHITE, BLACK);
-//      EPD_2IN9_V2_Display_Partial(BlackImage);
-
-	Paint_NewImage(BlackImage, EPD_2IN9_V2_WIDTH, EPD_2IN9_V2_HEIGHT, 90, WHITE);
-	EPD_2IN9_V2_Display_Partial(BlackImage);
-
+	    Paint_NewImage(BlackImage, EPD_2IN9_V2_WIDTH, EPD_2IN9_V2_HEIGHT, 90, WHITE);
+        EPD_2IN9_V2_Display(BlackImage);
+        flag_default_mode->flag_ALARM_SETUP_MODE = 1;
+        flag_default_mode->flag_ALARM_VIEW_MODE = 1;
+        flag_default_mode->flag_SYSTEM_SETUP_MODE = 1;
+        flag_default_mode->flag_TIME_SETUP_MODE = 1;
+    }
+        Paint_NewImage(BlackImage, EPD_2IN9_V2_WIDTH, EPD_2IN9_V2_HEIGHT, 90, WHITE);
+        EPD_2IN9_V2_Display_Partial(BlackImage);
     printf("Partial refresh\r\n");
     Paint_SelectImage(BlackImage);
 
     PAINT_TIME sPaint_time;
-    sPaint_time.Hour = 12;
-    sPaint_time.Min = 34;
-    sPaint_time.Sec = *second;
-    UBYTE num = 10;
+    sPaint_time.Hour = time_get_data->hour;
+    sPaint_time.Min = time_get_data->minute;
+    sPaint_time.Sec = 0;
+    UBYTE num = 3;
     for (;;) {
-        sPaint_time.Sec = sPaint_time.Sec + 1;
-        if (sPaint_time.Sec == 60) {
-            sPaint_time.Min = sPaint_time.Min + 1;
-            sPaint_time.Sec = 0;
-            if (sPaint_time.Min == 60) {
-                sPaint_time.Hour =  sPaint_time.Hour + 1;
-                sPaint_time.Min = 0;
-                if (sPaint_time.Hour == 24) {
-                    sPaint_time.Hour = 0;
-                    sPaint_time.Min = 0;
-                    sPaint_time.Sec = 0;
-                }
-            }
-        }
-        Paint_ClearWindows(150, 80, 150 + Font20.Width * 7, 80 + Font20.Height, WHITE);
-        Paint_DrawTime(150, 80, &sPaint_time, &Font20, WHITE, BLACK);
-
+        Paint_ClearWindows(100, 60, 100 + Font20.Width * 7, 60 + Font20.Height, WHITE);
+        Paint_ClearWindows(70, 100, 296, 100 + Font20.Height, WHITE);
+        Paint_DrawTime(100, 60, &sPaint_time, &Font20, WHITE, BLACK);
+        draw_day(time_get_data->dayofweek, time_get_data->dateofmonth, time_get_data->month, time_get_data->year);
+        draw_battery(battery_percentage);
         num = num - 1;
         if(num == 0) {
             break;
@@ -287,12 +97,12 @@ void default_mode(int *flag_main_screen, uint8_t *hour, uint8_t *minute, uint8_t
 		EPD_2IN9_V2_Display_Partial(BlackImage);
     }
       EPD_2IN9_V2_Sleep();
-      *flag_main_screen = 0;
+      flag_default_mode->flag_DEFAULT_MODE = 0;
       free(BlackImage);
 }
 
 // mode menu
-void menu_set_up (int *flag_set_up,  SYSTEM_MODE *mode, uint8_t *count)
+void system_setup_mode (FLAG_SYSTEM *flag_set_up,  SYSTEM_STATE *system_state, uint8_t battery_percentage)
 {
 	UBYTE *BlackImage;
 
@@ -302,7 +112,7 @@ void menu_set_up (int *flag_set_up,  SYSTEM_MODE *mode, uint8_t *count)
     }
 
 	EPD_2IN9_V2_Init();
-	if(*flag_set_up == 1)
+	if(flag_set_up->flag_SYSTEM_SETUP_MODE == 1)
 	{
 		EPD_2IN9_V2_Init();
     	EPD_2IN9_V2_Clear();
@@ -317,151 +127,44 @@ void menu_set_up (int *flag_set_up,  SYSTEM_MODE *mode, uint8_t *count)
     	// 2.Drawing on the image
     	printf("Drawing:BlackImage\r\n");
 
-    	Paint_DrawString_EN(10, 0, "0. Default Mode", &Font12, BLACK, WHITE);
-    	Paint_DrawString_EN(10, 15, "1. Time Setup", &Font12, BLACK, WHITE);
-    	Paint_DrawString_EN(10, 30, "2. Alarm Setup", &Font12, BLACK, WHITE);
-    	Paint_DrawString_EN(10, 45, "3. Alarm Review", &Font12, BLACK, WHITE);
-    	Paint_DrawString_EN(10, 60, "4. Alarm Active", &Font12, BLACK, WHITE);
-    	Paint_DrawString_EN(10, 75, "5. System Options", &Font12, BLACK, WHITE);
-
+ 
+    
     	EPD_2IN9_V2_Display_Base(BlackImage);
+        flag_set_up->flag_ALARM_SETUP_MODE  = 1;
+        flag_set_up->flag_ALARM_VIEW_MODE   = 1;
+        flag_set_up->flag_DEFAULT_MODE      = 1;
+        flag_set_up->flag_TIME_SETUP_MODE   = 1;
 	}
 
 Paint_NewImage(BlackImage, EPD_2IN9_V2_WIDTH, EPD_2IN9_V2_HEIGHT, 90, WHITE);
 printf("Partial refresh\r\n");
 Paint_SelectImage(BlackImage);
 UBYTE num = 3;
-if (*count > 6)
-{
-    *count = 0;
-}
+
 for (;;) {
 
     /*
     Paint_ClearWindows(150, 80, 150 + Font20.Width * 7, 80 + Font20.Height, WHITE);
     Paint_DrawTime(150, 80, &sPaint_time, &Font20, WHITE, BLACK);
 */
-	switch (*mode){
-        case DEFAULT_MODE:
-        Paint_ClearWindows(10, 0, 10 + Font12.Width * 20, 0 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 0, "0. Default Mode", &Font12, WHITE, BLACK);
+    draw_battery(battery_percentage);
+	switch (system_state->system_opt_cursor){
+        case CLEAR_ALL_ALARM:
+        Paint_ClearWindows(10, 0, 10 + Font16.Width * 20, 0 + Font16.Height, WHITE);
+        Paint_DrawString_EN(10, 0, "0. CLEAR ALL ALARM", &Font16, WHITE, BLACK);
         //mode_1
-        Paint_ClearWindows(10, 15, 10 + Font12.Width * 20, 15 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 15, "1. Time Setup", &Font12, BLACK, WHITE);
-        //mode 2
-        Paint_ClearWindows(10, 30, 10 + Font12.Width * 20, 30 + Font12.Height, WHITE);
-    	Paint_DrawString_EN(10, 30, "2. Alarm Setup", &Font12, BLACK, WHITE);
-        //mode 3
-        Paint_ClearWindows(10, 45, 10 + Font12.Width * 20, 45 + Font12.Height, WHITE);
-    	Paint_DrawString_EN(10, 45, "3. Alarm Review", &Font12, BLACK, WHITE);
-        //mode 4
-        Paint_ClearWindows(10, 60, 10 + Font12.Width * 20, 60 + Font12.Height, WHITE);
-    	Paint_DrawString_EN(10, 60, "4. Alarm Active", &Font12, BLACK, WHITE);
-    	//mode 5
-        Paint_ClearWindows(10, 75, 10 + Font12.Width * 20, 75 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 75, "5. System Options", &Font12, BLACK, WHITE);
+        Paint_ClearWindows(10, 40, 10 + Font16.Width * 20, 40 + Font16.Height, WHITE);
+        Paint_DrawString_EN(10, 40, "1. CONTRIBUTOR INFO", &Font16, BLACK, WHITE);
         break;
 
-        case TIME_SETUP_MODE:
-        Paint_ClearWindows(10, 0, 10 + Font12.Width * 20, 0 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 0, "0. Default Mode", &Font12, BLACK, WHITE);
+        case CONTRIBUTOR_INFO:
+        Paint_ClearWindows(10, 0, 10 + Font16.Width * 20, 0 + Font16.Height, WHITE);
+        Paint_DrawString_EN(10, 0, "0. CLEAR ALL ALARM", &Font16, BLACK, WHITE);
         //mode_1
-        Paint_ClearWindows(10, 15, 10 + Font12.Width * 20, 15 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 15, "1. Time Setup", &Font12, WHITE, BLACK);
-        //mode 2
-        Paint_ClearWindows(10, 30, 10 + Font12.Width * 20, 30 + Font12.Height, WHITE);
-    	Paint_DrawString_EN(10, 30, "2. Alarm Setup", &Font12, BLACK, WHITE);
-        //mode 3
-        Paint_ClearWindows(10, 45, 10 + Font12.Width * 20, 45 + Font12.Height, WHITE);
-    	Paint_DrawString_EN(10, 45, "3. Alarm Review", &Font12, BLACK, WHITE);
-        //mode 4
-        Paint_ClearWindows(10, 60, 10 + Font12.Width * 20, 60 + Font12.Height, WHITE);
-    	Paint_DrawString_EN(10, 60, "4. Alarm Active", &Font12, BLACK, WHITE);
-    	//mode 5
-        Paint_ClearWindows(10, 75, 10 + Font12.Width * 20, 75 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 75, "5. System Options", &Font12, BLACK, WHITE);
+        Paint_ClearWindows(10, 40, 10 + Font16.Width * 20, 40 + Font16.Height, WHITE);
+        Paint_DrawString_EN(10, 40, "1. CONTRIBUTOR INFO", &Font16, WHITE, BLACK);
         break;
-
-        case ALARM_SETUP_MODE:
-        Paint_ClearWindows(10, 0, 10 + Font12.Width * 20, 0 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 0, "0. Default Mode", &Font12, BLACK, WHITE);
-        //mode_1
-        Paint_ClearWindows(10, 15, 10 + Font12.Width * 20, 15 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 15, "1. Time Setup", &Font12, BLACK, WHITE);
-        //mode 2
-        Paint_ClearWindows(10, 30, 10 + Font12.Width * 20, 30 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 30, "2. Alarm Setup", &Font12, WHITE, BLACK);
-        //mode 3
-        Paint_ClearWindows(10, 45, 10 + Font12.Width * 20, 45 + Font12.Height, WHITE);
-    	Paint_DrawString_EN(10, 45, "3. Alarm Review", &Font12, BLACK, WHITE);
-        //mode 4
-        Paint_ClearWindows(10, 60, 10 + Font12.Width * 20, 60 + Font12.Height, WHITE);
-    	Paint_DrawString_EN(10, 60, "4. Alarm Active", &Font12, BLACK, WHITE);
-    	//mode 5
-        Paint_ClearWindows(10, 75, 10 + Font12.Width * 20, 75 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 75, "5. System Options", &Font12, BLACK, WHITE);
-        break;
-
-        case ALARM_VIEW_MODE:
-        Paint_ClearWindows(10, 0, 10 + Font12.Width * 20, 0 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 0, "0. Default Mode", &Font12, BLACK, WHITE);
-        //mode_1
-        Paint_ClearWindows(10, 15, 10 + Font12.Width * 20, 15 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 15, "1. Time Setup", &Font12, BLACK, WHITE);
-        //mode 2
-        Paint_ClearWindows(10, 30, 10 + Font12.Width * 20, 30 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 30, "2. Alarm Setup", &Font12, BLACK, WHITE);
-        //mode 3
-        Paint_ClearWindows(10, 45, 10 + Font12.Width * 20, 45 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 45, "3. Alarm Revie", &Font12, WHITE, BLACK);
-        //mode 4
-        Paint_ClearWindows(10, 60, 10 + Font12.Width * 20, 60 + Font12.Height, WHITE);
-    	Paint_DrawString_EN(10, 60, "4. Alarm Active", &Font12, BLACK, WHITE);
-    	//mode 5
-        Paint_ClearWindows(10, 75, 10 + Font12.Width * 20, 75 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 75, "5. System Options", &Font12, BLACK, WHITE);
-        break;
-
-        case ALARM_ACTIVE_MODE:
-
-        Paint_ClearWindows(10, 0, 10 + Font12.Width * 20, 0 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 0, "0. Default Mode", &Font12, BLACK, WHITE);
-        //mode_1
-        Paint_ClearWindows(10, 15, 10 + Font12.Width * 20, 15 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 15, "1. Time Setup", &Font12, BLACK, WHITE);
-        //mode 2
-        Paint_ClearWindows(10, 30, 10 + Font12.Width * 20, 30 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 30, "2. Alarm Setup", &Font12, BLACK, WHITE);
-        //mode 3
-        Paint_ClearWindows(10, 45, 10 + Font12.Width * 20, 45 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 45, "3. Alarm Revie", &Font12, BLACK, WHITE);
-        //mode 4
-        Paint_ClearWindows(10, 60, 10 + Font12.Width * 20, 60 + Font12.Height, WHITE);
-    	Paint_DrawString_EN(10, 60, "4. Alarm Active", &Font12, WHITE, BLACK);
-    	//mode 5
-        Paint_ClearWindows(10, 75, 10 + Font12.Width * 20, 75 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 75, "5. System Options", &Font12, BLACK, WHITE);
-        break;
-
-        case SYSTEM_OPTIONS_MODE:
-        Paint_ClearWindows(10, 0, 10 + Font12.Width * 20, 0 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 0, "0. Default Mode", &Font12, BLACK, WHITE);
-        //mode_1
-        Paint_ClearWindows(10, 15, 10 + Font12.Width * 20, 15 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 15, "1. Time Setup", &Font12, BLACK, WHITE);
-        //mode 2
-        Paint_ClearWindows(10, 30, 10 + Font12.Width * 20, 30 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 30, "2. Alarm Setup", &Font12, BLACK, WHITE);
-        //mode 3
-        Paint_ClearWindows(10, 45, 10 + Font12.Width * 20, 45 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 45, "3. Alarm Revie", &Font12, BLACK, WHITE);
-        //mode 4
-        Paint_ClearWindows(10, 60, 10 + Font12.Width * 20, 60 + Font12.Height, WHITE);
-    	Paint_DrawString_EN(10, 60, "4. Alarm Active", &Font12, BLACK, WHITE);
-    	//mode 5
-        Paint_ClearWindows(10, 75, 10 + Font12.Width * 20, 75 + Font12.Height, WHITE);
-        Paint_DrawString_EN(10, 75, "5. System Options", &Font12, WHITE, BLACK);
-        break;
+       default: break;
     }
 
     num = num - 1;
@@ -470,13 +173,13 @@ for (;;) {
     }
 	EPD_2IN9_V2_Display_Partial(BlackImage);
 }
-  *flag_set_up = 0;
+  flag_set_up->flag_SYSTEM_SETUP_MODE = 0;
   EPD_2IN9_V2_Sleep();
   free(BlackImage);
 }
 
 // alarm view mode
-void alarm_view_mode (int *flag_alarm_view_mode_set_up,  uint8_t *count_view, uint8_t *count_select, SYSTEM_PARAM_DATA_ALARM_VIEW_MODE *alarm_view_mode)
+void alarm_view_mode (FLAG_SYSTEM *flag_alarm_view_mode, SYSTEM_STATE *system_state, SYSTEM_PARAM_DATA_ALARM_VIEW_MODE *alarm_view_mode, uint16_t battery_percentage)
 {
 	UBYTE *BlackImage;
 
@@ -486,7 +189,7 @@ void alarm_view_mode (int *flag_alarm_view_mode_set_up,  uint8_t *count_view, ui
     }
 
 	EPD_2IN9_V2_Init();
-	if(*flag_alarm_view_mode_set_up == 1)
+	if(flag_alarm_view_mode->flag_ALARM_VIEW_MODE == 1)
 	{
 		EPD_2IN9_V2_Init();
     	EPD_2IN9_V2_Clear();
@@ -503,131 +206,350 @@ void alarm_view_mode (int *flag_alarm_view_mode_set_up,  uint8_t *count_view, ui
         //parameter 1
     	Paint_DrawString_EN(10, 0, "1.", &Font16, BLACK, WHITE);
         drawn_alarm_view_mode(140, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1, Font16);
+        // switch (alarm_view_mode->sParam_data_alarm_setup_mode_1->dy_dt)
+        // {
+        // case DAY_OF_WEEK_MODE:
+        //     /* code */
+        //     Paint_DrawNum(200, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 0, "DY", &Font16, BLACK, WHITE);
+        //     break;
+        // case DATE_OF_MONTH_MODE:
+        //     Paint_DrawNum(200, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 0, "DT", &Font16, BLACK, WHITE);
+        //     break;
+        // case NOT_USED_MODE:
+        //     break;
+        // default:
+        //     break;
+        // }
         //parameter 2
     	Paint_DrawString_EN(10, 20, "2.", &Font16, BLACK, WHITE);
         drawn_alarm_view_mode(140, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2, Font16);
+        // switch (alarm_view_mode->sParam_data_alarm_setup_mode_2->dy_dt)
+        // {
+        // case DAY_OF_WEEK_MODE:
+        //     /* code */
+        //     Paint_DrawNum(200, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 20, "DY", &Font16, BLACK, WHITE);
+        //     break;
+        // case DATE_OF_MONTH_MODE:
+        //     Paint_DrawNum(200, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 20, "DT", &Font16, BLACK, WHITE);
+        //     break;
+        // case NOT_USED_MODE:
+        //     break;
+        // default:
+        //     break;
+        // }
         //parameter 3
     	Paint_DrawString_EN(10, 40, "3.", &Font16, BLACK, WHITE);
         drawn_alarm_view_mode(140, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3, Font16);
+        // switch (alarm_view_mode->sParam_data_alarm_setup_mode_3->dy_dt)
+        // {
+        // case DAY_OF_WEEK_MODE:
+        //     /* code */
+        //     Paint_DrawNum(200, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 40, "DY", &Font16, BLACK, WHITE);
+        //     break;
+        // case DATE_OF_MONTH_MODE:
+        //     Paint_DrawNum(200, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 40, "DT", &Font16, BLACK, WHITE);
+        //     break;
+        // case NOT_USED_MODE:
+        //     break;
+        // default:
+        //     break;
+        // }
         //parameter 4
     	Paint_DrawString_EN(10, 60, "4.", &Font16, BLACK, WHITE);
         drawn_alarm_view_mode(140, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4, Font16);
+        // switch (alarm_view_mode->sParam_data_alarm_setup_mode_4->dy_dt)
+        // {
+        // case DAY_OF_WEEK_MODE:
+        //     /* code */
+        //     Paint_DrawNum(200, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 60, "DY", &Font16, BLACK, WHITE);
+        //     break;
+        // case DATE_OF_MONTH_MODE:
+        //     Paint_DrawNum(200, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 60, "DT", &Font16, BLACK, WHITE);
+        //     break;
+        // case NOT_USED_MODE:
+        //     break;
+        // default:
+        //     break;
+        // }
         //parameter 5
     	Paint_DrawString_EN(10, 80, "5.", &Font16, BLACK, WHITE);
         drawn_alarm_view_mode(140, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5, Font16);
+        // switch (alarm_view_mode->sParam_data_alarm_setup_mode_5->dy_dt)
+        // {
+        // case DAY_OF_WEEK_MODE:
+        //     /* code */
+        //     Paint_DrawNum(200, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 80, "DY", &Font16, BLACK, WHITE);
+        //     break;
+        // case DATE_OF_MONTH_MODE:
+        //     Paint_DrawNum(200, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom/10, &Font16, BLACK, WHITE);
+        //     Paint_DrawNum(210, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom%10, &Font16, BLACK, WHITE);
+        //     Paint_DrawString_EN(230, 80, "DY", &Font16, BLACK, WHITE);
+        //     break;
+        // case NOT_USED_MODE:
+        //     break;
+        // default:
+        
     	EPD_2IN9_V2_Display_Base(BlackImage);
+        flag_alarm_view_mode->flag_ALARM_SETUP_MODE  = 1;
+        flag_alarm_view_mode->flag_SYSTEM_SETUP_MODE = 1;
+        flag_alarm_view_mode->flag_DEFAULT_MODE      = 1;
+        flag_alarm_view_mode->flag_TIME_SETUP_MODE   = 1;
 	}
     UBYTE num = 3;
-    if(*count_view > 1)
+    uint32_t count_change_screen;
+    if(system_state->alarm_view_cursor < 5)
     {
-        *count_view = 0;
+        count_change_screen = 0;
     }
 
-    if (*count_select > 4)
+    else
     {
-        *count_select = 0;
+        count_change_screen = 1;
     }
 
-    if(*count_view == 0)
+    if(count_change_screen  == 0)
     {
         for (;;) {
-        
+            draw_battery(battery_percentage);
             /*
             Paint_ClearWindows(150, 80, 150 + Font20.Width * 7, 80 + Font20.Height, WHITE);
             Paint_DrawTime(150, 80, &sPaint_time, &Font20, WHITE, BLACK);
         */
-            switch (*count_select)
+            switch (system_state->alarm_view_cursor)
             {
                 case 0:
                 //parameter 1
-                Paint_ClearWindows(10, 0, 10 + Font16.Width * 2, Font16.Height, WHITE);
+                Paint_ClearWindows(10, 0, 255, Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 0, "1.", &Font16, WHITE, BLACK);
-                //parameter 2
-                Paint_ClearWindows(10, 20, 10 + Font16.Width * 2, 20 + Font16.Height, WHITE);
-                Paint_DrawString_EN(10, 20, "2.", &Font16, BLACK, WHITE);
-                //parameter 3
-                Paint_ClearWindows(10, 40, 10 + Font16.Width * 2, 40 + Font16.Height, WHITE);
-                Paint_DrawString_EN(10, 40, "3.", &Font16, BLACK, WHITE);
-                //parameter 4
-                Paint_ClearWindows(10, 60, 10 + Font16.Width * 2, 60 + Font16.Height, WHITE);
-                Paint_DrawString_EN(10, 60, "4.", &Font16, BLACK, WHITE);
-                //parameter 5
-                Paint_ClearWindows(10, 80, 10 + Font16.Width * 2, 80 + Font16.Height, WHITE);
-                Paint_DrawString_EN(10, 80, "5.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1, Font16);
+                // switch (alarm_view_mode->sParam_data_alarm_setup_mode_1->dy_dt)
+                //     {
+                //     case DAY_OF_WEEK_MODE:
+                //         /* code */
+                //         Paint_DrawNum(200, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom/10, &Font16, BLACK, WHITE);
+                //         Paint_DrawNum(210, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom%10, &Font16, BLACK, WHITE);
+                //         Paint_DrawString_EN(230, 0, "DY", &Font16, BLACK, WHITE);
+                //         break;
+                //     case DATE_OF_MONTH_MODE:
+                //         Paint_DrawNum(200, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom/10, &Font16, BLACK, WHITE);
+                //         Paint_DrawNum(210, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1->dow_dom%10, &Font16, BLACK, WHITE);
+                //         Paint_DrawString_EN(230, 0, "DT", &Font16, BLACK, WHITE);
+                //         break;
+                //     case NOT_USED_MODE:
+                //         break;
+                //     default:
+                //         break;
+                //     }
+       //parameter 2
+       Paint_DrawString_EN(10, 20, "2.", &Font16, BLACK, WHITE);
+       drawn_alarm_view_mode(140, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2, Font16);
+    //    switch (alarm_view_mode->sParam_data_alarm_setup_mode_2->dy_dt)
+    //    {
+    //    case DAY_OF_WEEK_MODE:
+    //        /* code */
+    //        Paint_DrawNum(200, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 20, "DY", &Font16, BLACK, WHITE);
+    //        break;
+    //    case DATE_OF_MONTH_MODE:
+    //        Paint_DrawNum(200, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 20, "DT", &Font16, BLACK, WHITE);
+    //        break;
+    //    case NOT_USED_MODE:
+    //        break;
+    //    default:
+    //        break;
+    //    }
+       //parameter 3
+       Paint_DrawString_EN(10, 40, "3.", &Font16, BLACK, WHITE);
+       drawn_alarm_view_mode(140, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3, Font16);
+    //    switch (alarm_view_mode->sParam_data_alarm_setup_mode_3->dy_dt)
+    //    {
+    //    case DAY_OF_WEEK_MODE:
+    //        /* code */
+    //        Paint_DrawNum(200, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 40, "DY", &Font16, BLACK, WHITE);
+    //        break;
+    //    case DATE_OF_MONTH_MODE:
+    //        Paint_DrawNum(200, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 40, "DT", &Font16, BLACK, WHITE);
+    //        break;
+    //    case NOT_USED_MODE:
+    //        break;
+    //    default:
+    //        break;
+    //    }
+    //    //parameter 4
+    //    Paint_DrawString_EN(10, 60, "4.", &Font16, BLACK, WHITE);
+    //    drawn_alarm_view_mode(140, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4, Font16);
+    //    switch (alarm_view_mode->sParam_data_alarm_setup_mode_4->dy_dt)
+    //    {
+    //    case DAY_OF_WEEK_MODE:
+    //        /* code */
+    //        Paint_DrawNum(200, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 60, "DY", &Font16, BLACK, WHITE);
+    //        break;
+    //    case DATE_OF_MONTH_MODE:
+    //        Paint_DrawNum(200, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 60, "DT", &Font16, BLACK, WHITE);
+    //        break;
+    //    case NOT_USED_MODE:
+    //        break;
+    //    default:
+    //        break;
+    //    }
+       //parameter 5
+       Paint_DrawString_EN(10, 80, "5.", &Font16, BLACK, WHITE);
+       drawn_alarm_view_mode(140, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5, Font16);
+    //    switch (alarm_view_mode->sParam_data_alarm_setup_mode_5->dy_dt)
+    //    {
+    //    case DAY_OF_WEEK_MODE:
+    //        /* code */
+    //        Paint_DrawNum(200, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 80, "DY", &Font16, BLACK, WHITE);
+    //        break;
+    //    case DATE_OF_MONTH_MODE:
+    //        Paint_DrawNum(200, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom/10, &Font16, BLACK, WHITE);
+    //        Paint_DrawNum(210, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5->dow_dom%10, &Font16, BLACK, WHITE);
+    //        Paint_DrawString_EN(230, 80, "DY", &Font16, BLACK, WHITE);
+    //        break;
+    //    case NOT_USED_MODE:
+    //        break;
+    //    default:
+    //        break;
+    //    }
+
                 break;
         
                 case 1:
                 //parameter 1
-                Paint_ClearWindows(10, 0, 10 + Font16.Width * 2, Font16.Height, WHITE);
+                Paint_ClearWindows(10, 0, 200, Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 0, "1.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1, Font16);
+               
                 //parameter 2
-                Paint_ClearWindows(10, 20, 10 + Font16.Width * 2, 20 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 20, 200, 20 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 20, "2.", &Font16, WHITE, BLACK);
+                drawn_alarm_view_mode(140, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2, Font16);
                 //parameter 3
-                Paint_ClearWindows(10, 40, 10 + Font16.Width * 2, 40 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 40, 200, 40 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 40, "3.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3, Font16);
                 //parameter 4
-                Paint_ClearWindows(10, 60, 10 + Font16.Width * 2, 60 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 60, 200, 60 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 60, "4.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4, Font16);
                 //parameter 5
-                Paint_ClearWindows(10, 80, 10 + Font16.Width * 2, 80 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 80, 200, 80 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 80, "5.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5, Font16);
                 break;
         
                 case 2:
                 //parameter 1
-                Paint_ClearWindows(10, 0, 10 + Font16.Width * 2, Font16.Height, WHITE);
+                Paint_ClearWindows(10, 0, 200, Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 0, "1.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1, Font16);
+                
                 //parameter 2
-                Paint_ClearWindows(10, 20, 10 + Font16.Width * 2, 20 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 20, 200, 20 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 20, "2.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2, Font16);
+
                 //parameter 3
-                Paint_ClearWindows(10, 40, 10 + Font16.Width * 2, 40 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 40, 200, 40 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 40, "3.", &Font16, WHITE, BLACK);
+                drawn_alarm_view_mode(140, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3, Font16);
+
                 //parameter 4
-                Paint_ClearWindows(10, 60, 10 + Font16.Width * 2, 60 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 60, 200, 60 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 60, "4.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4, Font16);
+
                 //parameter 5
-                Paint_ClearWindows(10, 80, 10 + Font16.Width * 2, 80 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 80, 200, 80 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 80, "5.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5, Font16);
+
                 break;
-        
                 case 3:
                 //parameter 1
-                Paint_ClearWindows(10, 0, 10 + Font16.Width * 2, Font16.Height, WHITE);
+                Paint_ClearWindows(10, 0, 200, Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 0, "1.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1, Font16);
+
                 //parameter 2
-                Paint_ClearWindows(10, 20, 10 + Font16.Width * 2, 20 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 20, 200, 20 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 20, "2.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2, Font16);
                 //parameter 3
-                Paint_ClearWindows(10, 40, 10 + Font16.Width * 2, 40 + Font16.Height, WHITE);
+
+                Paint_ClearWindows(10, 40, 200, 40 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 40, "3.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3, Font16);
+
                 //parameter 4
-                Paint_ClearWindows(10, 60, 10 + Font16.Width * 2, 60 + Font16.Height, WHITE);
+
+                Paint_ClearWindows(10, 60, 200, 60 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 60, "4.", &Font16, WHITE, BLACK);
+                drawn_alarm_view_mode(140, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4, Font16);
+
                 //parameter 5
-                Paint_ClearWindows(10, 80, 10 + Font16.Width * 2, 80 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 80, 200, 80 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 80, "5.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5, Font16);
+
                 break;
         
                 case 4:
                 //parameter 1
-                Paint_ClearWindows(10, 0, 10 + Font16.Width * 2, Font16.Height, WHITE);
+                Paint_ClearWindows(10, 0, 200, Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 0, "1.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 0, alarm_view_mode->sParam_data_alarm_setup_mode_1, Font16);
+
                 //parameter 2
-                Paint_ClearWindows(10, 20, 10 + Font16.Width * 2, 20 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 20, 200, 20 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 20, "2.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 20, alarm_view_mode->sParam_data_alarm_setup_mode_2, Font16);
+
                 //parameter 3
-                Paint_ClearWindows(10, 40, 10 + Font16.Width * 2, 40 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 40, 200, 40 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 40, "3.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 40, alarm_view_mode->sParam_data_alarm_setup_mode_3, Font16);
+
                 //parameter 4
-                Paint_ClearWindows(10, 60, 10 + Font16.Width * 2, 60 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 60, 200, 60 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 60, "4.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 60, alarm_view_mode->sParam_data_alarm_setup_mode_4, Font16);
+
                 //parameter 5
-                Paint_ClearWindows(10, 80, 10 + Font16.Width * 2, 80 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 80, 200, 80 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 80, "5.", &Font16, WHITE, BLACK);
-                break;
-        
+                drawn_alarm_view_mode(140, 80, alarm_view_mode->sParam_data_alarm_setup_mode_5, Font16);
                 default: break;
             }
 
@@ -644,101 +566,249 @@ void alarm_view_mode (int *flag_alarm_view_mode_set_up,  uint8_t *count_view, ui
     {
         for (;;) 
         {
-        
+            draw_battery(battery_percentage);
             /*
             Paint_ClearWindows(150, 80, 150 + Font20.Width * 7, 80 + Font20.Height, WHITE);
             Paint_DrawTime(150, 80, &sPaint_time, &Font20, WHITE, BLACK);
         */
-            switch (*count_select)
+            switch (system_state->alarm_view_cursor)
             {
-                case 0:
+                case 5:
                 //parameter 1
-                Paint_ClearWindows(10, 0, 10 + Font16.Width * 2, Font16.Height, WHITE);
+                Paint_ClearWindows(10, 0, 255, Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 0, "6.", &Font16, WHITE, BLACK);
+                drawn_alarm_view_mode(140, 0, alarm_view_mode->sParam_data_alarm_setup_mode_6, Font16);
+
                 //parameter 2
-                Paint_ClearWindows(10, 20, 10 + Font16.Width * 2, 20 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 20, 255, 20 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 20, "7.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 20, alarm_view_mode->sParam_data_alarm_setup_mode_7, Font16);
+
                 //parameter 3
-                Paint_ClearWindows(10, 40, 10 + Font16.Width * 2, 40 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 40, 255, 40 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 40, "8.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 40, alarm_view_mode->sParam_data_alarm_setup_mode_8, Font16);
+
                 //parameter 4
-                Paint_ClearWindows(10, 60, 10 + Font16.Width * 2, 60 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 60, 255, 60 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 60, "9.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 60, alarm_view_mode->sParam_data_alarm_setup_mode_9, Font16);
+
                 //parameter 5
-                Paint_ClearWindows(10, 80, 10 + Font16.Width * 3, 80 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 80, 255, 80 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 80, "10.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 80, alarm_view_mode->sParam_data_alarm_setup_mode_10, Font16);
+                
+                switch (alarm_view_mode->sParam_data_alarm_setup_mode_6->dy_dt)
+                    {
+                    case DAY_OF_WEEK_MODE:
+                        /* code */
+                        Paint_DrawNum(200, 0, alarm_view_mode->sParam_data_alarm_setup_mode_6->dow_dom/10, &Font16, BLACK, WHITE);
+                        Paint_DrawNum(210, 0, alarm_view_mode->sParam_data_alarm_setup_mode_6->dow_dom%10, &Font16, BLACK, WHITE);
+                        Paint_DrawString_EN(230, 0, "DY", &Font16, BLACK, WHITE);
+                        break;
+                    case DATE_OF_MONTH_MODE:
+                        Paint_DrawNum(200, 0, alarm_view_mode->sParam_data_alarm_setup_mode_6->dow_dom/10, &Font16, BLACK, WHITE);
+                        Paint_DrawNum(210, 0, alarm_view_mode->sParam_data_alarm_setup_mode_6->dow_dom%10, &Font16, BLACK, WHITE);
+                        Paint_DrawString_EN(230, 0, "DT", &Font16, BLACK, WHITE);
+                        break;
+                    case NOT_USED_MODE:
+                        break;
+                    default:
+                        break;
+                    }
+
+                switch (alarm_view_mode->sParam_data_alarm_setup_mode_7->dy_dt)
+                {
+                    case DAY_OF_WEEK_MODE:
+                        /* code */
+                        Paint_DrawNum(200, 20, alarm_view_mode->sParam_data_alarm_setup_mode_7->dow_dom/10, &Font16, BLACK, WHITE);
+                        Paint_DrawNum(210, 20, alarm_view_mode->sParam_data_alarm_setup_mode_7->dow_dom%10, &Font16, BLACK, WHITE);
+                        Paint_DrawString_EN(230, 20, "DY", &Font16, BLACK, WHITE);
+                        break;
+                    case DATE_OF_MONTH_MODE:
+                        Paint_DrawNum(200, 20, alarm_view_mode->sParam_data_alarm_setup_mode_7->dow_dom/10, &Font16, BLACK, WHITE);
+                        Paint_DrawNum(210, 20, alarm_view_mode->sParam_data_alarm_setup_mode_7->dow_dom%10, &Font16, BLACK, WHITE);
+                        Paint_DrawString_EN(230, 20, "DT", &Font16, BLACK, WHITE);
+                        break;
+                    case NOT_USED_MODE:
+                        break;
+                    default:
+                        break;
+                    }
+
+        switch (alarm_view_mode->sParam_data_alarm_setup_mode_8->dy_dt)
+       {
+        case DAY_OF_WEEK_MODE:
+           /* code */
+           Paint_DrawNum(200, 40, alarm_view_mode->sParam_data_alarm_setup_mode_8->dow_dom/10, &Font16, BLACK, WHITE);
+           Paint_DrawNum(210, 40, alarm_view_mode->sParam_data_alarm_setup_mode_8->dow_dom%10, &Font16, BLACK, WHITE);
+           Paint_DrawString_EN(230, 40, "DY", &Font16, BLACK, WHITE);
+           break;
+        case DATE_OF_MONTH_MODE:
+           Paint_DrawNum(200, 40, alarm_view_mode->sParam_data_alarm_setup_mode_8->dow_dom/10, &Font16, BLACK, WHITE);
+           Paint_DrawNum(210, 40, alarm_view_mode->sParam_data_alarm_setup_mode_8->dow_dom%10, &Font16, BLACK, WHITE);
+           Paint_DrawString_EN(230, 40, "DT", &Font16, BLACK, WHITE);
+           break;
+        case NOT_USED_MODE:
+           break;
+        default:
+           break;
+        }
+    switch (alarm_view_mode->sParam_data_alarm_setup_mode_9->dy_dt)
+       {
+       case DAY_OF_WEEK_MODE:
+           /* code */
+           Paint_DrawNum(200, 60, alarm_view_mode->sParam_data_alarm_setup_mode_9->dow_dom/10, &Font16, BLACK, WHITE);
+           Paint_DrawNum(210, 60, alarm_view_mode->sParam_data_alarm_setup_mode_9->dow_dom%10, &Font16, BLACK, WHITE);
+           Paint_DrawString_EN(230, 60, "DY", &Font16, BLACK, WHITE);
+           break;
+       case DATE_OF_MONTH_MODE:
+           Paint_DrawNum(200, 60, alarm_view_mode->sParam_data_alarm_setup_mode_9->dow_dom/10, &Font16, BLACK, WHITE);
+           Paint_DrawNum(210, 60, alarm_view_mode->sParam_data_alarm_setup_mode_9->dow_dom%10, &Font16, BLACK, WHITE);
+           Paint_DrawString_EN(230, 60, "DT", &Font16, BLACK, WHITE);
+           break;
+       case NOT_USED_MODE:
+           break;
+       default:
+           break;
+       }
+    switch (alarm_view_mode->sParam_data_alarm_setup_mode_10->dy_dt)
+       {
+       case DAY_OF_WEEK_MODE:
+           /* code */
+           Paint_DrawNum(200, 80, alarm_view_mode->sParam_data_alarm_setup_mode_10->dow_dom/10, &Font16, BLACK, WHITE);
+           Paint_DrawNum(210, 80, alarm_view_mode->sParam_data_alarm_setup_mode_10->dow_dom%10, &Font16, BLACK, WHITE);
+           Paint_DrawString_EN(230, 80, "DY", &Font16, BLACK, WHITE);
+           break;
+       case DATE_OF_MONTH_MODE:
+           Paint_DrawNum(200, 80, alarm_view_mode->sParam_data_alarm_setup_mode_10->dow_dom/10, &Font16, BLACK, WHITE);
+           Paint_DrawNum(210, 80, alarm_view_mode->sParam_data_alarm_setup_mode_10->dow_dom%10, &Font16, BLACK, WHITE);
+           Paint_DrawString_EN(230, 80, "DT", &Font16, BLACK, WHITE);
+           break;
+       case NOT_USED_MODE:
+           break;
+       default:
+           break;
+       }
+                // change to another
                 break;
         
-                case 1:
+                case 6:
                 //parameter 1
-                Paint_ClearWindows(10, 0, 10 + Font16.Width * 2, Font16.Height, WHITE);
+                Paint_ClearWindows(10, 0, 200, Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 0, "6.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 0, alarm_view_mode->sParam_data_alarm_setup_mode_6, Font16);
+
                 //parameter 2
-                Paint_ClearWindows(10, 20, 10 + Font16.Width * 2, 20 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 20, 200, 20 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 20, "7.", &Font16, WHITE, BLACK);
+                drawn_alarm_view_mode(140, 20, alarm_view_mode->sParam_data_alarm_setup_mode_7, Font16);
+
                 //parameter 3
-                Paint_ClearWindows(10, 40, 10 + Font16.Width * 2, 40 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 40, 200, 40 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 40, "8.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 40, alarm_view_mode->sParam_data_alarm_setup_mode_8, Font16);
+
                 //parameter 4
-                Paint_ClearWindows(10, 60, 10 + Font16.Width * 2, 60 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 60, 200, 60 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 60, "9.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 60, alarm_view_mode->sParam_data_alarm_setup_mode_9, Font16);
+
                 //parameter 5
-                Paint_ClearWindows(10, 80, 10 + Font16.Width * 3, 80 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 80, 200, 80 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 80, "10.", &Font16, BLACK, WHITE);
+                 drawn_alarm_view_mode(140, 80, alarm_view_mode->sParam_data_alarm_setup_mode_10, Font16);
+               
                 break;
         
-                case 2:
+                case 7:
                 //parameter 1
-                Paint_ClearWindows(10, 0, 10 + Font16.Width * 2, Font16.Height, WHITE);
+                Paint_ClearWindows(10, 0, 200, Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 0, "6.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 0, alarm_view_mode->sParam_data_alarm_setup_mode_6, Font16);
+
                 //parameter 2
-                Paint_ClearWindows(10, 20, 10 + Font16.Width * 2, 20 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 20, 200, 20 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 20, "7.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 20, alarm_view_mode->sParam_data_alarm_setup_mode_7, Font16);
+
                 //parameter 3
-                Paint_ClearWindows(10, 40, 10 + Font16.Width * 2, 40 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 40, 200, 40 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 40, "8.", &Font16, WHITE, BLACK);
+                drawn_alarm_view_mode(140, 40, alarm_view_mode->sParam_data_alarm_setup_mode_8, Font16);
+
                 //parameter 4
-                Paint_ClearWindows(10, 60, 10 + Font16.Width * 2, 60 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 60, 200, 60 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 60, "9.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 60, alarm_view_mode->sParam_data_alarm_setup_mode_9, Font16);
+
                 //parameter 5
-                Paint_ClearWindows(10, 80, 10 + Font16.Width * 3, 80 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 80, 200, 80 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 80, "10.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 80, alarm_view_mode->sParam_data_alarm_setup_mode_10, Font16);
+
                 break;
         
-                case 3:
+                case 8:
                 //parameter 1
-                Paint_ClearWindows(10, 0, 10 + Font16.Width * 2, Font16.Height, WHITE);
+                Paint_ClearWindows(10, 0, 200, Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 0, "6.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 0, alarm_view_mode->sParam_data_alarm_setup_mode_6, Font16);
+
                 //parameter 2
-                Paint_ClearWindows(10, 20, 10 + Font16.Width * 2, 20 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 20, 200, 20 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 20, "7.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 20, alarm_view_mode->sParam_data_alarm_setup_mode_7, Font16);
+
                 //parameter 3
-                Paint_ClearWindows(10, 40, 10 + Font16.Width * 2, 40 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 40, 200, 40 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 40, "8.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 40, alarm_view_mode->sParam_data_alarm_setup_mode_8, Font16);
+
                 //parameter 4
-                Paint_ClearWindows(10, 60, 10 + Font16.Width * 2, 60 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 60, 200, 60 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 60, "9.", &Font16, WHITE, BLACK);
+                drawn_alarm_view_mode(140, 60, alarm_view_mode->sParam_data_alarm_setup_mode_9, Font16);
+
                 //parameter 5
-                Paint_ClearWindows(10, 80, 10 + Font16.Width * 3, 80 + Font16.Height, WHITE);
+                Paint_ClearWindows(10, 80, 200, 80 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 80, "10.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 80, alarm_view_mode->sParam_data_alarm_setup_mode_10, Font16);
+
                 break;
         
-                case 4:
+                case 9:
                 //parameter 1
-                Paint_ClearWindows(10, 0, 10 + Font16.Width * 2, Font16.Height, WHITE);
+
+                Paint_ClearWindows(10, 0, 200, Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 0, "6.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 0, alarm_view_mode->sParam_data_alarm_setup_mode_6, Font16);
+
                 //parameter 2
-                Paint_ClearWindows(10, 20, 10 + Font16.Width * 2, 20 + Font16.Height, WHITE);
+
+                Paint_ClearWindows(10, 20, 200, 20 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 20, "7.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 20, alarm_view_mode->sParam_data_alarm_setup_mode_7, Font16);
+
                 //parameter 3
-                Paint_ClearWindows(10, 40, 10 + Font16.Width * 2, 40 + Font16.Height, WHITE);
+
+                Paint_ClearWindows(10, 40, 200, 40 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 40, "8.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 40, alarm_view_mode->sParam_data_alarm_setup_mode_8, Font16);
+
                 //parameter 4
-                Paint_ClearWindows(10, 60, 10 + Font16.Width * 2, 60 + Font16.Height, WHITE);
+
+                Paint_ClearWindows(10, 60, 200, 60 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 60, "9.", &Font16, BLACK, WHITE);
+                drawn_alarm_view_mode(140, 60, alarm_view_mode->sParam_data_alarm_setup_mode_9, Font16);
+
                 //parameter 5
-                Paint_ClearWindows(10, 80, 10 + Font16.Width * 3, 80 + Font16.Height, WHITE);
+
+                Paint_ClearWindows(10, 80, 200, 80 + Font16.Height, WHITE);
                 Paint_DrawString_EN(10, 80, "10.", &Font16, WHITE, BLACK);
+                drawn_alarm_view_mode(140, 80, alarm_view_mode->sParam_data_alarm_setup_mode_10, Font16);
+
                 break;
         
                 default: break;
@@ -753,12 +823,12 @@ void alarm_view_mode (int *flag_alarm_view_mode_set_up,  uint8_t *count_view, ui
     }
 }
 
-  *flag_alarm_view_mode_set_up = 0;
+  flag_alarm_view_mode->flag_ALARM_VIEW_MODE = 0;
   EPD_2IN9_V2_Sleep();
   free(BlackImage);
 }
 
-void drawn_alarm_view_mode(uint16_t Xstart, uint16_t Ystart, SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *sParam_data_alarm_setup_mode, sFONT Font)
+void drawn_alarm_view_mode(uint16_t Xstart, uint16_t Ystart, ALARM_DATA_SETUP_MODE *sParam_data_alarm_setup_mode, sFONT Font)
 {
     PAINT_TIME sPaint_time;
     sPaint_time.Hour = sParam_data_alarm_setup_mode->hour;
@@ -779,7 +849,7 @@ void drawn_alarm_view_mode(uint16_t Xstart, uint16_t Ystart, SYSTEM_PARAM_DATA_A
 }
 
 //alarm setup mode
-void alarm_setup_mode(int *flag_alarm_set_up_mode, uint8_t *count_view, uint8_t *count_select, uint8_t *count_edit, SYSTEM_PARAM_DATA_ALARM_VIEW_MODE *alarm_view_mode)
+void alarm_setup_mode(FLAG_SYSTEM *flag_alarm_set_up_mode, SYSTEM_STATE *system_state, ALARM_SETUP_DATA *alarm_setup_data, uint16_t battery_percentage)
 {
 	UBYTE *BlackImage;
     UBYTE num = 3;
@@ -787,86 +857,20 @@ void alarm_setup_mode(int *flag_alarm_set_up_mode, uint8_t *count_view, uint8_t 
     if((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
         printf("Failed to apply for black memory...\r\n");
     }
+    ALARM_DATA_SETUP_MODE *alarm_setup_data_store = malloc(sizeof(ALARM_DATA_SETUP_MODE));
+    alarm_setup_data_store->hour    = alarm_setup_data->hour;
+    alarm_setup_data_store->minute  = alarm_setup_data->minute;
+    alarm_setup_data_store->on_off  = alarm_setup_data->on_off;
 
-    SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *sParam_data_alarm_setup_mode = (SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *)malloc(sizeof(SYSTEM_PARAM_DATA_ALARM_SETUP_MODE));
-
-
-    if(*count_view > 1)
-    {
-        *count_view = 0;
-    }
-
-    if(*count_select > 4)
-    {
-        *count_select = 0;
-    }
-
-    if(*count_edit > 5)
-    {
-        *count_edit = 0;
-    }
-    //select param data
-    if(*count_view == 0)
-    {
-        switch (*count_select)
-        {
-            case 0:
-            sParam_data_alarm_setup_mode = alarm_view_mode->sParam_data_alarm_setup_mode_1;
-            break;
-
-            case 1:
-            sParam_data_alarm_setup_mode = alarm_view_mode->sParam_data_alarm_setup_mode_2;
-            break;
-
-            case 2:
-            sParam_data_alarm_setup_mode = alarm_view_mode->sParam_data_alarm_setup_mode_3;
-            break;
-
-            case 3:
-            sParam_data_alarm_setup_mode = alarm_view_mode->sParam_data_alarm_setup_mode_4;
-            break;
-
-            case 4:
-            sParam_data_alarm_setup_mode = alarm_view_mode->sParam_data_alarm_setup_mode_5;
-            break;
-
-            default:
-            break;
-        }
-    }
     
-    else
-        {
-            switch (*count_select)
-        {
-            case 0:
-            sParam_data_alarm_setup_mode = alarm_view_mode->sParam_data_alarm_setup_mode_6;
-            break;
-
-            case 1:
-            sParam_data_alarm_setup_mode = alarm_view_mode->sParam_data_alarm_setup_mode_7;
-            break;
-
-            case 2:
-            sParam_data_alarm_setup_mode = alarm_view_mode->sParam_data_alarm_setup_mode_8;
-            break;
-
-            case 3:
-            sParam_data_alarm_setup_mode = alarm_view_mode->sParam_data_alarm_setup_mode_9;
-            break;
-
-            case 4:
-            sParam_data_alarm_setup_mode = alarm_view_mode->sParam_data_alarm_setup_mode_10;
-            break;
-
-            default:
-            break;
-        }
-    }
-
 	EPD_2IN9_V2_Init();
-	if(*flag_alarm_set_up_mode == 1)
+	if(flag_alarm_set_up_mode->flag_ALARM_SETUP_MODE == 1)
 	{
+        flag_alarm_set_up_mode->flag_ALARM_VIEW_MODE    = 1;
+        flag_alarm_set_up_mode->flag_DEFAULT_MODE       = 1;
+        flag_alarm_set_up_mode->flag_SYSTEM_SETUP_MODE  = 1;
+        flag_alarm_set_up_mode->flag_TIME_SETUP_MODE    = 1;
+
 		EPD_2IN9_V2_Init();
     	EPD_2IN9_V2_Clear();
     	DEV_Delay_ms(1000);
@@ -878,67 +882,32 @@ void alarm_setup_mode(int *flag_alarm_set_up_mode, uint8_t *count_view, uint8_t 
     	Paint_Clear(WHITE);
 
     	// 2.Drawing on the image
-        if(*count_view == 0)
-        {
-            switch (*count_select)
-            {
-                case 0:
-                drawn_alarm_setup_mode(90, 100, alarm_view_mode->sParam_data_alarm_setup_mode_1, Font24);
-                break;
+           
+            drawn_alarm_setup_mode(90, 100, alarm_setup_data_store, Font24);
+    //     switch (alarm_setup_data->dy_dt)
+    //     {
+    //         case DAY_OF_WEEK_MODE:
+    //         /* code */
+    //         Paint_DrawNum(90, 30, alarm_setup_data->dow_dom/10, &Font16, BLACK, WHITE);
+    //         Paint_DrawNum(100, 30, alarm_setup_data->dow_dom%10, &Font16, BLACK, WHITE);
+    //         Paint_DrawString_EN(120, 30, "DY", &Font16, BLACK, WHITE);
+    //         break;
+    //     case DATE_OF_MONTH_MODE:
+    //         Paint_DrawNum(90, 30, alarm_setup_data->dow_dom/10, &Font16, BLACK, WHITE);
+    //         Paint_DrawNum(100, 30, alarm_setup_data->dow_dom%10, &Font16, BLACK, WHITE);
+    //         Paint_DrawString_EN(120, 30, "DT", &Font16, BLACK, WHITE);
+    //         break;
+    //     case NOT_USED_MODE:
+    //         break;
+    //     default:
+    //         break;
+    // }
+            EPD_2IN9_V2_Display_Base(BlackImage);
 
-                case 1:
-                drawn_alarm_setup_mode(90, 100, alarm_view_mode->sParam_data_alarm_setup_mode_2, Font24);
-                break;
-
-                case 2:
-                drawn_alarm_setup_mode(90, 100, alarm_view_mode->sParam_data_alarm_setup_mode_3, Font24);
-                break;
-
-                case 3:
-                drawn_alarm_setup_mode(90, 100, alarm_view_mode->sParam_data_alarm_setup_mode_4, Font24);
-                break;
-
-                case 4:
-                drawn_alarm_setup_mode(90, 100, alarm_view_mode->sParam_data_alarm_setup_mode_5, Font24);
-                break;
-
-                default:
-                break;
-            }
-        }
-        
-        else
-            {
-                switch (*count_select)
-            {
-                case 0:
-                drawn_alarm_setup_mode(90, 100, alarm_view_mode->sParam_data_alarm_setup_mode_6, Font24);
-                break;
-
-                case 1:
-                drawn_alarm_setup_mode(90, 100, alarm_view_mode->sParam_data_alarm_setup_mode_7, Font24);
-                break;
-
-                case 2:
-                drawn_alarm_setup_mode(90, 100, alarm_view_mode->sParam_data_alarm_setup_mode_8, Font24);
-                break;
-
-                case 3:
-                drawn_alarm_setup_mode(90, 100, alarm_view_mode->sParam_data_alarm_setup_mode_9, Font24);
-                break;
-
-                case 4:
-                drawn_alarm_setup_mode(90, 100, alarm_view_mode->sParam_data_alarm_setup_mode_10, Font24);
-                break;
-
-                default:
-                break;
-            }
         }
 
 
-    	EPD_2IN9_V2_Display_Base(BlackImage);
-	}    
+	    
 
 	
         // Paint_ClearWindows(150, 80, 150 + Font20.Width * 7, 80 + Font20.Height, WHITE);
@@ -948,84 +917,54 @@ void alarm_setup_mode(int *flag_alarm_set_up_mode, uint8_t *count_view, uint8_t 
         // if(num == 0) {
         // }
 		// EPD_2IN9_V2_Display_Partial(BlackImage);
-        switch (*count_edit)
+        switch (system_state->alarm_setup_cursor)
         {
-            case 0:
-                /* code */
+            case ALARM_MINUTE:
+               /* code */
                 Paint_ClearWindows(100, 50, 100 + Font24.Width * 7, 50 + Font24.Height, WHITE);
-                drawn_alarm_setup_mode(90, 100, sParam_data_alarm_setup_mode, Font24);
+                drawn_alarm_setup_mode(90, 100, alarm_setup_data_store, Font24);
                 for(;;)
                 {
-                    num = num - 1;
-                    if(num == 0) {
-                        num = 3;
-                        break;
-                    }
-		            EPD_2IN9_V2_Display_Partial(BlackImage);
-                }
-                break;
-            //set hour
-            case 1:
-                /* code */
-                Paint_ClearWindows(100, 50, 100 + Font24.Width * 7, 50 + Font24.Height, WHITE);
-                drawn_alarm_setup_mode(90, 100, sParam_data_alarm_setup_mode, Font24);
-                for(;;)
-                {
-                    Paint_ClearWindows(100, 50, 100 + Font24.Width * 2, 50 + Font24.Height, WHITE);
-                    Paint_DrawNum(100, 50, sParam_data_alarm_setup_mode->hour / 10, &Font24, WHITE, BLACK);
-                    Paint_DrawNum(100 + Font24.Width * 1, 50, sParam_data_alarm_setup_mode->hour % 10, &Font24, WHITE, BLACK);
-                    num = num - 1;
-                    if(num == 0) {
-                        num = 3;
-                        break;
-                    }
-		            EPD_2IN9_V2_Display_Partial(BlackImage);
-                }
-            break;
-            //set minute
-            case 2:
-            /* code */
-            Paint_ClearWindows(100, 50, 100 + Font24.Width * 7, 50 + Font24.Height, WHITE);
-            drawn_alarm_setup_mode(90, 100, sParam_data_alarm_setup_mode, Font24);
-            for(;;)
-            {
-                Paint_ClearWindows(100 + Font24.Width * 2 + Font24.Width / 2, 50, 100 + Font24.Width * 4 +  Font24.Width / 4, 50 + Font24.Height, WHITE);
-                Paint_DrawNum(100 + Font24.Width * 2 + Font24.Width / 2, 50, sParam_data_alarm_setup_mode->minute / 10, &Font24, WHITE, BLACK);
-                Paint_DrawNum(100 + Font24.Width * 3 + Font24.Width / 2, 50, sParam_data_alarm_setup_mode->minute % 10, &Font24, WHITE, BLACK);
-                num = num - 1;
-                if(num == 0) {
-                    num = 3;
-                    break;
-                }
-                EPD_2IN9_V2_Display_Partial(BlackImage);
-            }
-            break;
-            //set second
-            case 3:
-            /* code */
-                Paint_ClearWindows(100, 50, 100 + Font24.Width * 7, 50 + Font24.Height, WHITE);
-                drawn_alarm_setup_mode(90, 100, sParam_data_alarm_setup_mode, Font24);
-                for(;;)
-                {
-                    Paint_ClearWindows(100 + Font24.Width * 5, 50, 100 + Font24.Width * 7, 50 + Font24.Height, WHITE);
-                    Paint_DrawNum(100 + Font24.Width * 5, 50, sParam_data_alarm_setup_mode->second / 10, &Font24, WHITE, BLACK);
-                    Paint_DrawNum(100 + Font24.Width * 6, 50, sParam_data_alarm_setup_mode->second % 10, &Font24, WHITE, BLACK);
+                    draw_battery(battery_percentage);
+                    Paint_ClearWindows(100 + Font24.Width * 2 + Font24.Width / 2, 50, 100 + Font24.Width * 4 +  Font24.Width / 4, 50 + Font24.Height, WHITE);
+                    Paint_DrawNum(100 + Font24.Width * 2 + Font24.Width / 2, 50, alarm_setup_data->minute / 10, &Font24, WHITE, BLACK);
+                    Paint_DrawNum(100 + Font24.Width * 3 + Font24.Width / 2, 50, alarm_setup_data->minute % 10, &Font24, WHITE, BLACK);
                     num = num - 1;
                     if(num == 0) {
                         num = 3;
                         break;
                     }
                     EPD_2IN9_V2_Display_Partial(BlackImage);
+                }
+            break;
+            //set hour
+            case ALARM_HOUR:
+                /* code */
+                Paint_ClearWindows(100, 50, 100 + Font24.Width * 7, 50 + Font24.Height, WHITE);
+                drawn_alarm_setup_mode(90, 100, alarm_setup_data_store, Font24);
+                for(;;)
+                {
+                    draw_battery(battery_percentage);
+                    Paint_ClearWindows(100, 50, 100 + Font24.Width * 2, 50 + Font24.Height, WHITE);
+                    Paint_DrawNum(100, 50, alarm_setup_data->hour / 10, &Font24, WHITE, BLACK);
+                    Paint_DrawNum(100 + Font24.Width * 1, 50, alarm_setup_data->hour % 10, &Font24, WHITE, BLACK);
+                    num = num - 1;
+                    if(num == 0) {
+                        num = 3;
+                        break;
+                    }
+		            EPD_2IN9_V2_Display_Partial(BlackImage);
                 }
             break;
             //set on
-            case 4:
+            case ALARM_ON_OFF:
                 Paint_ClearWindows(100, 50, 100 + Font24.Width * 7, 50 + Font24.Height, WHITE);
                 for(;;)
                 {
+                    draw_battery(battery_percentage);
                     Paint_ClearWindows(90, 100, 90 + 100, 100 + Font16.Height, WHITE);
-                    sParam_data_alarm_setup_mode->on_off = TRUE;
-                    drawn_alarm_setup_mode(90, 100, sParam_data_alarm_setup_mode, Font24);
+                    drawn_alarm_setup_mode(90, 100, alarm_setup_data_store, Font24);
+                    
                     num = num - 1;
                     if(num == 0) {
                         num = 3;
@@ -1034,33 +973,65 @@ void alarm_setup_mode(int *flag_alarm_set_up_mode, uint8_t *count_view, uint8_t 
                     EPD_2IN9_V2_Display_Partial(BlackImage);
                 }
             break;
-            //set off
-            case 5:
-            Paint_ClearWindows(100, 50, 100 + Font24.Width * 7, 50 + Font24.Height, WHITE);
-            for(;;)
-            {
-                Paint_ClearWindows(90, 100, 90 + 100, 100 + Font16.Height, WHITE);
-                sParam_data_alarm_setup_mode->on_off = FALSE;
-                drawn_alarm_setup_mode(90, 100, sParam_data_alarm_setup_mode, Font24);
-                num = num - 1;
-                if(num == 0) {
-                    num = 3;
-                    break;
-                }
-                EPD_2IN9_V2_Display_Partial(BlackImage);
-            }
-            break;
-
+            // //DY - DT
+            // case ALARM_DY_DT:
+            // Paint_ClearWindows(120, 30, 160, 30 + Font16.Height, WHITE);
+            // for(;;)
+            // {
+                
+            //     draw_battery(battery_percentage);
+            //     Paint_ClearWindows(120, 30, 160, 30 + Font16.Height, WHITE);
+            //     switch (alarm_setup_data->dy_dt)
+            //     {
+            //         case DAY_OF_WEEK_MODE:
+            //         /* code */
+            //         Paint_DrawString_EN(120, 30, "DY", &Font16, WHITE, BLACK);
+            //         break;
+            //     case DATE_OF_MONTH_MODE:
+            //         Paint_DrawString_EN(120, 30, "DT", &Font16, BLACK, WHITE);
+            //         break;
+            //     case NOT_USED_MODE:
+            //         Paint_DrawString_EN(120, 30, "NA", &Font16, BLACK, WHITE);
+            //         break;
+            //     default:
+            //         break;
+            // }
+            //     num = num - 1;
+            //     if(num == 0) {
+            //         num = 3;
+            //         break;
+            //     }
+            //     EPD_2IN9_V2_Display_Partial(BlackImage);
+            // }
+            // break;
+            // //DOW_DOM
+            // case ALARM_DOW_DOM:
+            // Paint_ClearWindows(90, 30, 105, 30 + Font16.Height, WHITE);
+            // for(;;)
+            // {
+            //     draw_battery(battery_percentage);
+            //     Paint_ClearWindows(90, 30, 105, 30 + Font16.Height, WHITE);
+            //     Paint_DrawNum(90, 30, alarm_setup_data->dow_dom/10, &Font16, WHITE, BLACK);
+            //     Paint_DrawNum(100, 30, alarm_setup_data->dow_dom%10, &Font16, WHITE, BLACK);
+            //     num = num - 1;
+            //     if(num == 0) {
+            //         num = 3;
+            //         break;
+            //     }
+            //     EPD_2IN9_V2_Display_Partial(BlackImage);
+            // }
+            // break;
         default:
             break;
         }
       EPD_2IN9_V2_Sleep();
-      *flag_alarm_set_up_mode = 0;
+      flag_alarm_set_up_mode->flag_ALARM_SETUP_MODE = 0;
       free(BlackImage);
-      free(sParam_data_alarm_setup_mode);
+      free(alarm_setup_data_store);
+    //   free(sParam_data_alarm_setup_mode);
 }
 
-void drawn_alarm_setup_mode(uint16_t Xstart, uint16_t Ystart, SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *sParam_data_alarm_setup_mode, sFONT Font)
+void drawn_alarm_setup_mode(uint16_t Xstart, uint16_t Ystart, ALARM_DATA_SETUP_MODE *sParam_data_alarm_setup_mode, sFONT Font)
 {
     PAINT_TIME sPaint_time;
     sPaint_time.Hour = sParam_data_alarm_setup_mode->hour;
@@ -1086,7 +1057,7 @@ void drawn_alarm_setup_mode(uint16_t Xstart, uint16_t Ystart, SYSTEM_PARAM_DATA_
 }
 
 //Time setup mode
-void time_setup_mode(int *flag_time_set_up_mode, uint8_t *count_edit, SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *time_setup_param)
+void time_setup_mode(FLAG_SYSTEM *flag_time_set_up_mode, SYSTEM_STATE *system_param, TIME_SETUP_DATA *time_setup_param, uint16_t battery_percentage)
 {
     UBYTE *BlackImage;
     UBYTE num = 3;
@@ -1095,14 +1066,20 @@ void time_setup_mode(int *flag_time_set_up_mode, uint8_t *count_edit, SYSTEM_PAR
         printf("Failed to apply for black memory...\r\n");
     }
 
-    if(*count_edit > 7)
-    {
-        *count_edit = 0;
-    }
+
     
 	EPD_2IN9_V2_Init();
-	if(*flag_time_set_up_mode == 1)
+    PAINT_TIME sPaint_time;
+    sPaint_time.Hour = time_setup_param->hour;
+    sPaint_time.Min = time_setup_param->minute;
+    sPaint_time.Sec = 0;
+	if(flag_time_set_up_mode->flag_TIME_SETUP_MODE == 1)
 	{
+        flag_time_set_up_mode->flag_ALARM_SETUP_MODE    = 1;
+        flag_time_set_up_mode->flag_ALARM_VIEW_MODE     = 1;
+        flag_time_set_up_mode->flag_SYSTEM_SETUP_MODE   = 1;
+        flag_time_set_up_mode->flag_DEFAULT_MODE        = 1;
+
 		EPD_2IN9_V2_Init();
     	EPD_2IN9_V2_Clear();
     	DEV_Delay_ms(1000);
@@ -1113,11 +1090,12 @@ void time_setup_mode(int *flag_time_set_up_mode, uint8_t *count_edit, SYSTEM_PAR
     	Paint_SelectImage(BlackImage);
     	Paint_Clear(WHITE);
 
-    	// 2.Drawing on the image
-
-
-        drawn_alarm_setup_mode(90, 100, time_setup_param, Font24);
+    	// 2.Drawing on the image       
         Paint_ClearWindows(80, 100, 220, 100 + Font16.Height, WHITE);
+        Paint_DrawTime(100, 50, &sPaint_time, &Font24, WHITE, BLACK);
+        draw_day(time_setup_param->dow, time_setup_param->dom, time_setup_param->month, time_setup_param->year);
+        draw_battery(battery_percentage);
+        // drawn_alarm_setup_mode(90, 100, time_setup_param, Font24);
     	EPD_2IN9_V2_Display_Base(BlackImage);
 	}    
 
@@ -1129,29 +1107,197 @@ void time_setup_mode(int *flag_time_set_up_mode, uint8_t *count_edit, SYSTEM_PAR
         // if(num == 0) {
         // }
 		// EPD_2IN9_V2_Display_Partial(BlackImage);
-        switch (*count_edit)
+        char day_string[5];
+    char month_string[5];
+
+    switch (time_setup_param->dow)
+    {
+    case 1:
+        day_string[0] = 'S';
+        day_string[1] = 'U';
+        day_string[2] = 'N';
+        day_string[3] = NULL;
+        day_string[4] = NULL;
+        break;
+    case 2:
+        day_string[0] = 'M';
+        day_string[1] = 'O';
+        day_string[2] = 'N';
+        day_string[3] = NULL;
+        day_string[4] = NULL;
+        break;
+
+    case 3:
+        day_string[0] = 'T';
+        day_string[1] = 'U';
+        day_string[2] = 'E';
+        day_string[3] = 'S';
+        day_string[4] = NULL;
+        break;
+
+    case 4:
+        day_string[0] = 'W';
+        day_string[1] = 'E';
+        day_string[2] = 'D';
+        day_string[3] = 'N';
+        day_string[4] = NULL;
+        break;
+
+    case 5:
+        day_string[0] = 'T';
+        day_string[1] = 'H';
+        day_string[2] = 'U';
+        day_string[3] = 'R';
+        break;
+
+    case 6:
+        day_string[0] = 'F';
+        day_string[1] = 'R';
+        day_string[2] = 'I';
+        day_string[3] = NULL;
+        day_string[4] = NULL;
+        break;
+
+    case 7:
+        day_string[0] = 'S';
+        day_string[1] = 'A';
+        day_string[2] = 'T';
+        day_string[3] = NULL;
+        day_string[4] = NULL;
+        break;
+
+    default:
+        break;
+    }
+
+switch (time_setup_param->month)
+    {
+    case 1:
+        month_string[0] = 'J';
+        month_string[1] = 'A';
+        month_string[2] = 'N';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+    case 2:
+        month_string[0] = 'F';
+        month_string[1] = 'E';
+        month_string[2] = 'B';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+
+    case 3:
+        month_string[0] = 'M';
+        month_string[1] = 'A';
+        month_string[2] = 'R';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+
+    case 4:
+        month_string[0] = 'A';
+        month_string[1] = 'P';
+        month_string[2] = 'I';
+        month_string[3] = 'R';
+        month_string[4] = NULL;
+        break;
+
+    case 5:
+        month_string[0] = 'M';
+        month_string[1] = 'A';
+        month_string[2] = 'Y';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+
+    case 6:
+        month_string[0] = 'J';
+        month_string[1] = 'U';
+        month_string[2] = 'N';
+        month_string[3] = 'E';
+        month_string[4] = NULL;
+        break;
+
+    case 7:
+        month_string[0] = 'J';
+        month_string[1] = 'U';
+        month_string[2] = 'L';
+        month_string[3] = 'Y';
+        month_string[4] = NULL;
+        break;
+
+    case 8:
+        month_string[0] = 'A';
+        month_string[1] = 'U';
+        month_string[2] = 'G';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+
+    case 9:
+        month_string[0] = 'S';
+        month_string[1] = 'E';
+        month_string[2] = 'P';
+        month_string[3] = 'T';
+        month_string[4] = NULL;
+        break;
+    case 10:
+        month_string[0] = 'O';
+        month_string[1] = 'C';
+        month_string[2] = 'T';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+
+    case 11:
+        month_string[0] = 'N';
+        month_string[1] = 'O';
+        month_string[2] = 'V';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+
+    case 12:
+        month_string[0] = 'D';
+        month_string[1] = 'E';
+        month_string[2] = 'C';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+    default:
+        break;
+    }
+    
+        //translate day month
+        switch (system_param->time_setup_cursor)
         {
-            case 0:
+            case TIME_MINUTE:
                 /* code */
                 Paint_ClearWindows(100, 50, 100 + Font24.Width * 7, 50 + Font24.Height, WHITE);
-                drawn_alarm_setup_mode(90, 100, time_setup_param, Font24);
+                Paint_DrawTime(100, 50, &sPaint_time,  &Font24, WHITE, BLACK);
                 Paint_ClearWindows(80, 100, 220, 100 + Font16.Height, WHITE);
+                draw_day(time_setup_param->dow, time_setup_param->dom, time_setup_param->month, time_setup_param->year);
                 for(;;)
                 {
+                    Paint_ClearWindows(100 + Font24.Width * 2 + Font24.Width / 2, 50, 100 + Font24.Width * 4 +  Font24.Width / 4, 50 + Font24.Height, WHITE);
+                    Paint_DrawNum(100 + Font24.Width * 2 + Font24.Width / 2, 50, time_setup_param->minute / 10, &Font24, WHITE, BLACK);
+                    Paint_DrawNum(100 + Font24.Width * 3 + Font24.Width / 2, 50, time_setup_param->minute % 10, &Font24, WHITE, BLACK);
                     num = num - 1;
                     if(num == 0) {
                         num = 3;
                         break;
                     }
-		            EPD_2IN9_V2_Display_Partial(BlackImage);
+                    EPD_2IN9_V2_Display_Partial(BlackImage);
                 }
                 break;
             //set hour
-            case 1:
+            case TIME_HOUR:
                 /* code */
                 Paint_ClearWindows(100, 50, 100 + Font24.Width * 7, 50 + Font24.Height, WHITE);
-                drawn_alarm_setup_mode(90, 100, time_setup_param, Font24);
+                Paint_DrawTime(100, 50, &sPaint_time,  &Font24, WHITE, BLACK);
                 Paint_ClearWindows(80, 100, 220, 100 + Font16.Height, WHITE);
+                draw_day(time_setup_param->dow, time_setup_param->dom, time_setup_param->month, time_setup_param->year);
                 for(;;)
                 {
                     Paint_ClearWindows(100, 50, 100 + Font24.Width * 2, 50 + Font24.Height, WHITE);
@@ -1165,17 +1311,16 @@ void time_setup_mode(int *flag_time_set_up_mode, uint8_t *count_edit, SYSTEM_PAR
 		            EPD_2IN9_V2_Display_Partial(BlackImage);
                 }
             break;
-            //set minute
-            case 2:
+            case TIME_DOW:
             /* code */
             Paint_ClearWindows(100, 50, 100 + Font24.Width * 7, 50 + Font24.Height, WHITE);
-            drawn_alarm_setup_mode(90, 100, time_setup_param, Font24);
+            Paint_DrawTime(100, 50, &sPaint_time,  &Font24, WHITE, BLACK);
             Paint_ClearWindows(80, 100, 220, 100 + Font16.Height, WHITE);
+            draw_day(time_setup_param->dow, time_setup_param->dom, time_setup_param->month, time_setup_param->year);
             for(;;)
             {
-                Paint_ClearWindows(100 + Font24.Width * 2 + Font24.Width / 2, 50, 100 + Font24.Width * 4 +  Font24.Width / 4, 50 + Font24.Height, WHITE);
-                Paint_DrawNum(100 + Font24.Width * 2 + Font24.Width / 2, 50, time_setup_param->minute / 10, &Font24, WHITE, BLACK);
-                Paint_DrawNum(100 + Font24.Width * 3 + Font24.Width / 2, 50, time_setup_param->minute % 10, &Font24, WHITE, BLACK);
+                Paint_ClearWindows(85, 100, 120, 100 + Font16.Height, WHITE);
+                Paint_DrawString_EN(80, 100, &day_string[0], &Font16, WHITE, BLACK);
                 num = num - 1;
                 if(num == 0) {
                     num = 3;
@@ -1185,16 +1330,56 @@ void time_setup_mode(int *flag_time_set_up_mode, uint8_t *count_edit, SYSTEM_PAR
             }
             break;
             //set second
-            case 3:
+            case TIME_MONTH:
             /* code */
                 Paint_ClearWindows(100, 50, 100 + Font24.Width * 7, 50 + Font24.Height, WHITE);
-                drawn_alarm_setup_mode(90, 100, time_setup_param, Font24);
+                Paint_DrawTime(100, 50, &sPaint_time,  &Font24, WHITE, BLACK);
                 Paint_ClearWindows(80, 100, 220, 100 + Font16.Height, WHITE);
+                draw_day(time_setup_param->dow, time_setup_param->dom, time_setup_param->month, time_setup_param->year);
                 for(;;)
                 {
-                    Paint_ClearWindows(100 + Font24.Width * 5, 50, 100 + Font24.Width * 7, 50 + Font24.Height, WHITE);
-                    Paint_DrawNum(100 + Font24.Width * 5, 50, time_setup_param->second / 10, &Font24, WHITE, BLACK);
-                    Paint_DrawNum(100 + Font24.Width * 6, 50, time_setup_param->second % 10, &Font24, WHITE, BLACK);
+                    Paint_ClearWindows(135, 100, 170, 100 + Font16.Height, WHITE);
+                    Paint_DrawString_EN(130, 100, &month_string[0], &Font16, WHITE, BLACK);
+                    num = num - 1;
+                    if(num == 0) {
+                        num = 3;
+                        break;
+                    }
+                    EPD_2IN9_V2_Display_Partial(BlackImage);
+                }
+            break;
+
+            case TIME_DOM:
+            /* code */
+                Paint_ClearWindows(100, 50, 100 + Font24.Width * 7, 50 + Font24.Height, WHITE);
+                Paint_DrawTime(100, 50, &sPaint_time,  &Font24, WHITE, BLACK);
+                Paint_ClearWindows(80, 100, 220, 100 + Font16.Height, WHITE);
+                draw_day(time_setup_param->dow, time_setup_param->dom, time_setup_param->month, time_setup_param->year);
+                for(;;)
+                {
+                    Paint_ClearWindows(180, 100, 200, 100 + Font16.Height, WHITE);
+                    Paint_DrawNum(180, 100, time_setup_param->dom / 10, &Font16, BLACK, WHITE);
+                    Paint_DrawNum(190, 100, time_setup_param->dom % 10, &Font16, BLACK, WHITE);
+                    num = num - 1;
+                    if(num == 0) {
+                        num = 3;
+                        break;
+                    }
+                    EPD_2IN9_V2_Display_Partial(BlackImage);
+                }
+            break;
+
+            case TIME_YEAR:
+            /* code */
+                Paint_ClearWindows(100, 50, 100 + Font24.Width * 7, 50 + Font24.Height, WHITE);
+                Paint_DrawTime(100, 50, &sPaint_time,  &Font24, WHITE, BLACK);
+                Paint_ClearWindows(80, 100, 220, 100 + Font16.Height, WHITE);
+                draw_day(time_setup_param->dow, time_setup_param->dom, time_setup_param->month, time_setup_param->year);
+                for(;;)
+                {
+                    Paint_ClearWindows(210, 100, 230, 100 + Font16.Height, WHITE);
+                    Paint_DrawNum(210, 100, time_setup_param->year / 10, &Font16, BLACK, WHITE);
+                    Paint_DrawNum(220, 100, time_setup_param->year % 10, &Font16, BLACK, WHITE);
                     num = num - 1;
                     if(num == 0) {
                         num = 3;
@@ -1207,6 +1392,250 @@ void time_setup_mode(int *flag_time_set_up_mode, uint8_t *count_edit, SYSTEM_PAR
             break;
         }
       EPD_2IN9_V2_Sleep();
-      *flag_time_set_up_mode = 0;
+      flag_time_set_up_mode->flag_TIME_SETUP_MODE  = 0;
       free(BlackImage);
 }
+
+void draw_day(uint16_t day, uint16_t date, uint16_t month, uint16_t year)
+{
+    char day_string[5];
+    char month_string[5];
+
+    switch (day)
+    {
+    case 1:
+        day_string[0] = 'S';
+        day_string[1] = 'U';
+        day_string[2] = 'N';
+        day_string[3] = NULL;
+        day_string[4] = NULL;
+        break;
+    case 2:
+        day_string[0] = 'M';
+        day_string[1] = 'O';
+        day_string[2] = 'N';
+        day_string[3] = NULL;
+        day_string[4] = NULL;
+        break;
+
+    case 3:
+        day_string[0] = 'T';
+        day_string[1] = 'U';
+        day_string[2] = 'E';
+        day_string[3] = 'S';
+        day_string[4] = NULL;
+        break;
+
+    case 4:
+        day_string[0] = 'W';
+        day_string[1] = 'E';
+        day_string[2] = 'D';
+        day_string[3] = 'N';
+        day_string[4] = NULL;
+        break;
+
+    case 5:
+        day_string[0] = 'T';
+        day_string[1] = 'H';
+        day_string[2] = 'U';
+        day_string[3] = 'R';
+        break;
+
+    case 6:
+        day_string[0] = 'F';
+        day_string[1] = 'R';
+        day_string[2] = 'I';
+        day_string[3] = NULL;
+        day_string[4] = NULL;
+        break;
+
+    case 7:
+        day_string[0] = 'S';
+        day_string[1] = 'A';
+        day_string[2] = 'T';
+        day_string[3] = NULL;
+        day_string[4] = NULL;
+        break;
+
+    default:
+        break;
+    }
+
+switch (month)
+    {
+    case 1:
+        month_string[0] = 'J';
+        month_string[1] = 'A';
+        month_string[2] = 'N';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+    case 2:
+        month_string[0] = 'F';
+        month_string[1] = 'E';
+        month_string[2] = 'B';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+
+    case 3:
+        month_string[0] = 'M';
+        month_string[1] = 'A';
+        month_string[2] = 'R';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+
+    case 4:
+        month_string[0] = 'A';
+        month_string[1] = 'P';
+        month_string[2] = 'I';
+        month_string[3] = 'R';
+        month_string[4] = NULL;
+        break;
+
+    case 5:
+        month_string[0] = 'M';
+        month_string[1] = 'A';
+        month_string[2] = 'Y';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+
+    case 6:
+        month_string[0] = 'J';
+        month_string[1] = 'U';
+        month_string[2] = 'N';
+        month_string[3] = 'E';
+        month_string[4] = NULL;
+        break;
+
+    case 7:
+        month_string[0] = 'J';
+        month_string[1] = 'U';
+        month_string[2] = 'L';
+        month_string[3] = 'Y';
+        month_string[4] = NULL;
+        break;
+
+    case 8:
+        month_string[0] = 'A';
+        month_string[1] = 'U';
+        month_string[2] = 'G';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+
+    case 9:
+        month_string[0] = 'S';
+        month_string[1] = 'E';
+        month_string[2] = 'P';
+        month_string[3] = 'T';
+        month_string[4] = NULL;
+        break;
+    case 10:
+        month_string[0] = 'O';
+        month_string[1] = 'C';
+        month_string[2] = 'T';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+
+    case 11:
+        month_string[0] = 'N';
+        month_string[1] = 'O';
+        month_string[2] = 'V';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+
+    case 12:
+        month_string[0] = 'D';
+        month_string[1] = 'E';
+        month_string[2] = 'C';
+        month_string[3] = NULL;
+        month_string[4] = NULL;
+        break;
+    default:
+        break;
+    }
+
+
+
+
+    Paint_DrawString_EN(80, 100, &day_string[0], &Font16, BLACK, WHITE);
+    Paint_DrawString_EN(130, 100, &month_string[0], &Font16, BLACK, WHITE);
+    Paint_DrawNum(180, 100, date / 10, &Font16, WHITE, BLACK);
+    Paint_DrawNum(190, 100, date % 10, &Font16, WHITE, BLACK);
+    Paint_DrawNum(210, 100, year / 10, &Font16, WHITE, BLACK);
+    Paint_DrawNum(220, 100, year % 10, &Font16, WHITE, BLACK);
+
+}
+
+void draw_battery(uint16_t battery_percentage)
+{
+    Paint_ClearWindows(260, 0, 296, 15 + Font16.Height, WHITE);
+    if((battery_percentage < 100) && (battery_percentage > 75))
+    {
+        Paint_DrawRectangle(260, 2, 265, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+        Paint_DrawRectangle(265, 2, 270, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+        Paint_DrawRectangle(270, 2, 275, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+        Paint_DrawRectangle(275, 2, 280, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    }
+    else if ((battery_percentage < 75) && (battery_percentage > 50)){
+        Paint_DrawRectangle(260, 2, 265, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+        Paint_DrawRectangle(265, 2, 270, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+        Paint_DrawRectangle(270, 2, 275, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+        Paint_DrawRectangle(275, 2, 280, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    }
+
+    else if ((battery_percentage < 50) && (battery_percentage > 25)){
+        Paint_DrawRectangle(260, 2, 265, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+        Paint_DrawRectangle(265, 2, 270, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+        Paint_DrawRectangle(270, 2, 275, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+        Paint_DrawRectangle(275, 2, 280, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    }
+
+    else if ((battery_percentage < 25) && (battery_percentage > 5)){
+        Paint_DrawRectangle(260, 2, 265, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+        Paint_DrawRectangle(265, 2, 270, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+        Paint_DrawRectangle(270, 2, 275, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+        Paint_DrawRectangle(275, 2, 280, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    }
+
+    else
+    {
+        Paint_DrawRectangle(260, 2, 265, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+        Paint_DrawRectangle(265, 2, 270, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+        Paint_DrawRectangle(270, 2, 275, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+        Paint_DrawRectangle(275, 2, 280, 10, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+    }
+}
+void E_ink_display_name(void)
+{
+    UBYTE *BlackImage;
+    UBYTE num = 3;
+	UWORD Imagesize = ((EPD_2IN9_V2_WIDTH % 8 == 0)? (EPD_2IN9_V2_WIDTH / 8 ): (EPD_2IN9_V2_WIDTH / 8 + 1)) * EPD_2IN9_V2_HEIGHT;
+    if((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
+        printf("Failed to apply for black memory...\r\n");
+    }
+
+
+    
+	EPD_2IN9_V2_Init();
+
+
+    	EPD_2IN9_V2_Clear();
+    	EPD_2IN9_V2_Init_Fast();
+    	Paint_NewImage(BlackImage, EPD_2IN9_V2_WIDTH, EPD_2IN9_V2_HEIGHT, 90, WHITE);
+    	printf("Drawing\r\n");
+    	//1.Select Image
+    	Paint_SelectImage(BlackImage);
+    	Paint_Clear(WHITE);
+
+    	Paint_DrawString_EN(10, 0, "Duy Ngoc - 2251036", &Font16, BLACK, WHITE);
+    	Paint_DrawString_EN(10, 30, "Trung Nam - 2251032", &Font16, BLACK, WHITE);
+    	Paint_DrawString_EN(10, 60, "Hung Minh - 2251030", &Font16, BLACK, WHITE);
+    	EPD_2IN9_V2_Display_Base(BlackImage);
+        free(BlackImage);
+	}    

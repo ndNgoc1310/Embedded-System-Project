@@ -37,10 +37,10 @@
 #include <stdlib.h> // malloc() free()
 
 int EPD_test(void);
-void default_mode(int *flag_main_screen, uint8_t *hour, uint8_t *minute, uint8_t *second);
-void menu_set_up (int *flag_set_up,  SYSTEM_MODE *mode, uint8_t *count);
-void alarm_view_mode (int *flag_alarm_view_mode_set_up,  uint8_t *count_view, uint8_t *count_select, SYSTEM_PARAM_DATA_ALARM_VIEW_MODE *alarm_view_mode);
-void alarm_setup_mode(int *flag_alarm_set_up_mode, uint8_t *count_view, uint8_t *count_select, uint8_t *count_edit, SYSTEM_PARAM_DATA_ALARM_VIEW_MODE *alarm_view_mode);
-void time_setup_mode(int *flag_time_set_up_mode, uint8_t *count_edit, SYSTEM_PARAM_DATA_ALARM_SETUP_MODE *time_setup_param);
-
+void default_mode(FLAG_SYSTEM *flag_default_mode, TIME_DATA *time_get_data, uint16_t battery_percentage);
+void system_setup_mode (FLAG_SYSTEM *flag_set_up,  SYSTEM_STATE *system_state, uint8_t battery_percentage);
+void alarm_view_mode (FLAG_SYSTEM *flag_alarm_view_mode, SYSTEM_STATE *system_state, SYSTEM_PARAM_DATA_ALARM_VIEW_MODE *alarm_view_mode, uint16_t battery_percentage);
+void alarm_setup_mode(FLAG_SYSTEM *flag_alarm_set_up_mode, SYSTEM_STATE *system_state, ALARM_SETUP_DATA *alarm_setup_data, uint16_t battery_percentage);
+void time_setup_mode(FLAG_SYSTEM *flag_time_set_up_mode, SYSTEM_STATE *system_param, TIME_SETUP_DATA *time_setup_param, uint16_t battery_percentage);
+void E_ink_display_name(void);
 #endif

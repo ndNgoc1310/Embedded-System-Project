@@ -1,8 +1,10 @@
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:34:5:EPD_test	32	static
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:209:6:default_mode	48	static
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:295:6:menu_set_up	40	static
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:479:6:alarm_view_mode	40	static
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:761:6:drawn_alarm_view_mode	48	static
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:782:6:alarm_setup_mode	48	static
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1063:6:drawn_alarm_setup_mode	48	static
-C:/Users/NCPC/OneDrive/BKLearning/Git/Github Desktop/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1089:6:time_setup_mode	40	static
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:37:6:default_mode	48	static
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:105:6:system_setup_mode	40	static
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:182:6:alarm_view_mode	48	static
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:831:6:drawn_alarm_view_mode	48	static
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:852:6:alarm_setup_mode	48	static
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1034:6:drawn_alarm_setup_mode	48	static
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1060:6:time_setup_mode	64	static
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1399:6:draw_day	48	static
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1575:6:draw_battery	32	static
+C:/Users/Public/Documents/Altium/Projects/BTL_test_1/Project_EBS/Embedded-System-Project/3. Firmware/Mylibrary/src/EPD_2in9_V2_test.c:1614:6:E_ink_display_name	24	static
