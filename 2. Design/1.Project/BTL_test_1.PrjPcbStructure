@@ -1,0 +1,6 @@
+Record=TopLevelDocument|FileName=01_Cover_Page.SchDoc|SheetNumber=1
+Record=NoMainPathDocument|SourceDocument=01_Cover_Page.SchDoc|FileName=02_Block_Diagram.SchDoc|SheetNumber=2
+Record=NoMainPathDocument|SourceDocument=01_Cover_Page.SchDoc|FileName=03_Power_Spply.SchDoc|SheetNumber=3
+Record=NoMainPathDocument|SourceDocument=01_Cover_Page.SchDoc|FileName=04_MCU.SchDoc|SheetNumber=4
+Record=NoMainPathDocument|SourceDocument=01_Cover_Page.SchDoc|FileName=05_GPIOs.SchDoc|SheetNumber=5
+Record=NoMainPathDocument|SourceDocument=01_Cover_Page.SchDoc|FileName=06_Communication_Protocols.SchDoc|SheetNumber=6
