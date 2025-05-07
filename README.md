@@ -1,48 +1,115 @@
-# ChronoSync: Embedded Digital Clock  
+# ChronoSync – Embedded Digital Clock
 
-## Overview  
-**ChronoSync** is an energy-efficient **digital clock** designed with **real-time clock (RTC) synchronization, Bluetooth connectivity, and an E-Ink display**. It ensures **accurate timekeeping**, low power consumption, and remote configuration via a mobile app.  
+**Course**: EE3427 Embedded Systems  
+**Semester**: 242  
+**University**: Ho Chi Minh City University of Technology  
+**Group**: TT01 – Group 01  
+**Members**: Nguyễn Duy Ngọc, Bùi Đình Trung Nam, Nguyễn Hùng Minh
 
-## Features  
-- **Precise Timekeeping** – Uses **DS3231 RTC** with minimal drift.  
-- **E-Ink Display** – Power-efficient and highly readable.  
-- **Bluetooth Connectivity** – Remote time sync and alarm control.  
-- **Multiple Alarms** – Stores alarms with EEPROM retention.  
-- **Power Optimization** – Efficient voltage regulation and sleep modes.  
+---
 
-## System Architecture  
-ChronoSync is powered by an **STM32 microcontroller**, interfacing with key peripherals:  
-- **Display** – E-Ink LCD via **SPI**.  
-- **Wireless** – Bluetooth (HC-05) via **UART**.  
-- **Real-Time Clock** – DS3231 via **I2C**.  
-- **User Interaction** – Buttons (GPIO) & Buzzer (GPIO).  
-- **Memory** – EEPROM for non-volatile data storage.  
+## 📌 Overview
 
-### **Block Diagram**  
-![Block-diagram](https://github.com/user-attachments/assets/aa5ef7aa-f239-42a0-bf8f-e37bf8ad20eb)
+ChronoSync is a compact, low-power embedded digital clock system built on the STM32F103C8T6 microcontroller. It features:
 
-## Setup & Compilation  
-### **Requirements**  
-- **STM32CubeIDE** or **Keil uVision** (for firmware development)  
-- **ST-Link** or **USB-UART** (for flashing/debugging)  
-- **Embedded C libraries** (HAL, CMSIS)  
+- Real-time timekeeping with ±2 ppm accuracy (DS3231)
+- E-Ink display for ultra-low power static UI
+- Alarm scheduling (up to 10 configurable alarms)
+- Button-based and Bluetooth-based configuration
+- Mobile app interface built with MIT App Inventor
+- Persistent EEPROM-based alarm storage
 
-### **Building & Flashing**  
-1. Clone the repository:  
-   ```sh
-   git clone https://github.com/ndNgoc1310/Embedded-System-Project.git
-   cd Embedded-System-Project
-2. Open the project in STM32CubeIDE.
-3. Compile and flash the firmware to the STM32 board.
+---
 
-## Usage
-- Power On via DC Jack or Battery.
-- Set Time & Alarms via buttons or Bluetooth app.
-- View Time & Alarm Info on the E-Ink LCD.
-- Automatic Timekeeping via RTC, retaining settings after power loss.
+## 🧩 Project Objectives
 
-## License
-This project is open-source. Contributions are welcome!
+- Integrate real-time hardware modules using I²C, SPI, UART
+- Optimize for low-power and battery-operated design
+- Provide physical and mobile-based time/alarm configuration
+- Ensure modular firmware and maintainability
+- Design a compact PCB with future 3D enclosure support
 
-## Contributors
-Nguyen Hung Minh, Bui Dinh Trung Nam, Nguyen Duy Ngoc (Students at Vietnam National University, Ho Chi Minh City - University of Technology)
+---
+
+## ⚙️ System Features
+
+### ✅ Implemented
+
+- Real-time clock display and update every second
+- Time and alarm configuration via 5 physical buttons
+- View and edit alarm slots with ON/OFF toggle
+- Bluetooth mobile app for time and alarm setting
+- Alarm match detection and buzzer melody
+- Power-efficient E-Ink display
+- EEPROM alarm persistence across resets
+- System option to clear all alarms
+
+### 🚧 Pending/Partially Implemented
+
+- Button long-press for continuous input adjustment
+- Factory reset, display test mode
+- Battery holder integration and battery percentage
+- Real-time update and editing from mobile app
+- Final enclosure (currently carton prototype)
+- Display UI refinement
+
+---
+
+## 📐 Hardware Overview
+
+| Component        | Description                                       |
+|------------------|---------------------------------------------------|
+| **MCU**          | STM32F103C8T6 (ARM Cortex-M3, 72 MHz)             |
+| **RTC**          | DS3231SN – I²C, high-precision timekeeping        |
+| **Display**      | 2.9” Waveshare E-Ink display – SPI                |
+| **EEPROM**       | AT24C64D – 64Kbit, I²C                            |
+| **Bluetooth**    | HC-05 module – UART                               |
+| **Buttons**      | 5 tactile buttons – short & long press detection  |
+| **Buzzer**       | 9x4.2mm, 80 dB with transistor driver             |
+| **Power**        | Buck converter TPS54231 + AMS1117-3.3V regulator  |
+
+---
+
+## 📱 Mobile App
+
+- Developed using **MIT App Inventor**
+- Connects via **Bluetooth HC-05**
+- Supports:
+  - Time sync & setup
+  - Alarm configuration (DoW or DoM modes)
+  - Real-time communication with STM32
+
+---
+
+## 🛠️ Development Tools
+
+- **Hardware**: Altium Designer, Oscilloscope, Multimeter
+- **Firmware**: STM32CubeIDE, STM32CubeMX, ST-Link Utility
+- **App**: MIT App Inventor
+- **Version Control**: GitHub
+
+---
+
+## 📈 Performance Highlights
+
+| Constraint           | Status  | Description                          |
+|----------------------|---------|--------------------------------------|
+| C-1.1 ±3 ppm Accuracy| ✅ Met   | DS3231 TCXO verified over 24 hrs     |
+| C-2.1 Data Retention | ✅ Met   | EEPROM retains data post power-loss  |
+| C-3.1 Input <30 ms   | ✅ Met   | Short press detected ~20–30 ms       |
+| C-5.1 Size ≤ 15x15x8cm| ✅ Met  | PCB and layout within limits         |
+
+*See report for unverified constraints.*
+
+---
+
+## 📁 Folder Structure
+
+```bash
+.
+├── 1. Documents/           # Final report, figures, and references
+├── 2. Design/              # Schematic, PCB layout files (Altium)
+├── 3. Firmware/            # STM32 firmware (CubeIDE project)
+├── 99.demo/ code_e_ink/    # Demo code for E-Ink display
+├── .vscode/                # VSCode workspace settings
+├── README.md               # Project overview and documentation
