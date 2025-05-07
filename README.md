@@ -1,4 +1,4 @@
-# ChronoSyn – Embedded Digital Clock
+# ChronoSync – Embedded Digital Clock
 
 **Course**: EE3427 Embedded Systems  
 **Semester**: 242  
@@ -10,7 +10,7 @@
 
 ## 📌 Overview
 
-ChronoSyn is a compact, low-power embedded digital clock system built on the STM32F103C8T6 microcontroller. It features:
+ChronoSync is a compact, low-power embedded digital clock system built on the STM32F103C8T6 microcontroller. It features:
 
 - Real-time timekeeping with ±2 ppm accuracy (DS3231)
 - E-Ink display for ultra-low power static UI
@@ -108,8 +108,9 @@ ChronoSyn is a compact, low-power embedded digital clock system built on the STM
 ```bash
 .
 ├── 1. Documents/           # Final report, figures, and references
-├── 2. Design/              # Schematic, PCB layout files (Altium)
-├── 3. Firmware/            # STM32 firmware (CubeIDE project)
-├── 99.demo/ code_e_ink/    # Demo code for E-Ink display
+├── 2. Hardware Design/     # Schematic, PCB layout files (Altium)
+├── 3. Firmware Design/     # STM32 firmware (CubeIDE project)
+├── 3. Mobile Application Design/
+├── 5. Report
 ├── .vscode/                # VSCode workspace settings
 ├── README.md               # Project overview and documentation
