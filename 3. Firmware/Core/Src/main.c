@@ -33,11 +33,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "stdbool.h"  // Include standard boolean types
-#include "stdio.h"    // Include standard input/output functions
-#include "string.h"   // Include string manipulation functions
-#include "EPD_Test.h" // Include the EPD_Test header file for e-Paper display functions
-
+#include "stdbool.h"
+#include "stdio.h"
+#include "string.h"
+#include "EPD_Test.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -95,7 +94,7 @@ typedef struct
 	uint8_t year;         // Year: 0-99 (0 = 2000, 1 = 2001, ..., 99 = 2099)
 } TIME_DATA;
 
-// Structure of 4 one-byte unsigned characters to store alarm values
+// // Structure of 4 one-byte unsigned characters to store alarm values
 typedef struct
 {
   uint8_t           second;   // Seconds: 0-59 (MSB = 1 for ON, 0 for OFF)
@@ -123,11 +122,10 @@ typedef struct
 // Struct for system state
 typedef struct
 {
-  SYSTEM_MODE         mode;             // Current system mode
-  SYSTEM_MODE         past_mode;        // Previous system mode
-  SYSTEM_PARAM_SELECT param_select;     // Selected system parameter to be modified
-  uint8_t             cursor;           // Cursor of selection
-  uint8_t             battery_display;  // Battery percentage to be displayed: 100, 75, 50, 25, 0
+  SYSTEM_MODE         mode;         // Current system mode
+  SYSTEM_MODE         past_mode;    // Previous system mode
+  SYSTEM_PARAM_SELECT param_select; // Selected system parameter to be modified
+  uint8_t             cursor;       // Cursor of selection
 } SYSTEM_STATE;
 
 // Struct for system parameters to be modified
@@ -164,7 +162,7 @@ typedef struct
 // Number of alarms in the EEPROM module
 #define ALARM_SLOT_NUM 10 
 
-// Address of alarm slot pointer in EEPROM module (right after the last alarm slot)
+// Address of alarm slot pointer in EEPROM module (right next to the final alarm slot)
 #define ALARM_SLOT_PTR_ADDR (ALARM_SLOT_NUM * 4)
 
 // Active state of buttons
@@ -182,10 +180,8 @@ typedef struct
 // Number of system modes
 #define SYSTEM_MODE_NUM 6
 
-// Maximum value of the system cursor
 #define SYSTEM_CURSOR_MAX 9
 
-// Delay for displaying the e-Paper screen in milliseconds
 #define DISPLAY_DELAY 500
 
 /* USER CODE END PD */
@@ -201,7 +197,7 @@ typedef struct
 
 /* SYSTEM ==========================================*/
 // Global variable to store the current system mode and selected parameter
-SYSTEM_STATE system_state = {0};
+SYSTEM_STATE system_state = {DEFAULT_MODE, DEFAULT_MODE, SET_MINUTE};
 
 // Global variable to store the system parameters to be modified
 SYSTEM_PARAM_DATA system_param_data = {0};
@@ -442,7 +438,6 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    // Call the button debounce handler for each button
     Button_Handle();
 
     // int a;
@@ -459,35 +454,25 @@ int main(void)
       //   void Alarm_Check (volatile TIME_DATA *time_get_data)
       Alarm_Check(&time_get_data);
 
-      // Debugging: Toggle the debug RTC interrupt flag for debugging purposes
+      // Reset the RTC Interrupt Flag
+      rtc_int_flag = false;
+
+      // Toggle the debug RTC interrupt flag for debugging purposes
       debug_rtc_int = !debug_rtc_int;
 
       // time_get = (TIME_DATA) time_get_data;    
       // default_mode(&a, &time_get.hour, &time_get.minute, &time_get.second);
-
-      // Check if the ADC interrupt flag is set (ADC Valid Flag)
-      if (adc_valid_flag)
-      {
-        // Re-enable the ADC interrupt to continue monitoring ADC values
-        HAL_ADC_Start_IT(&hadc1);
-
-        // Delay for 100ms to allow the ADC to stabilize
-        HAL_Delay(100);
-
-        // Track the battery percentage value at 5 different levels: 0, 25, 50, 75, 100
-        if ((battery_percentage % 25) == 0)
-        {
-          // Update the battery percentage value to be displayed
-          system_state.battery_display = battery_percentage;
-        }
-
-        // Reset the ADC interrupt flag
-        adc_valid_flag = false;
-      }
-
-      // Reset the RTC Interrupt Flag
-      rtc_int_flag = false;
     }
+
+    // Check if the ADC interrupt flag is set (ADC Valid Flag)
+    if (adc_valid_flag)
+	  {
+      // Re-enable the ADC interrupt to continue monitoring ADC values
+      HAL_ADC_Start_IT(&hadc1);
+
+      // Delay for 100ms to allow the ADC to stabilize
+      HAL_Delay(100);
+	  }
 
     // Check if the UART interrupt flag is set (UART Receive Flag)
     if (uart_rx_flag)
@@ -497,9 +482,6 @@ int main(void)
       
       // Delay for 100ms to allow the UART to stabilize
       HAL_Delay(100);
-
-      // Reset the UART interrupt flag
-      uart_rx_flag = false;
 	  }
 
   }
@@ -602,6 +584,8 @@ void Time_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom,
 	setTime[6] = Dec_To_BCD(year);
 
   // Send the array containing the time values to the RTC module through I2C interface at address 00h - 06h (size of value: 7 bytes)
+  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);	
   HAL_I2C_Mem_Write(DS3231_I2C, DS3231_ADDR, 0x00, 1, setTime, sizeof(setTime), 1000);
 
   // Delay for 1ms to allow the RTC module to process the data
@@ -619,6 +603,8 @@ void Time_Get (volatile TIME_DATA *time_get_data)
   uint8_t getTime[7];
 
   // Receive the time values from the RTC module through I2C interface, then store them into the blank array (size of value: 7 bytes)
+  // HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);  
   HAL_I2C_Mem_Read(DS3231_I2C, DS3231_ADDR, 0x00, 1, getTime, sizeof(getTime), 1000);
 
   // Delay for 1ms to allow the RTC module to process the data
@@ -728,12 +714,16 @@ void Time_Ctrl (uint8_t mode, uint8_t sec, uint8_t min, uint8_t hour, uint8_t do
   }
 
   // Send the array containing the RTC alarm mode setting to the RTC module through I2C interface at address 07h - 0Ah (size of value: 4 bytes)
+  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);	  
   HAL_I2C_Mem_Write(DS3231_I2C, DS3231_ADDR, 0x07, 1, ctrlTime, sizeof(ctrlTime), 1000);
 
   // Delay for 1ms to allow the RTC module to process the data
   HAL_Delay(1);
 
   // Send the alarm control mask bits to the RTC module through I2C interface at address 0Eh (size of value: 1 byte)
+  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);	  
   HAL_I2C_Mem_Write(DS3231_I2C, DS3231_ADDR, 0x0E, 1, &ctrlAlarm, sizeof(ctrlAlarm), 1000);
 
   // Delay for 1ms to allow the RTC module to process the data
@@ -792,32 +782,33 @@ void Time_Init (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow, uint8_t dom
 */
 void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_DY_DT_MODE dy_dt, bool on_off, uint8_t slot)
 {
-  // Encode the ON/OFF state of the alarm into the alarm package
-  // By masking the 7th bit of the second register
+  // Internal address of the alarm in the EEPROM module (0-8192, or 13 bits)
+  uint16_t address = slot * 4;
+
+  // Add an ON/OFF (1 bit) signal into the alarm package by using the MSB of the second register
   if (on_off)
   {
     sec += (1 << 7);
   }
 
-  // Encode the day of week or date of month mode into the alarm package
-  // By masking the 7th and 6th bits of the dow_dom variable
+  // Add a [day of week] or [date of month] (1 bit) signal into the alarm package by using bit 6 of the dow_dom register
   switch (dy_dt)
   {
     // Date of the month
     case DATE_OF_MONTH_MODE:
-      // Encoding: [Bit 7] = 1, [Bit 6] = 0
+      // Decoding: [Bit 7] = 1, [Bit 6] = 0
       dow_dom += (1 << 7);
       break;
 
     // Day of the week
     case DAY_OF_WEEK_MODE:
-      // Ending: [Bit 7] = 1, [Bit 6] = 1
+      // Decoding: [Bit 7] = 1, [Bit 6] = 1
       dow_dom += ((1 << 7) | (1 << 6));
       break;
 
     // Not used
     case NOT_USED_MODE:
-      // Encoding: [Bit 7] = 0, [Bit 6] = 0
+      // Decoding: [Bit 7] = 0, [Bit 6] = 0
       dow_dom += 0;
       break;
 
@@ -826,17 +817,29 @@ void Alarm_Set (uint8_t sec, uint8_t min, uint8_t hour, uint8_t dow_dom, ALARM_D
       break;
   }
 
-  // Store the encoded alarm values into the blank array
-  uint8_t setAlarm[4] = {sec, min, hour, dow_dom};
+  // A blank array (4 slots) to contain the alarm values
+  uint8_t setAlarm[4];
   
-  // Calculate the internal address of the alarm in the EEPROM module (0-8192, or 13 bits)
-  // By multiplying the slot number by 4 (size of each alarm: 4 bytes)
-  uint16_t address = slot * 4;
+  // Store the alarm values into the blank array
+  setAlarm[0] = sec;
+  setAlarm[1] = min;
+  setAlarm[2] = hour;
+  setAlarm[3] = dow_dom;
 
-  // Send the array containing the alarm values to the EEPROM module through I2C interface
+  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
   HAL_I2C_Mem_Write(EEPROM_I2C, EEPROM_ADDR, address, 2, setAlarm, sizeof(setAlarm), 1000);
 
   // Delay to allow the EEPROM module to complete the Page Write operation
+  //    Neccesary delay cycle calculation:
+  //        1 [Start Condition by Host] +
+  //     +  8 [Device Address Byte]     + 1 [ACK from Client]      +
+  //     +  8 [1st Word Address Byte]   + 1 [ACK from Client]      +
+  //     +  8 [2nd Word Address Byte]   + 1 [ACK from Client]      +
+  //     + {8 [1st Data Word]           + 1 [ACK from Client]} * 4 + 
+  //     +  1 [Stop Condition by Host] 
+  //     =  65 cycles  
+  //    Neccesary delay time = 65 cycles / 400 kHz = 162.5 us = ~ 0.17 ms
   HAL_Delay(5);
 }
 
@@ -854,10 +857,24 @@ void Alarm_Get (uint8_t slot, volatile ALARM_DATA *alarm_get_data)
   // A blank array (4 slots) to contain the alarm values received from the EEPROM module
   uint8_t getAlarm[4];
 
-  // Receive the alarm values from the EEPROM module through I2C interface, then store them into the blank array (size of value: 4 bytes)
+  // HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
   HAL_I2C_Mem_Read(EEPROM_I2C, EEPROM_ADDR, address, 2, getAlarm, sizeof(getAlarm), 1000);
 
   // Delay to allow the EEPROM module to complete the Sequential Read operation
+  //    Neccesary delay cycle calculation:
+  //     {Dummy Write}
+  //        1 [Start Condition by Host] +
+  //     +  8 [Device Address Byte]     + 1 [ACK from Client]      +
+  //     +  8 [1st Word Address Byte]   + 1 [ACK from Client]      +
+  //     +  8 [2nd Word Address Byte]   + 1 [ACK from Client]      +
+  //     {Sequential Read}
+  //     +  1 [Start Condition by Host] +
+  //     +  8 [Device Address Byte]     + 1 [ACK from Client]      +
+  //     + {8 [1st Data Word]           + 1 [ACK from Client]} * 4 + 
+  //     +  1 [Stop Condition by Host] 
+  //     =  75 cycles
+  //    Neccesary delay time = 75 cycles / 400 kHz = 187.5 us = ~ 0.19 ms
   HAL_Delay(1);
 
   // Store the alarm values into the alarm variable
@@ -901,10 +918,20 @@ void Alarm_Clear (uint8_t slot)
   // A blank array (4 slots) to contain the alarm values to be cleared
   uint8_t clearAlarm[4] = {0, 0, 0, 0};
 
-  // Write the blank array to the EEPROM module through I2C interface
+  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
   HAL_I2C_Mem_Write(EEPROM_I2C, EEPROM_ADDR, address, 2, clearAlarm, sizeof(clearAlarm), 1000);
 
   // Delay to allow the EEPROM module to complete the Page Write operation
+  //    Neccesary delay cycle calculation:
+  //        1 [Start Condition by Host] +
+  //     +  8 [Device Address Byte]     + 1 [ACK from Client]      +
+  //     +  8 [1st Word Address Byte]   + 1 [ACK from Client]      +
+  //     +  8 [2nd Word Address Byte]   + 1 [ACK from Client]      +
+  //     + {8 [1st Data Word]           + 1 [ACK from Client]} * 4 + 
+  //     +  1 [Stop Condition by Host] 
+  //     =  65 cycles  
+  //    Neccesary delay time = 65 cycles / 400 kHz = 162.5 us = ~ 0.17 ms
   HAL_Delay(5);
 }
 
@@ -914,10 +941,20 @@ void Alarm_Clear (uint8_t slot)
  */
 void Alarm_Slot_Pointer_Set (void)
 {
-  // Write the alarm slot pointer value to the EEPROM module through I2C interface
+  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
   HAL_I2C_Mem_Write(EEPROM_I2C, EEPROM_ADDR, ALARM_SLOT_PTR_ADDR, 2, &alarm_slot_ptr, sizeof(alarm_slot_ptr), 1000);
 
   // Delay to allow the EEPROM module to complete the Page Write operation
+  //    Neccesary delay cycle calculation:
+  //        1 [Start Condition by Host] +
+  //     +  8 [Device Address Byte]     + 1 [ACK from Client]  +
+  //     +  8 [1st Word Address Byte]   + 1 [ACK from Client]  +
+  //     +  8 [2nd Word Address Byte]   + 1 [ACK from Client]  +
+  //     +  8 [1st Data Word]           + 1 [ACK from Client]} + 
+  //     +  1 [Stop Condition by Host] 
+  //     =  38 cycles  
+  //    Neccesary delay time = 65 cycles / 400 kHz = 95 us = ~ 0.01 ms
   HAL_Delay(5);
 }
 
@@ -927,10 +964,24 @@ void Alarm_Slot_Pointer_Set (void)
  */
 void Alarm_Slot_Pointer_Get (void)
 {
-  // Read the alarm slot pointer from the EEPROM module through I2C interface
+  // HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+  //    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
   HAL_I2C_Mem_Read(EEPROM_I2C, EEPROM_ADDR, ALARM_SLOT_PTR_ADDR, 2, &alarm_slot_ptr, sizeof(alarm_slot_ptr), 1000);
 
-  // Delay to allow the EEPROM module to complete the Sequential Read operation
+  // Delay to allow the EEPROM module to complete the Random Read operation
+  //    Neccesary delay cycle calculation:
+  //     {Dummy Write}
+  //        1 [Start Condition by Host] +
+  //     +  8 [Device Address Byte]     + 1 [ACK from Client]  +
+  //     +  8 [1st Word Address Byte]   + 1 [ACK from Client]  +
+  //     +  8 [2nd Word Address Byte]   + 1 [ACK from Client]  +
+  //     {Random Read}
+  //     +  1 [Start Condition by Host] +
+  //     +  8 [Device Address Byte]     + 1 [ACK from Client]  +
+  //     +  8 [1st Data Word]           + 1 [ACK from Client]} + 
+  //     +  1 [Stop Condition by Host] 
+  //     =  48 cycles
+  //    Neccesary delay time = 75 cycles / 400 kHz = 0.12 ms
   HAL_Delay(1);
 }
 
@@ -942,7 +993,6 @@ void Alarm_Slot_Pointer_Get (void)
 */
 void Alarm_Check (volatile TIME_DATA *time_get_data)
 {
-  // A blank array to contain the alarm values retrieved from the EEPROM module
   volatile ALARM_DATA alarmCheckData = {0};
 
   // Compare the current time with all available alarms in the EEPROM module
@@ -996,7 +1046,7 @@ void Alarm_Check (volatile TIME_DATA *time_get_data)
       continue;
     }
 
-    // Debugging: If all the above checks pass, the alarm is activated
+    // If all the above checks pass, the alarm is activated
     debug_alarm_activate_ctr++;
 
     // Stop checking time matching
@@ -1024,7 +1074,6 @@ void Button_Debounce(BUTTON_DATA *button)
     // Initial state: Button is released (HIGH)
     case BUTTON_RELEASED:
 
-      // Reset all flags and state variables
       button->press_flag = false;
       button->hold_flag = false;
       button->latch = false;
@@ -1116,7 +1165,7 @@ void Button_Handle (void)
   Button_Debounce(&button3);
   Button_Debounce(&button4);
 
-  // Check which button is pressed or held and assign it to the button pointer
+  
   if      (button0.press_flag || button0.hold_flag) button = &button0;
   else if (button1.press_flag || button1.hold_flag) button = &button1;
   else if (button2.press_flag || button2.hold_flag) button = &button2;
@@ -1124,7 +1173,7 @@ void Button_Handle (void)
   else if (button4.press_flag || button4.hold_flag) button = &button4;
   
 
-  // Initialize the start tick for button hold detection
+  // Debugging: Initialize the start tick for button hold detection
   uint32_t startTick = 0;
   
   // Debugging: Check if the button is pressed or held by increment its counter in activation
