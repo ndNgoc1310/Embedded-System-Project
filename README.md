@@ -110,6 +110,5 @@ ChronoSync is a compact, low-power embedded digital clock system built on the ST
 ├── 1. Documents/           # Final report, figures, and references
 ├── 2. Design/              # Schematic, PCB layout files (Altium)
 ├── 3. Firmware/            # STM32 firmware (CubeIDE project)
-├── 99.demo/ code_e_ink/    # Demo code for E-Ink display
 ├── .vscode/                # VSCode workspace settings
 ├── README.md               # Project overview and documentation
