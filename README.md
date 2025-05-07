@@ -107,10 +107,10 @@ ChronoSync is a compact, low-power embedded digital clock system built on the ST
 
 ```bash
 .
-├── 1. Documents/           # Final report, figures, and references
-├── 2. Hardware Design/     # Schematic, PCB layout files (Altium)
-├── 3. Firmware Design/     # STM32 firmware (CubeIDE project)
-├── 3. Mobile Application Design/
-├── 5. Report
-├── .vscode/                # VSCode workspace settings
-├── README.md               # Project overview and documentation
+├── 1. Documents/                 # Figures, planning documents, technical references
+├── 2. Hardware Design/           # Schematic and PCB layout files (Altium Designer project)
+├── 3. Firmware Design/           # STM32CubeIDE project for embedded firmware
+├── 4. Mobile Application Design/ # MIT App Inventor source files and exported .aia/.apk packages
+├── 5. Report                     # # Final formatted report for submission, figures, and exported PDF
+├── .vscode/                      # VSCode workspace settings
+├── README.md                     # Project overview and documentation
